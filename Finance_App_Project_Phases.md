@@ -127,7 +127,7 @@
 
 ### Room Database Schema
 
-- [ ] Create `data/db/Transaction.kt` (Entity)
+- [x] Create `data/db/Transaction.kt` (Entity)
   ```kotlin
   @Entity
   data class Transaction(
@@ -142,40 +142,40 @@
     val notes: String?
   )
   ```
-- [ ] Create `data/db/Account.kt` (Entity)
+- [x] Create `data/db/Account.kt` (Entity)
   - Fields: id, name, type (cash/bank/credit), balance (Long), currency, createdAt, isActive
-- [ ] Create `data/db/Transfer.kt` (Entity)
+- [x] Create `data/db/Transfer.kt` (Entity)
   - Tracks transfers between accounts (two Transaction records linked by transferId)
   - Fields: id, fromAccountId, toAccountId, amount (Long), timestamp, notes
-- [ ] Create `data/db/Goal.kt` (Entity)
+- [x] Create `data/db/Goal.kt` (Entity)
   - Fields: id, name, targetAmount (Long), deadline, currentAmount (Long), linkedAccountId?, category, notes
-- [ ] Create `data/db/Debt.kt` (Entity)
+- [x] Create `data/db/Debt.kt` (Entity)
   - Fields: id, type (lent/borrowed), counterparty, amount (Long), createdAt, settledAt?, notes
   - **Never deleted** — only marked settled
-- [ ] Create `data/db/RepeatExpense.kt` (Entity)
+- [x] Create `data/db/RepeatExpense.kt` (Entity)
   - Fields: id, description, amount (Long), frequency (DAILY/WEEKLY/MONTHLY/YEARLY), lastGenerated, category, isActive
-- [ ] Create `data/db/Category.kt` (Entity)
+- [x] Create `data/db/Category.kt` (Entity)
   - Predefined + user-created categories
   - Fields: id, name, icon, color, isCustom
-- [ ] Create `data/db/AppDatabase.kt`
+- [x] Create `data/db/AppDatabase.kt`
   - Room database class with all DAOs
   - Version 1, no migrations needed yet
 
 ### DAO Interfaces
 
-- [ ] Create `data/db/TransactionDao.kt`
+- [x] Create `data/db/TransactionDao.kt`
   - Insert, update, delete transaction
   - Query by account, date range, category
   - Query for statistics (sum, count, average)
-- [ ] Create `data/db/AccountDao.kt`
-- [ ] Create `data/db/GoalDao.kt`
-- [ ] Create `data/db/DebtDao.kt`
-- [ ] Create `data/db/RepeatExpenseDao.kt`
-- [ ] Create `data/db/CategoryDao.kt`
+- [x] Create `data/db/AccountDao.kt`
+- [x] Create `data/db/GoalDao.kt`
+- [x] Create `data/db/DebtDao.kt`
+- [x] Create `data/db/RepeatExpenseDao.kt`
+- [x] Create `data/db/CategoryDao.kt`
 
 ### Repositories
 
-- [ ] Create `data/repository/TransactionRepository.kt`
+- [x] Create `data/repository/TransactionRepository.kt`
   - `fun getAllTransactions(): Flow<List<Transaction>>`
   - `suspend fun addTransaction(transaction: Transaction)`
   - `suspend fun updateTransaction(transaction: Transaction)`
@@ -183,68 +183,68 @@
   - `fun getTransactionsByDateRange(start: Long, end: Long): Flow<List<Transaction>>`
   - `fun getTransactionsByCategory(category: String): Flow<List<Transaction>>`
   - All monetary logic stored as Long, no rounding
-- [ ] Create `data/repository/AccountRepository.kt`
+- [x] Create `data/repository/AccountRepository.kt`
   - CRUD operations
   - `fun getAccountBalance(accountId: String): Flow<Long>`
   - Cascade or block logic for deletion (document in ADR)
-- [ ] Create `data/repository/GoalRepository.kt`
-- [ ] Create `data/repository/DebtRepository.kt`
-- [ ] Create `data/repository/TransferRepository.kt`
+- [x] Create `data/repository/GoalRepository.kt`
+- [x] Create `data/repository/DebtRepository.kt`
+- [x] Create `data/repository/TransferRepository.kt`
   - `suspend fun createTransfer(fromAccountId, toAccountId, amount)` → creates TWO linked Transaction records
   - Ensures consistency: debit + credit always paired
-- [ ] Create `data/repository/RepeatExpenseRepository.kt`
+- [x] Create `data/repository/RepeatExpenseRepository.kt`
   - `fun generateNextOccurrence(id: String): Flow<Transaction?>` → lazy generation
-- [ ] Create `data/repository/CategoryRepository.kt`
+- [x] Create `data/repository/CategoryRepository.kt`
 
 ### DataStore Preferences
 
-- [ ] Create `data/datastore/PreferenceKeys.kt`
+- [x] Create `data/datastore/PreferenceKeys.kt`
   - Theme preference (light/dark)
   - Font scale multiplier
   - Currency preference
   - Language preference
   - App opening count (for analytics/reviews, if needed)
-- [ ] Create `data/datastore/PreferencesRepository.kt`
+- [x] Create `data/datastore/PreferencesRepository.kt`
   - Getter/setter functions for all preferences
 
 ### Data Model Classes
 
-- [ ] Create `data/model/TransactionDisplayItem.kt`
+- [x] Create `data/model/TransactionDisplayItem.kt`
   - Used in UI layer (never expose Entity directly to UI)
   - Fields: id, description, amountFormatted (String), date (String), category, tags
-- [ ] Create display models for all other entities
+- [x] Create display models for all other entities
   - Separation between database entities and UI models
 
 ### Dependency Injection Setup
 
-- [ ] Create `di/DatabaseModule.kt` — provides AppDatabase and all DAOs
-- [ ] Create `di/RepositoryModule.kt` — provides all repository instances
-- [ ] Create `di/DataStoreModule.kt` — provides DataStore instance
+- [x] Create `di/DatabaseModule.kt` — provides AppDatabase and all DAOs
+- [x] Create `di/RepositoryModule.kt` — provides all repository instances
+- [x] Create `di/DataStoreModule.kt` — provides DataStore instance
 
 ### Testing Setup
 
-- [ ] Create sample Room database test: insert and retrieve transaction
-- [ ] Create TransactionRepository test: verify monetary values stored as Long
-- [ ] Create TransferRepository test: verify two-transaction linking
+- [x] Create sample Room database test: insert and retrieve transaction
+- [x] Create TransactionRepository test: verify monetary values stored as Long
+- [x] Create TransferRepository test: verify two-transaction linking
 
 ### Governance Update
 
-- [ ] Update `SCHEMA.md` with complete ER diagram and invariants
-- [ ] Update `UTILITIES.md` with currency formatter signature
-- [ ] Create `docs/decisions/ADR-001-Monetary-Storage-Long.md`
+- [x] Update `SCHEMA.md` with complete ER diagram and invariants
+- [x] Update `UTILITIES.md` with currency formatter signature
+- [x] Create `docs/decisions/ADR-001-Monetary-Storage-Long.md`
   - Decision: All monetary values stored as Long
   - Reasoning: Avoid floating-point precision errors in financial calculations
   - Consequences: Every monetary display requires formatter, calculations never lose precision
-- [ ] Create `docs/decisions/ADR-002-Transfers-As-Dual-Records.md`
+- [x] Create `docs/decisions/ADR-002-Transfers-As-Dual-Records.md`
   - Decision: Transfers stored as two linked Transaction records, not one
   - Reasoning: Maintains account-centric transaction log, simplifies queries
   - Consequences: Must always create/delete transfers atomically
-- [ ] Create `docs/decisions/ADR-003-Repeat-Expenses-Lazy-Generation.md`
+- [x] Create `docs/decisions/ADR-003-Repeat-Expenses-Lazy-Generation.md`
   - Decision: Repeat expenses generated one at a time on demand, not eagerly
   - Reasoning: Avoids unbounded expense tables, scales to any frequency
   - Consequences: UI must request next occurrence explicitly
-- [ ] Update `CHANGELOG_INTERNAL.md`: "Phase 2: Core database schema and repositories complete."
-- [ ] Commit to git: "Phase 2 complete: Database schema and repositories"
+- [x] Update `CHANGELOG_INTERNAL.md`: "Phase 2: Core database schema and repositories complete."
+- [x] Commit to git: "Phase 2 complete: Database schema and repositories"
 
 ---
 

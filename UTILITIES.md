@@ -15,6 +15,16 @@ This file serves as the index for all shared utilities, formatters, extensions, 
   - `formatDateTime(timestampMs: Long, pattern: String = "dd MMM yyyy, hh:mm a"): String`
   - `formatShortDate(timestampMs: Long): String` (dd/MM/yyyy)
   - *Location*: `util/Formatters.kt`
+- **Database Transaction Runner** (`com.rushi.mitavyay.data.db.DatabaseTransactionRunner`):
+  - `withTransaction<R>(block: suspend () -> R): R`: Executes operations atomically inside a database transaction.
+  - *Location*: `data/db/DatabaseTransactionRunner.kt`
+- **Preferences & DataStore** (`com.rushi.mitavyay.data.datastore.PreferencesRepository`):
+  - Theme, font scale, currency, language, and app opening count persistence.
+  - *Location*: `data/datastore/PreferencesRepository.kt` & `PreferenceKeys.kt`
+- **UI Display Model Mappers** (`com.rushi.mitavyay.data.model.*`):
+  - `toDisplayItem()` extension functions for `Transaction`, `Account`, `Goal`, `Debt`, `RepeatExpense`, and `Category`.
+  - Ensures entities are never exposed directly to UI components.
+  - *Location*: `data/model/*DisplayItem.kt`
 - **Currency Conversion Utilities**: Helper functions for currency processing (if applicable, entirely offline). *Status: Pending*
 - **Transaction Categorization Logic**: Centralized logic for determining default or custom categories. *Status: Pending*
 

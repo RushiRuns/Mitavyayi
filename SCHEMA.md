@@ -1,86 +1,107 @@
-# Database Schema
+# Database Schema & Data Model
 
-This document details the complete data model for the Finance App in plain language.
+This document details the complete data model, Room database specifications, constraints, and invariants for Mitavyay in plain language.
 
-## Entities (Tables)
+---
 
-### 1. Transaction
-- `id`: String (Primary Key)
-- `accountId`: String (Foreign Key to Account)
-- `amount`: Long (Smallest currency unit, e.g., paise/cents)
-- `description`: String
-- `timestamp`: Long (Unix milliseconds)
-- `category`: String
-- `tags`: String (JSON array)
-- `transferId`: String? (Optional, links two transactions forming a transfer)
-- `notes`: String?
+## Room Database Specifications
 
-### 2. Account
-- `id`: String (Primary Key)
-- `name`: String
-- `type`: String (cash/bank/credit)
-- `balance`: Long (Smallest currency unit)
-- `currency`: String
-- `createdAt`: Long (Unix milliseconds)
-- `isActive`: Boolean
+- **Database Class**: `com.rushi.mitavyay.data.db.AppDatabase`
+- **Database File**: `mitavyay.db`
+- **Schema Version**: 1 (Initial Release)
+- **Destructive Migrations**: **BANNED** (`fallbackToDestructiveMigration()` is forbidden by `ARCHITECTURE.md`).
 
-### 3. Transfer
-- Tracks transfers between accounts. Represented as two linked `Transaction` records sharing the same `transferId`.
-- `id`: String (Primary Key)
-- `fromAccountId`: String
-- `toAccountId`: String
-- `amount`: Long (Smallest currency unit)
-- `timestamp`: Long (Unix milliseconds)
-- `notes`: String?
+---
 
-### 4. Goal
-- `id`: String (Primary Key)
-- `name`: String
-- `targetAmount`: Long (Smallest currency unit)
-- `deadline`: Long (Unix milliseconds)
-- `currentAmount`: Long (Smallest currency unit)
-- `linkedAccountId`: String? (Optional Foreign Key to Account)
-- `category`: String
-- `notes`: String?
+## Entities & Tables
 
-### 5. Debt
-- `id`: String (Primary Key)
-- `type`: String (lent/borrowed)
-- `counterparty`: String
-- `amount`: Long (Smallest currency unit)
-- `createdAt`: Long (Unix milliseconds)
-- `settledAt`: Long? (Unix milliseconds, null if active)
-- `notes`: String?
+### 1. `transactions` (`Transaction.kt`)
+Represents single ledger transactions (both regular expenses/incomes and transfer legs).
+- `id`: `String` (Primary Key, UUID)
+- `accountId`: `String` (Foreign reference to `accounts.id`, Indexed)
+- `amount`: `Long` (Smallest currency unit, e.g. paise. Negative = Debit/Expense, Positive = Credit/Income)
+- `description`: `String`
+- `timestamp`: `Long` (Unix milliseconds, Indexed)
+- `category`: `String` (Indexed)
+- `tags`: `String` (JSON array string format, e.g. `["food", "dining"]`)
+- `transferId`: `String?` (Indexed, non-null if this transaction is part of an inter-account transfer)
+- `notes`: `String?`
 
-### 6. RepeatExpense
-- `id`: String (Primary Key)
-- `description`: String
-- `amount`: Long (Smallest currency unit)
-- `frequency`: String (DAILY/WEEKLY/MONTHLY/YEARLY)
-- `lastGenerated`: Long (Unix milliseconds)
-- `category`: String
-- `isActive`: Boolean
+### 2. `accounts` (`Account.kt`)
+Represents user financial accounts (cash, bank accounts, credit cards).
+- `id`: `String` (Primary Key, UUID)
+- `name`: `String`
+- `type`: `String` (`cash`, `bank`, `credit`)
+- `balance`: `Long` (Current balance in smallest currency unit)
+- `currency`: `String` (Default `INR`)
+- `createdAt`: `Long` (Unix milliseconds)
+- `isActive`: `Boolean` (True if active, false if archived)
 
-### 7. Category
-- `id`: String (Primary Key)
-- `name`: String
-- `icon`: String
-- `color`: String
-- `isCustom`: Boolean
+### 3. `transfers` (`Transfer.kt`)
+Metadata tracking transfer movements between accounts.
+- `id`: `String` (Primary Key, UUID, identical to `transactions.transferId`)
+- `fromAccountId`: `String` (Source account)
+- `toAccountId`: `String` (Destination account)
+- `amount`: `Long` (Transfer magnitude in smallest currency unit)
+- `timestamp`: `Long` (Unix milliseconds)
+- `notes`: `String?`
 
-### 8. Label
-- `id`: String (Primary Key)
-- `name`: String
-- `color`: String
+### 4. `goals` (`Goal.kt`)
+Represents user savings goals and financial targets.
+- `id`: `String` (Primary Key, UUID)
+- `name`: `String`
+- `targetAmount`: `Long` (Target amount in paise)
+- `deadline`: `Long` (Unix milliseconds)
+- `currentAmount`: `Long` (Current saved amount in paise)
+- `linkedAccountId`: `String?` (Optional foreign key to `accounts.id`)
+- `category`: `String`
+- `notes`: `String?`
 
-## Relationships & Constraints
-- A `Transaction` always belongs to one `Account`.
-- A `Transfer` is represented by exactly two `Transaction` records (one debit from `fromAccountId`, one credit to `toAccountId`).
-- `Goal` can optionally be linked to a specific `Account`.
+### 5. `debts` (`Debt.kt`)
+Tracks money lent to others or borrowed from others.
+- `id`: `String` (Primary Key, UUID)
+- `type`: `String` (`lent` or `borrowed`)
+- `counterparty`: `String` (Person or entity)
+- `amount`: `Long` (Magnitude in smallest currency unit)
+- `createdAt`: `Long` (Unix milliseconds)
+- `settledAt`: `Long?` (Null while active; timestamp when settled)
+- `notes`: `String?`
+- **Rule**: Never deleted from the database—only marked settled.
 
-## Invariants (Must Never Break)
-1. **Offline Only**: Data is strictly local. No cloud synchronization, no backend tables.
-2. **Monetary Precision**: All monetary values are stored as `Long` in the smallest denomination (no floating-point types).
-3. **Immutability of Debt**: Debt records are never deleted; they are only marked as settled by updating `settledAt`.
-4. **Double-Entry Transfers**: Deleting or creating a transfer must atomically affect both associated `Transaction` records.
-5. **No Destructive Migrations**: Room migrations must be meticulously written (`fallbackToDestructiveMigration` is banned).
+### 6. `repeat_expenses` (`RepeatExpense.kt`)
+Configuration for recurring scheduled expenses.
+- `id`: `String` (Primary Key, UUID)
+- `description`: `String`
+- `amount`: `Long` (Amount in smallest currency unit)
+- `frequency`: `String` (`DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`)
+- `lastGenerated`: `Long` (Unix milliseconds of the most recently generated occurrence)
+- `category`: `String`
+- `isActive`: `Boolean`
+
+### 7. `categories` (`Category.kt`)
+Predefined and custom user-created transaction categories.
+- `id`: `String` (Primary Key)
+- `name`: `String`
+- `icon`: `String` (Icon identifier token)
+- `color`: `String` (Hex color token)
+- `isCustom`: `Boolean` (False for default seeded categories, true for user-defined)
+
+---
+
+## Relationships & Invariants
+
+1. **Monetary Precision Rule**:
+   - Every financial value (`amount`, `balance`, `targetAmount`, etc.) is strictly stored as `Long` in paise/cents.
+   - Floats and Doubles are prohibited in entities, repositories, and calculation methods.
+2. **Atomic Dual-Entry Transfers**:
+   - A transfer consists of two linked `Transaction` records: one debit (`-amount`) on the source account, and one credit (`+amount`) on the target account, both sharing the same `transferId`.
+   - Creation and deletion of transfers are executed atomically in a database transaction via `TransferRepository`.
+3. **Debt Immutability**:
+   - `DebtDao` intentionally has no `@Delete` method.
+   - Debts are closed exclusively by updating `settledAt` with the resolution timestamp.
+4. **Lazy Generation of Recurring Expenses**:
+   - Recurring expenses are evaluated on demand via `RepeatExpenseRepository.generateNextOccurrence()`.
+   - Occurrences are generated only after the current time meets or passes the next due date.
+5. **Composables Isolation**:
+   - Room Entities are NEVER directly used as UI state.
+   - UI layers observe decoupled display models (`data/model/*DisplayItem.kt`).
