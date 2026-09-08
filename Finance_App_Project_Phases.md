@@ -38,8 +38,8 @@
 
 ### Project Setup in Antigravity
 
-- [ ] Initialize empty Android project with Kotlin + Compose + Hilt
-- [ ] Create folder structure per `ARCHITECTURE.md`:
+- [x] Initialize empty Android project with Kotlin + Compose + Hilt
+- [x] Create folder structure per `ARCHITECTURE.md`:
   ```
   app/
   ├── data/
@@ -56,11 +56,11 @@
   ├── util/
   └── di/
   ```
-- [ ] Set up build.gradle with locked dependency versions
+- [x] Set up build.gradle with locked dependency versions
   - Record each dependency in `DEPENDENCIES.md`
   - Pin versions — no floating versions
-- [ ] Create `docs/decisions/` folder for ADRs
-- [ ] Set up git with initial commit (checkpoint before ANY code)
+- [x] Create `docs/decisions/` folder for ADRs
+- [x] Set up git with initial commit (checkpoint before ANY code)
 
 ---
 
@@ -70,23 +70,23 @@
 
 ### Design Tokens
 
-- [ ] Create `ui/theme/Color.kt`
+- [x] Create `ui/theme/Color.kt`
   - Light theme: primary, secondary, tertiary, surface, background, error, success, warning
   - Dark theme: inverse mappings
   - Ensure WCAG AA contrast ratios
   - Document the chosen color palette rationale in `docs/decisions/ADR-001-Color-Palette.md`
-- [ ] Create `ui/theme/Type.kt`
+- [x] Create `ui/theme/Type.kt`
   - Font family: choose (e.g., Roboto, Inter, or system default)
   - Font sizes: xs (12sp), sm (13sp), body (15sp), lg (18sp), xl (20sp), title (24sp)
   - Line heights and letter spacing
   - Styles: bodySmall, bodyMedium, titleMedium, labelMedium, etc.
-- [ ] Create `ui/theme/Shape.kt`
+- [x] Create `ui/theme/Shape.kt`
   - Border radius: none (0dp), small (4dp), medium (8dp), large (12dp), full (9999dp)
   - Consistent shape usage per component type
-- [ ] Create `ui/theme/Spacing.kt`
+- [x] Create `ui/theme/Spacing.kt`
   - Spacing scale: xs (4dp), sm (8dp), md (16dp), lg (24dp), xl (32dp)
   - Custom `Spacing` class with computed values for consistency
-- [ ] Create `ui/theme/Theme.kt`
+- [x] Create `ui/theme/Theme.kt`
   - Root MaterialTheme composable
   - Light/dark mode switching via DataStore preference
   - Font scale adjustment (for v4 feature: "font size increase")
