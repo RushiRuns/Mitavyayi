@@ -6,20 +6,51 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 
 ## Utilities & Formatters
 
-- **Monetary Formatter**: Converts `Long` values (smallest currency unit) into readable `String` format (e.g., ₹ display). *Status: Pending*
-- **Date/Time Formatter**: Converts `Long` (Unix timestamp) into human-readable date/time strings. *Status: Pending*
+- **Monetary Formatter** (`com.rushi.mitavyay.util.CurrencyFormatter`):
+  - `format(amountPaise: Long, currencySymbol: String = "₹"): String`: Formats monetary amounts using Indian numbering system (Lakhs & Crores) into display strings without floating point math.
+  - `parseToPaise(input: String): Long`: Parses user numeric input into smallest currency unit (paise: Long) without floating point math.
+  - *Location*: `util/Formatters.kt`
+- **Date/Time Formatter** (`com.rushi.mitavyay.util.DateTimeFormatter`):
+  - `formatDate(timestampMs: Long, pattern: String = "dd MMM yyyy"): String`
+  - `formatDateTime(timestampMs: Long, pattern: String = "dd MMM yyyy, hh:mm a"): String`
+  - `formatShortDate(timestampMs: Long): String` (dd/MM/yyyy)
+  - *Location*: `util/Formatters.kt`
 - **Currency Conversion Utilities**: Helper functions for currency processing (if applicable, entirely offline). *Status: Pending*
 - **Transaction Categorization Logic**: Centralized logic for determining default or custom categories. *Status: Pending*
 
-## Reusable UI Components
-*(To be populated as components are created in `ui/components/`)*
-- `TransactionCard`: *Pending*
-- `AccountCard`: *Pending*
-- `GoalCard`: *Pending*
-- `TextField` wrappers: *Pending*
-- `AlertDialog` wrappers: *Pending*
+## Reusable UI Components (`com.rushi.mitavyay.ui.components`)
+
+### Buttons (`ui/components/Buttons.kt`)
+- `PrimaryButton`: Main CTA button with primary brand color, loading spinner, and theme shape.
+- `SecondaryButton`: Outlined button for secondary actions.
+- `TertiaryButton`: Text button for low-emphasis actions.
+- `DangerButton`: Destructive button with error color for deletions and destructive confirmations.
+
+### Cards (`ui/components/Cards.kt`)
+- `TransactionCard`: Card displaying title, category, formatted amount (green for income, red for expenses), and formatted date.
+- `AccountCard`: Card displaying account name, type chip (Cash/Bank/Credit), formatted balance, and active status.
+- `GoalCard`: Card displaying goal progress bar, saved vs target amount, deadline, and percentage.
+
+### Inputs & Date Selection (`ui/components/Inputs.kt`, `CurrencyInput.kt`, `DatePicker.kt`)
+- `AppTextField`: Outlined text field wrapper with theme token colors, shapes, and error state validation feedback.
+- `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, and direct `Long` paise conversion.
+- `DatePickerField` & `AppDatePickerDialog`: Date selection field launching a Material 3 DatePickerDialog and emitting Unix timestamp ms (`Long`).
+
+### Dialogs (`ui/components/Dialogs.kt`)
+- `AppAlertDialog`: Standardized confirmation and alert dialog with theme typography, colors, and confirm/dismiss actions.
+
+### Layout & Spacers (`ui/components/Spacing.kt`)
+- `VerticalSpacer(height: Dp)` / `HorizontalSpacer(width: Dp)`
+- Pre-bound spacers: `SpacerXs`, `SpacerSm`, `SpacerMd`, `SpacerLg`, `SpacerXl`
+- Horizontal pre-bound spacers: `HSpacerXs`, `HSpacerSm`, `HSpacerMd`, `HSpacerLg`, `HSpacerXl`
+
+### States (`ui/components/States.kt`)
+- `LoadingState`: Centered spinner with theme primary color and message.
+- `ErrorState`: Centered error icon, message, and retry button.
+- `EmptyState`: Centered empty placeholder icon, title, description, and optional action CTA.
 
 ## DO NOT CREATE
-- Do not create a second currency formatter. Use the centralized one.
-- Do not create ad-hoc date formatting in UI components. Use the central Date/Time Formatter.
-- Do not create custom spacer components per screen. Use theme spacing scales.
+- Do not create a second currency formatter. Use `CurrencyFormatter.format`.
+- Do not create ad-hoc date formatting in UI components. Use `DateTimeFormatter.formatDate`.
+- Do not create custom spacer components per screen. Use `ui/components/Spacing.kt` or `MaterialTheme.spacing`.
+- Do not create duplicate cards or buttons inside screen folders.

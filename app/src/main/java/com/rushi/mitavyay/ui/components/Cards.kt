@@ -1,0 +1,309 @@
+package com.rushi.mitavyay.ui.components
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import com.rushi.mitavyay.R
+import com.rushi.mitavyay.ui.theme.appShapes
+import com.rushi.mitavyay.ui.theme.extendedColorScheme
+import com.rushi.mitavyay.ui.theme.spacing
+import com.rushi.mitavyay.util.CurrencyFormatter
+import com.rushi.mitavyay.util.DateTimeFormatter
+
+/**
+ * Card representing a single financial transaction.
+ * Uses theme tokens and semantic income/expense colors.
+ */
+@Composable
+fun TransactionCard(
+    title: String,
+    category: String,
+    amountPaise: Long,
+    timestampMs: Long,
+    modifier: Modifier = Modifier,
+    accountName: String? = null,
+    onClick: () -> Unit = {}
+) {
+    val isCredit = amountPaise >= 0
+    val amountColor = if (isCredit) {
+        MaterialTheme.extendedColorScheme.success
+    } else {
+        MaterialTheme.colorScheme.error
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.appShapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = MaterialTheme.spacing.xs
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.cardContent),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                SpacerXs()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)
+                ) {
+                    Text(
+                        text = category,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (accountName != null) {
+                        Text(
+                            text = "• $accountName",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                SpacerXs()
+                Text(
+                    text = DateTimeFormatter.formatDate(timestampMs),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+
+            Text(
+                text = CurrencyFormatter.format(amountPaise),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = amountColor
+            )
+        }
+    }
+}
+
+/**
+ * Card representing a user financial account (e.g., Bank, Cash, Credit).
+ */
+@Composable
+fun AccountCard(
+    accountName: String,
+    accountType: String,
+    balancePaise: Long,
+    modifier: Modifier = Modifier,
+    isActive: Boolean = true,
+    onClick: () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.appShapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = MaterialTheme.spacing.xs
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.cardContent)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = accountName,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                SuggestionChip(
+                    onClick = {},
+                    label = {
+                        Text(
+                            text = accountType,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    },
+                    shape = MaterialTheme.appShapes.small,
+                    colors = SuggestionChipDefaults.suggestionChipColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    border = null
+                )
+            }
+
+            SpacerSm()
+
+            Text(
+                text = stringResource(
+                    R.string.account_balance,
+                    CurrencyFormatter.format(balancePaise)
+                ),
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                color = if (balancePaise >= 0) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.error
+                }
+            )
+
+            SpacerXs()
+
+            Text(
+                text = stringResource(
+                    if (isActive) R.string.account_status_active else R.string.account_status_inactive
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                color = if (isActive) {
+                    MaterialTheme.extendedColorScheme.success
+                } else {
+                    MaterialTheme.colorScheme.outline
+                }
+            )
+        }
+    }
+}
+
+/**
+ * Card representing a savings or financial goal with progress tracking.
+ */
+@Composable
+fun GoalCard(
+    goalName: String,
+    category: String,
+    currentAmountPaise: Long,
+    targetAmountPaise: Long,
+    deadlineMs: Long,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    val progress = if (targetAmountPaise > 0) {
+        (currentAmountPaise.toFloat() / targetAmountPaise.toFloat()).coerceIn(0f, 1f)
+    } else 0f
+
+    val progressColor = if (progress >= 1.0f) {
+        MaterialTheme.extendedColorScheme.success
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.appShapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = MaterialTheme.spacing.xs
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.cardContent)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = goalName,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "${(progress * 100).toInt()}%",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = progressColor
+                )
+            }
+
+            SpacerXs()
+
+            Text(
+                text = category,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            SpacerSm()
+
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth(),
+                color = progressColor,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+
+            SpacerSm()
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(
+                        R.string.goal_saved,
+                        CurrencyFormatter.format(currentAmountPaise)
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(
+                        R.string.goal_target,
+                        CurrencyFormatter.format(targetAmountPaise)
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+
+            if (deadlineMs > 0) {
+                SpacerXs()
+                Text(
+                    text = stringResource(
+                        R.string.goal_deadline,
+                        DateTimeFormatter.formatDate(deadlineMs)
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+        }
+    }
+}

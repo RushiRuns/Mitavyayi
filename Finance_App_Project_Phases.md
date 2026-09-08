@@ -94,30 +94,30 @@
 
 ### Design System Components
 
-- [ ] Create `ui/components/Buttons.kt`
+- [x] Create `ui/components/Buttons.kt`
   - Primary, secondary, tertiary button variants
   - All use theme tokens (no hardcoded colors/sizes)
-- [ ] Create `ui/components/Cards.kt`
+- [x] Create `ui/components/Cards.kt`
   - TransactionCard, AccountCard, GoalCard variants
   - All use theme tokens
-- [ ] Create `ui/components/Inputs.kt`
+- [x] Create `ui/components/Inputs.kt`
   - TextField with proper validation feedback
   - All use theme tokens
-- [ ] Create `ui/components/Dialogs.kt`
+- [x] Create `ui/components/Dialogs.kt`
   - Basic AlertDialog wrapper
   - All use theme tokens
-- [ ] Create `ui/components/Spacing.kt`
+- [x] Create `ui/components/Spacing.kt`
   - Spacer utilities using theme spacing scale
-- [ ] Create base reusable Composables (extend as features are built):
+- [x] Create base reusable Composables (extend as features are built):
   - LoadingState, ErrorState, EmptyState screens
   - CurrencyInput with proper formatting
   - DatePicker integration
 
 ### Governance Update
 
-- [ ] Update `UTILITIES.md` with all new Composables created
-- [ ] Update `CHANGELOG_INTERNAL.md`: "Phase 1: Design system and theme defined. All tokens centralized."
-- [ ] Commit to git: "Phase 1 complete: Design tokens and theme system"
+- [x] Update `UTILITIES.md` with all new Composables created
+- [x] Update `CHANGELOG_INTERNAL.md`: "Phase 1: Design system and theme defined. All tokens centralized."
+- [x] Commit to git: "Phase 1 complete: Design tokens and theme system"
 
 ---
 
