@@ -70,6 +70,12 @@ fun MitavyayApp(
                 },
                 actions = {
                     if (appState.isTopLevelDestination) {
+                        IconButton(onClick = { appState.navController.navigate(NavDestination.Debt.route) }) {
+                            Icon(
+                                imageVector = NavDestination.Debt.icon,
+                                contentDescription = "Debts & Loans"
+                            )
+                        }
                         IconButton(onClick = { appState.navController.navigate(NavDestination.Categories.route) }) {
                             Icon(
                                 imageVector = Icons.Default.Star,

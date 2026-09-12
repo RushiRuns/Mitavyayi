@@ -2,6 +2,7 @@ package com.rushi.mitavyay.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Share
@@ -46,6 +47,12 @@ sealed class NavDestination(
         icon = Icons.Default.Share
     )
 
+    data object Debt : NavDestination(
+        route = "debts",
+        title = "Debts & Loans",
+        icon = Icons.Default.AccountCircle
+    )
+
     data object TransactionDetail : NavDestination(
         route = "transaction_detail/{transactionId}",
         title = "Transaction Details",
@@ -69,6 +76,7 @@ sealed class NavDestination(
                 Accounts.route -> Accounts
                 Categories.route -> Categories
                 ImportExport.route -> ImportExport
+                Debt.route -> Debt
                 "transaction_detail" -> TransactionDetail
                 else -> TransactionList
             }

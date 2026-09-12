@@ -64,4 +64,33 @@ class DebtRepositoryTest {
         assertEquals(1, afterSettleSettled.size)
         assertTrue(afterSettleSettled[0].toDisplayItem().isSettled)
     }
+
+    @Test
+    fun debt_getAllAndGetByIdAndUpdate() = runBlocking {
+        val fakeDao = FakeDebtDao()
+        val repository = DebtRepositoryImpl(fakeDao)
+
+        val debt = Debt(
+            id = "debt_2",
+            type = "borrowed",
+            counterparty = "Vikram",
+            amount = 100000L,
+            createdAt = 1725800000000L
+        )
+        repository.addDebt(debt)
+
+        val retrieved = repository.getDebtById("debt_2")
+        assertEquals("Vikram", retrieved?.counterparty)
+        assertEquals(100000L, retrieved?.amount)
+
+        val allDebts = repository.getAllDebts().first()
+        assertEquals(1, allDebts.size)
+
+        // Update notes
+        val updated = debt.copy(notes = "Partially discussed")
+        repository.updateDebt(updated)
+
+        val retrievedAfter = repository.getDebtById("debt_2")
+        assertEquals("Partially discussed", retrievedAfter?.notes)
+    }
 }

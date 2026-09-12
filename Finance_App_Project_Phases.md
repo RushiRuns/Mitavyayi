@@ -568,26 +568,26 @@
 ### Feature 5.1: Debt & Loans Management
 
 **Planning**
-- [ ] Track money lent to others and borrowed from others
-- [ ] Entries include: type (lent/borrowed), counterparty, amount, createdAt, settledAt
-- [ ] **Debt entries are never deleted** — only marked settled
+- [x] Track money lent to others and borrowed from others
+- [x] Entries include: type (lent/borrowed), counterparty, amount, createdAt, settledAt
+- [x] **Debt entries are never deleted** — only marked settled
 
 **Implementation**
-- [ ] Create `ui/screens/Debt/DebtListScreen.kt`
-- [ ] Create `ui/screens/Debt/AddDebtDialog.kt`
+- [x] Create `ui/screens/Debt/DebtListScreen.kt`
+- [x] Create `ui/screens/Debt/AddDebtDialog.kt`
   - Form: type (radio), counterparty name, amount, notes
-- [ ] DebtViewModel fetches debts, shows active and settled
-- [ ] Mark debt as settled (sets settledAt timestamp)
-- [ ] Create `docs/decisions/ADR-007-Debt-Never-Deleted.md`
+- [x] DebtViewModel fetches debts, shows active and settled
+- [x] Mark debt as settled (sets settledAt timestamp)
+- [x] Create `docs/decisions/ADR-007-Debt-Never-Deleted.md`
 
 **Testing**
-- [ ] Test: Add debt, see in active list
-- [ ] Test: Mark as settled, move to settled list
-- [ ] Test: Delete button blocked (or doesn't exist)
-- [ ] Test: Settled debts tracked separately
+- [x] Test: Add debt, see in active list
+- [x] Test: Mark as settled, move to settled list
+- [x] Test: Delete button blocked (or doesn't exist)
+- [x] Test: Settled debts tracked separately
 
 **Closure**
-- [ ] Commit: "Feature 5.1: Debt & loans"
+- [x] Commit: "Feature 5.1: Debt & loans"
 
 ### Feature 5.2: Repeat Expenses (Lazy Generation)
 

@@ -3,6 +3,17 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 5.1: Debt & Loans Management complete.
+  - Documented immutable debt records policy in `docs/decisions/ADR-007-Debt-Never-Deleted.md`: debt records represent legal/financial history and are permanent; entries can only be created and marked settled, never deleted.
+  - Updated `DebtDisplayItem` with `amountPaise: Long` and `isLent: Boolean` helper.
+  - Added `DebtCard` reusable UI component displaying counterparty name, formatted amount (green for lent, error color for borrowed), type chip, creation and settlement dates, notes, and "Mark Settled" CTA for active debts (strictly no delete options).
+  - Built `AddDebtDialog` supporting "I Lent" and "I Borrowed" type selection, counterparty name entry, sanitized `CurrencyInput`, notes, and validation.
+  - Built `DebtViewModel` calculating active vs settled debts, live totals (`totalLentActivePaise`, `totalBorrowedActivePaise`), input validation, settlement flow, and strict omission of delete methods.
+  - Built `DebtListScreen` with summary metrics cards (Total Lent, Total Borrowed), TabRow for Active and Settled debts, LazyColumn of `DebtCard`s, empty states, FAB for creation, and settlement confirmation dialog.
+  - Registered `NavDestination.Debt` (`debts`, "Debts & Loans"), mapped route in `MitavyayNavHost`, and added access action icon in `MitavyayApp` `TopAppBar`.
+  - Added unit test suite in `DebtViewModelTest.kt` (7 tests verifying active/settled separation, totals calculation, tab switching, debt creation, validation errors, settlement flow, and reflection verification that delete methods are never exposed) and updated `DebtRepositoryTest.kt` and `NavigationTest.kt`.
+  - Verified all 97 tests passing in `testDebugUnitTest` and clean build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 4.8: Import/Export (CSV) complete.
   - Documented strict all-or-nothing import policy in `docs/decisions/ADR-006-Import-All-Or-Nothing.md`: all rows pre-validated prior to writes; any row failure rolls back entirely with zero database mutations.
   - Implemented `CsvRepository` and `CsvRepositoryImpl` with OpenCSV 5.9:

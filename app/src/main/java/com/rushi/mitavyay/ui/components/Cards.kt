@@ -25,6 +25,7 @@ import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.extendedColorScheme
 import com.rushi.mitavyay.ui.theme.spacing
 import com.rushi.mitavyay.data.model.AccountDisplayItem
+import com.rushi.mitavyay.data.model.DebtDisplayItem
 import com.rushi.mitavyay.data.model.TransactionDisplayItem
 import com.rushi.mitavyay.util.CurrencyFormatter
 import com.rushi.mitavyay.util.DateTimeFormatter
@@ -499,3 +500,139 @@ fun GoalCard(
         }
     }
 }
+
+/**
+ * Card representing a debt or loan record (money lent or borrowed).
+ * Invariant: Debts are never deleted, only marked as settled.
+ */
+@Composable
+fun DebtCard(
+    item: DebtDisplayItem,
+    modifier: Modifier = Modifier,
+    onMarkSettled: (() -> Unit)? = null,
+    onClick: () -> Unit = {}
+) {
+    val isLent = item.isLent
+    val amountColor = if (isLent) {
+        MaterialTheme.extendedColorScheme.success
+    } else {
+        MaterialTheme.colorScheme.error
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.appShapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = MaterialTheme.spacing.xs
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.cardContent)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = item.counterparty,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    SpacerXs()
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)
+                    ) {
+                        SuggestionChip(
+                            onClick = {},
+                            label = {
+                                Text(
+                                    text = if (isLent) "Lent (To Receive)" else "Borrowed (To Pay)",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            shape = MaterialTheme.appShapes.small,
+                            colors = SuggestionChipDefaults.suggestionChipColors(
+                                containerColor = if (isLent) {
+                                    MaterialTheme.extendedColorScheme.success.copy(alpha = 0.15f)
+                                } else {
+                                    MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
+                                },
+                                labelColor = if (isLent) {
+                                    MaterialTheme.extendedColorScheme.success
+                                } else {
+                                    MaterialTheme.colorScheme.error
+                                }
+                            ),
+                            border = null
+                        )
+
+                        if (item.isSettled) {
+                            Surface(
+                                shape = MaterialTheme.appShapes.small,
+                                color = MaterialTheme.colorScheme.tertiaryContainer
+                            ) {
+                                Text(
+                                    text = "Settled",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Text(
+                    text = item.amountFormatted,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = amountColor
+                )
+            }
+
+            SpacerSm()
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (item.isSettled && item.settledDateFormatted != null) {
+                        "Settled on ${item.settledDateFormatted}"
+                    } else {
+                        "Created on ${item.createdDateFormatted}"
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+
+                if (!item.isSettled && onMarkSettled != null) {
+                    SecondaryButton(
+                        text = "Mark Settled",
+                        onClick = onMarkSettled
+                    )
+                }
+            }
+
+            if (!item.notes.isNullOrBlank()) {
+                SpacerXs()
+                Text(
+                    text = item.notes,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
