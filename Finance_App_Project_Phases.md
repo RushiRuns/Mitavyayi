@@ -592,29 +592,29 @@
 ### Feature 5.2: Repeat Expenses (Lazy Generation)
 
 **Planning**
-- [ ] User defines recurring expenses (daily, weekly, monthly, yearly)
-- [ ] On each day, next occurrence is generated automatically
-- [ ] Stored as separate transactions (one per occurrence)
+- [x] User defines recurring expenses (daily, weekly, monthly, yearly)
+- [x] On each day, next occurrence is generated automatically
+- [x] Stored as separate transactions (one per occurrence)
 
 **Implementation**
-- [ ] Create `ui/screens/RepeatExpense/RepeatExpenseListScreen.kt`
-- [ ] Create `ui/screens/RepeatExpense/AddRepeatDialog.kt`
+- [x] Create `ui/screens/RepeatExpense/RepeatExpenseListScreen.kt`
+- [x] Create `ui/screens/RepeatExpense/AddRepeatDialog.kt`
   - Form: description, amount, frequency, category, isActive toggle
-- [ ] RepeatExpenseRepository implements lazy generation:
+- [x] RepeatExpenseRepository implements lazy generation:
   - `fun generateNextOccurrence(repeatExpenseId): Flow<Transaction?>`
   - Called at app startup via ViewModel
   - Creates one transaction if enough time has passed
-- [ ] Metadata: lastGenerated timestamp on RepeatExpense entity
+- [x] Metadata: lastGenerated timestamp on RepeatExpense entity
 
 **Testing**
-- [ ] Test: Create repeat expense
-- [ ] Test: Next occurrence generated (simulate time passage)
-- [ ] Test: Only one occurrence per eligible date
-- [ ] Test: Toggle inactive stops generation
+- [x] Test: Create repeat expense
+- [x] Test: Next occurrence generated (simulate time passage)
+- [x] Test: Only one occurrence per eligible date
+- [x] Test: Toggle inactive stops generation
 
 **Closure**
-- [ ] Create `docs/decisions/ADR-003-Repeat-Expenses-Lazy-Generation.md` (from phase 2)
-- [ ] Commit: "Feature 5.2: Repeat expenses"
+- [x] Create `docs/decisions/ADR-003-Repeat-Expenses-Lazy-Generation.md` (from phase 2)
+- [x] Commit: "Feature 5.2: Repeat expenses"
 
 ### Feature 5.3: Goals Tracking
 

@@ -3,26 +3,47 @@ package com.rushi.mitavyay.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rushi.mitavyay.data.datastore.PreferencesRepository
+import com.rushi.mitavyay.data.repository.AccountRepository
+import com.rushi.mitavyay.data.repository.RepeatExpenseRepository
 import com.rushi.mitavyay.ui.theme.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * App-level ViewModel for MainActivity to observe and modify global preferences (theme, font scale).
+ * App-level ViewModel for MainActivity to observe and modify global preferences (theme, font scale),
+ * and trigger lazy evaluation of due recurring expenses on startup.
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val repeatExpenseRepository: RepeatExpenseRepository? = null,
+    private val accountRepository: AccountRepository? = null
 ) : ViewModel() {
 
     init {
         viewModelScope.launch {
             preferencesRepository.incrementAppOpenCount()
+            triggerLazyRecurringExpenses()
+        }
+    }
+
+    private suspend fun triggerLazyRecurringExpenses() {
+        try {
+            if (repeatExpenseRepository != null && accountRepository != null) {
+                val activeAccounts = accountRepository.getActiveAccounts().first()
+                val primaryAccount = activeAccounts.firstOrNull()
+                if (primaryAccount != null) {
+                    repeatExpenseRepository.processAllDueOccurrences(primaryAccount.id)
+                }
+            }
+        } catch (_: Exception) {
+            // Ignore offline startup generation issues
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,6 +54,12 @@ sealed class NavDestination(
         icon = Icons.Default.AccountCircle
     )
 
+    data object RepeatExpenses : NavDestination(
+        route = "repeat_expenses",
+        title = "Recurring Expenses",
+        icon = Icons.Default.Refresh
+    )
+
     data object TransactionDetail : NavDestination(
         route = "transaction_detail/{transactionId}",
         title = "Transaction Details",
@@ -77,6 +84,7 @@ sealed class NavDestination(
                 Categories.route -> Categories
                 ImportExport.route -> ImportExport
                 Debt.route -> Debt
+                RepeatExpenses.route -> RepeatExpenses
                 "transaction_detail" -> TransactionDetail
                 else -> TransactionList
             }

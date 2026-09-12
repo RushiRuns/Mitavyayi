@@ -14,6 +14,7 @@ class NavigationTest {
         assertEquals("categories", NavDestination.Categories.route)
         assertEquals("import_export", NavDestination.ImportExport.route)
         assertEquals("debts", NavDestination.Debt.route)
+        assertEquals("repeat_expenses", NavDestination.RepeatExpenses.route)
         assertEquals("transaction_detail/{transactionId}", NavDestination.TransactionDetail.route)
         assertEquals("transaction_detail/tx_123", NavDestination.TransactionDetail.createRoute("tx_123"))
     }
@@ -35,6 +36,7 @@ class NavigationTest {
         assertEquals(NavDestination.Categories, NavDestination.fromRoute("categories"))
         assertEquals(NavDestination.ImportExport, NavDestination.fromRoute("import_export"))
         assertEquals(NavDestination.Debt, NavDestination.fromRoute("debts"))
+        assertEquals(NavDestination.RepeatExpenses, NavDestination.fromRoute("repeat_expenses"))
         assertEquals(NavDestination.TransactionDetail, NavDestination.fromRoute("transaction_detail/tx_123"))
         assertEquals(NavDestination.TransactionList, NavDestination.fromRoute("transactions/item_123"))
         assertEquals(NavDestination.TransactionList, NavDestination.fromRoute("unknown_route"))

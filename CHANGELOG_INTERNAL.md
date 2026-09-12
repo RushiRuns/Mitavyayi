@@ -3,6 +3,19 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 5.2: Repeat Expenses (Lazy Generation) complete.
+  - Implemented lazy occurrence evaluation per `ADR-003: Lazy Occurrence Generation for Recurring Expenses`: occurrences generate concrete `Transaction` records strictly on demand when due, preventing database table bloat.
+  - Updated `RepeatExpenseDisplayItem` with typed `amountPaise: Long` and `lastGenerated: Long`.
+  - Added `toggleActive(id)` and `processAllDueOccurrences(defaultAccountId, currentTimeMs)` to `RepeatExpenseRepository` and `RepeatExpenseRepositoryImpl`.
+  - Integrated startup evaluation into `MainViewModel.init`, automatically processing due recurring occurrences using the primary active account.
+  - Added `RepeatExpenseCard` in `Cards.kt` with description, formatted amount, frequency chip, category, last generated date, active switch toggle, and deletion action.
+  - Created `AddRepeatDialog` with description input, sanitized `CurrencyInput`, frequency selector (`DAILY`, `WEEKLY`, `MONTHLY`, `YEARLY`), category chips from `CategoryRepository`, active toggle switch, and validation.
+  - Created `RepeatExpenseViewModel` managing `allExpenses`, `activeExpenses`, `pausedExpenses`, computing total estimated monthly commitment in paise, tab filtering, and on-demand evaluation.
+  - Created `RepeatExpenseListScreen` with monthly commitment readout card, All/Active/Paused `TabRow`, `LazyColumn` of `RepeatExpenseCard`s, empty states, FAB, and delete confirmation dialog.
+  - Registered `NavDestination.RepeatExpenses` (`repeat_expenses`, "Recurring Expenses", `Icons.Default.Refresh`) in `NavDestinations.kt`, `MitavyayNavHost`, and `MitavyayApp` `TopAppBar`.
+  - Added unit test suites in `RepeatExpenseViewModelTest.kt` (6 tests) and expanded `RepeatExpenseRepositoryTest.kt` (3 tests) and `NavigationTest.kt`.
+  - Verified 100% tests passing in `testDebugUnitTest` and clean build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 5.1: Debt & Loans Management complete.
   - Documented immutable debt records policy in `docs/decisions/ADR-007-Debt-Never-Deleted.md`: debt records represent legal/financial history and are permanent; entries can only be created and marked settled, never deleted.
   - Updated `DebtDisplayItem` with `amountPaise: Long` and `isLent: Boolean` helper.

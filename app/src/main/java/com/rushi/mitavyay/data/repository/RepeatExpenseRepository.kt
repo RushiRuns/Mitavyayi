@@ -4,6 +4,7 @@ import com.rushi.mitavyay.data.db.RepeatExpense
 import com.rushi.mitavyay.data.db.RepeatExpenseDao
 import com.rushi.mitavyay.data.db.Transaction
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
@@ -16,11 +17,16 @@ interface RepeatExpenseRepository {
     suspend fun addRepeatExpense(repeatExpense: RepeatExpense)
     suspend fun updateRepeatExpense(repeatExpense: RepeatExpense)
     suspend fun deleteRepeatExpense(id: String)
+    suspend fun toggleActive(id: String): Boolean
     suspend fun generateNextOccurrence(
         repeatExpenseId: String,
         accountId: String,
         currentTimeMs: Long = System.currentTimeMillis()
     ): Transaction?
+    suspend fun processAllDueOccurrences(
+        defaultAccountId: String,
+        currentTimeMs: Long = System.currentTimeMillis()
+    ): List<Transaction>
 }
 
 /**
@@ -48,6 +54,28 @@ class RepeatExpenseRepositoryImpl @Inject constructor(
 
     override suspend fun deleteRepeatExpense(id: String) =
         repeatExpenseDao.deleteById(id)
+
+    override suspend fun toggleActive(id: String): Boolean {
+        val repeatExpense = repeatExpenseDao.getById(id) ?: return false
+        val updatedStatus = !repeatExpense.isActive
+        repeatExpenseDao.update(repeatExpense.copy(isActive = updatedStatus))
+        return updatedStatus
+    }
+
+    override suspend fun processAllDueOccurrences(
+        defaultAccountId: String,
+        currentTimeMs: Long
+    ): List<Transaction> {
+        val activeExpenses = repeatExpenseDao.getActive().first()
+        val generated = mutableListOf<Transaction>()
+        for (expense in activeExpenses) {
+            val tx = generateNextOccurrence(expense.id, defaultAccountId, currentTimeMs)
+            if (tx != null) {
+                generated.add(tx)
+            }
+        }
+        return generated
+    }
 
     override suspend fun generateNextOccurrence(
         repeatExpenseId: String,

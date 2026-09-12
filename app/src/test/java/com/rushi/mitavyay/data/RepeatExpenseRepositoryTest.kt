@@ -36,9 +36,12 @@ class RepeatExpenseRepositoryTest {
     private class FakeRepeatDao : RepeatExpenseDao {
         val list = mutableListOf<RepeatExpense>()
         override suspend fun insert(repeatExpense: RepeatExpense) { list.add(repeatExpense) }
-        override suspend fun update(repeatExpense: RepeatExpense) {}
-        override suspend fun delete(repeatExpense: RepeatExpense) {}
-        override suspend fun deleteById(id: String) {}
+        override suspend fun update(repeatExpense: RepeatExpense) {
+            val idx = list.indexOfFirst { it.id == repeatExpense.id }
+            if (idx != -1) list[idx] = repeatExpense
+        }
+        override suspend fun delete(repeatExpense: RepeatExpense) { list.remove(repeatExpense) }
+        override suspend fun deleteById(id: String) { list.removeAll { it.id == id } }
         override suspend fun getById(id: String): RepeatExpense? = list.find { it.id == id }
         override fun getAll(): Flow<List<RepeatExpense>> = flowOf(list)
         override fun getActive(): Flow<List<RepeatExpense>> = flowOf(list.filter { it.isActive })
@@ -102,5 +105,69 @@ class RepeatExpenseRepositoryTest {
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
         assertEquals(oct1, updatedRepeat?.lastGenerated)
+    }
+
+    @Test
+    fun toggleActive_updatesStatus() = runBlocking {
+        val fakeDao = FakeRepeatDao()
+        val fakeTxRepo = FakeTransactionRepo()
+        val repository = RepeatExpenseRepositoryImpl(fakeDao, fakeTxRepo)
+
+        val expense = RepeatExpense(
+            id = "rep_sub",
+            description = "Magazine",
+            amount = 50000L,
+            frequency = "MONTHLY",
+            lastGenerated = 1000L,
+            category = "Entertainment",
+            isActive = true
+        )
+        fakeDao.insert(expense)
+
+        val newStatus = repository.toggleActive("rep_sub")
+        org.junit.Assert.assertFalse(newStatus)
+        org.junit.Assert.assertFalse(fakeDao.getById("rep_sub")!!.isActive)
+
+        val restoredStatus = repository.toggleActive("rep_sub")
+        org.junit.Assert.assertTrue(restoredStatus)
+        org.junit.Assert.assertTrue(fakeDao.getById("rep_sub")!!.isActive)
+    }
+
+    @Test
+    fun processAllDueOccurrences_evaluatesAllEligibleActiveExpenses() = runBlocking {
+        val fakeDao = FakeRepeatDao()
+        val fakeTxRepo = FakeTransactionRepo()
+        val repository = RepeatExpenseRepositoryImpl(fakeDao, fakeTxRepo)
+
+        val sept1 = Calendar.getInstance().apply {
+            set(2026, Calendar.SEPTEMBER, 1, 0, 0, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        // 1. Due active monthly expense
+        fakeDao.insert(
+            RepeatExpense("r1", "Rent", 2000000L, "MONTHLY", sept1, "Housing", true)
+        )
+        // 2. Due but PAUSED monthly expense -> should NOT generate
+        fakeDao.insert(
+            RepeatExpense("r2", "Paused Gym", 150000L, "MONTHLY", sept1, "Fitness", false)
+        )
+        // 3. Due active daily expense
+        fakeDao.insert(
+            RepeatExpense("r3", "Coffee Pods", 5000L, "DAILY", sept1, "Food", true)
+        )
+
+        // Evaluate at Oct 2 (both r1 and r3 are due, r2 is paused)
+        val oct2 = Calendar.getInstance().apply {
+            set(2026, Calendar.OCTOBER, 2, 0, 0, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        val generated = repository.processAllDueOccurrences("acc_main", oct2)
+        assertEquals(2, generated.size)
+        assertEquals(2, fakeTxRepo.transactions.size)
+        org.junit.Assert.assertTrue(generated.any { it.description == "Rent" })
+        org.junit.Assert.assertTrue(generated.any { it.description == "Coffee Pods" })
+        org.junit.Assert.assertFalse(generated.any { it.description == "Paused Gym" })
     }
 }
