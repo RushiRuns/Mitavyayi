@@ -646,20 +646,20 @@
 ### Feature 5.4: Enhanced Analysis
 
 **Planning**
-- [ ] Deeper analytics: trends, forecasts, comparisons
-- [ ] Breakdown by multiple dimensions (category + account)
+- [x] Deeper analytics: trends, forecasts, comparisons
+- [x] Breakdown by multiple dimensions (category + account)
 
 **Implementation**
-- [ ] Add more chart types (bar, stacked)
-- [ ] Trend analysis: is spending increasing or decreasing?
-- [ ] Year-over-year comparison
-- [ ] Category composition over time
+- [x] Add more chart types (bar, stacked)
+- [x] Trend analysis: is spending increasing or decreasing?
+- [x] Year-over-year comparison
+- [x] Category composition over time
 
 **Testing**
-- [ ] Test: Charts render correctly with multiple dimensions
+- [x] Test: Charts render correctly with multiple dimensions
 
 **Closure**
-- [ ] Commit: "Feature 5.4: Enhanced analysis"
+- [x] Commit: "Feature 5.4: Enhanced analysis"
 
 ### Feature 5.5: Notes on Transactions
 

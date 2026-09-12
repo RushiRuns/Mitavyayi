@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -36,18 +38,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.column.columnChart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.m3.style.m3ChartStyle
 import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.repository.AnalysisPeriod
 import com.rushi.mitavyay.data.repository.AnalysisSummary
+import com.rushi.mitavyay.data.repository.CategorySpending
 import com.rushi.mitavyay.data.repository.TimeSpendingPoint
+import com.rushi.mitavyay.ui.components.AccountBreakdownCard
+import com.rushi.mitavyay.ui.components.CategoryCompositionStackedBar
 import com.rushi.mitavyay.ui.components.CategoryDonutChart
 import com.rushi.mitavyay.ui.components.CategorySpendingLegendList
 import com.rushi.mitavyay.ui.components.EmptyState
 import com.rushi.mitavyay.ui.components.LoadingState
+import com.rushi.mitavyay.ui.components.PeriodComparisonCard
+import com.rushi.mitavyay.ui.components.TrendForecastCard
 import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.extendedColorScheme
 import com.rushi.mitavyay.ui.theme.spacing
@@ -66,6 +75,8 @@ fun AnalysisScreen(
         onPeriodSelected = { viewModel.selectPeriod(it) },
         onPreviousPeriod = { viewModel.previousPeriod() },
         onNextPeriod = { viewModel.nextPeriod() },
+        onAccountSelected = { viewModel.selectAccount(it) },
+        onChartTypeSelected = { viewModel.setChartType(it) },
         modifier = modifier
     )
 }
@@ -76,6 +87,8 @@ fun AnalysisContent(
     onPeriodSelected: (AnalysisPeriod) -> Unit,
     onPreviousPeriod: () -> Unit,
     onNextPeriod: () -> Unit,
+    onAccountSelected: (String?) -> Unit,
+    onChartTypeSelected: (TrendChartType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -110,30 +123,77 @@ fun AnalysisContent(
                     )
                 }
 
+                // 3. Multi-dimensional Filter: Account Selector
+                if (uiState.availableAccounts.isNotEmpty()) {
+                    item {
+                        AccountFilterRow(
+                            accounts = uiState.availableAccounts,
+                            selectedAccountId = uiState.selectedAccountId,
+                            onAccountSelected = onAccountSelected
+                        )
+                    }
+                }
+
                 if (uiState.isEmpty) {
                     item {
                         EmptyState(
                             title = "No data for this period",
-                            description = "Switch date range or add expenses to see charts and spending insights."
+                            description = "Switch date range, clear filters, or add expenses to see charts and spending insights."
                         )
                     }
                 } else {
-                    // 3. High-level Summary Metrics
+                    // 4. High-level Summary Metrics
                     item {
                         SummaryMetricsSection(summary = uiState.summary)
                     }
 
-                    // 4. Spending Trend (Vico Line Chart)
+                    // 5. Deeper Trend Analysis & Run-rate Forecast
                     item {
-                        SpendingTrendCard(points = uiState.timeTrendPoints)
+                        TrendForecastCard(
+                            insight = uiState.trendInsight,
+                            period = uiState.selectedPeriod,
+                            periodOffset = uiState.periodOffset
+                        )
                     }
 
-                    // 5. Category Breakdown (Donut Pie Chart & Legend)
+                    // 6. Spending Trend (Line vs Bar Chart Toggle)
+                    item {
+                        SpendingTrendCard(
+                            points = uiState.timeTrendPoints,
+                            chartType = uiState.chartType,
+                            onChartTypeSelected = onChartTypeSelected
+                        )
+                    }
+
+                    // 7. Period Comparison (Year-over-Year / Month-over-Month)
+                    if (uiState.periodComparison != null &&
+                        (uiState.periodComparison.currentTotalExpensePaise > 0L || uiState.periodComparison.previousTotalExpensePaise > 0L)
+                    ) {
+                        item {
+                            PeriodComparisonCard(
+                                comparison = uiState.periodComparison,
+                                period = uiState.selectedPeriod
+                            )
+                        }
+                    }
+
+                    // 8. Category Breakdown (Donut Pie Chart, Stacked Composition Bar & Legend)
                     if (uiState.categorySpendings.isNotEmpty()) {
                         item {
                             CategoryBreakdownSection(
                                 categorySpendings = uiState.categorySpendings,
                                 totalExpensePaise = uiState.totalExpensePaise
+                            )
+                        }
+                    }
+
+                    // 9. Account Breakdown (Multi-dimensional spending distribution)
+                    if (uiState.selectedAccountId == null && uiState.accountSpendings.isNotEmpty()) {
+                        item {
+                            AccountBreakdownCard(
+                                accountSpendings = uiState.accountSpendings,
+                                totalExpensePaise = uiState.totalExpensePaise,
+                                onAccountClick = { onAccountSelected(it) }
                             )
                         }
                     }
@@ -223,6 +283,52 @@ fun PeriodNavigatorRow(
                 } else {
                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                 }
+            )
+        }
+    }
+}
+
+@Composable
+fun AccountFilterRow(
+    accounts: List<AccountDisplayItem>,
+    selectedAccountId: String?,
+    onAccountSelected: (String?) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        item {
+            FilterChip(
+                selected = selectedAccountId == null,
+                onClick = { onAccountSelected(null) },
+                label = { Text("All Accounts") },
+                shape = MaterialTheme.appShapes.small,
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            )
+        }
+
+        items(accounts, key = { it.id }) { acc ->
+            FilterChip(
+                selected = selectedAccountId == acc.id,
+                onClick = {
+                    if (selectedAccountId == acc.id) {
+                        onAccountSelected(null)
+                    } else {
+                        onAccountSelected(acc.id)
+                    }
+                },
+                label = { Text(acc.name) },
+                shape = MaterialTheme.appShapes.small,
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
         }
     }
@@ -356,6 +462,8 @@ fun SummaryMetricsSection(
 @Composable
 fun SpendingTrendCard(
     points: List<TimeSpendingPoint>,
+    chartType: TrendChartType,
+    onChartTypeSelected: (TrendChartType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -369,17 +477,41 @@ fun SpendingTrendCard(
                 .fillMaxWidth()
                 .padding(MaterialTheme.spacing.md)
         ) {
-            Text(
-                text = "Spending Trend",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Expenses over the selected period",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Spending Trend",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Expenses over the selected period",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                // Line / Bar Toggle
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    FilterChip(
+                        selected = chartType == TrendChartType.LINE,
+                        onClick = { onChartTypeSelected(TrendChartType.LINE) },
+                        label = { Text("Line", style = MaterialTheme.typography.labelSmall) },
+                        shape = MaterialTheme.appShapes.small
+                    )
+                    FilterChip(
+                        selected = chartType == TrendChartType.BAR,
+                        onClick = { onChartTypeSelected(TrendChartType.BAR) },
+                        label = { Text("Bar", style = MaterialTheme.typography.labelSmall) },
+                        shape = MaterialTheme.appShapes.small
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.md))
 
@@ -408,8 +540,14 @@ fun SpendingTrendCard(
                 }
 
                 ProvideChartStyle(m3ChartStyle()) {
+                    val chart = if (chartType == TrendChartType.BAR) {
+                        columnChart()
+                    } else {
+                        lineChart()
+                    }
+
                     Chart(
-                        chart = lineChart(),
+                        chart = chart,
                         model = chartModel,
                         startAxis = rememberStartAxis(
                             valueFormatter = { value, _ ->
@@ -438,7 +576,7 @@ fun SpendingTrendCard(
 
 @Composable
 fun CategoryBreakdownSection(
-    categorySpendings: List<com.rushi.mitavyay.data.repository.CategorySpending>,
+    categorySpendings: List<CategorySpending>,
     totalExpensePaise: Long,
     modifier: Modifier = Modifier
 ) {
@@ -460,13 +598,22 @@ fun CategoryBreakdownSection(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Breakdown of top expense categories",
+                text = "Breakdown and composition of expenses",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.md))
 
+            // 1. Horizontal Stacked Composition Bar
+            CategoryCompositionStackedBar(
+                categorySpendings = categorySpendings,
+                totalExpensePaise = totalExpensePaise
+            )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.lg))
+
+            // 2. Animated Donut Pie Chart
             CategoryDonutChart(
                 categorySpendings = categorySpendings,
                 totalExpensePaise = totalExpensePaise
@@ -474,6 +621,7 @@ fun CategoryBreakdownSection(
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.md))
 
+            // 3. Ranked Detailed Legend
             CategorySpendingLegendList(categorySpendings = categorySpendings)
         }
     }

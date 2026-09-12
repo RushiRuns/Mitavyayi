@@ -31,6 +31,15 @@ data class CategorySpending(
     val percentage: Float = 0f
 )
 
+data class AccountSpending(
+    val accountId: String,
+    val accountName: String,
+    val accountType: String,
+    val totalExpensePaise: Long,
+    val transactionCount: Int,
+    val percentage: Float = 0f
+)
+
 data class TimeSpendingPoint(
     val label: String,
     val startTimestamp: Long,
@@ -46,6 +55,37 @@ data class AnalysisSummary(
     val savingsRate: Float = 0f
 )
 
+data class CategoryComparison(
+    val category: String,
+    val currentExpensePaise: Long,
+    val previousExpensePaise: Long,
+    val deltaPaise: Long,
+    val percentageChange: Float,
+    val colorHex: String? = null
+)
+
+data class PeriodComparisonData(
+    val currentTotalExpensePaise: Long = 0L,
+    val previousTotalExpensePaise: Long = 0L,
+    val currentTotalIncomePaise: Long = 0L,
+    val previousTotalIncomePaise: Long = 0L,
+    val expenseDeltaPaise: Long = 0L,
+    val expensePercentageChange: Float = 0f,
+    val isExpenseIncreasing: Boolean = false,
+    val categoryMovers: List<CategoryComparison> = emptyList()
+)
+
+data class SpendingTrendInsight(
+    val currentExpensePaise: Long = 0L,
+    val previousExpensePaise: Long = 0L,
+    val deltaExpensePaise: Long = 0L,
+    val percentageChange: Float = 0f,
+    val isIncreasing: Boolean = false,
+    val dailyBurnRatePaise: Long = 0L,
+    val projectedPeriodExpensePaise: Long = 0L,
+    val hasComparisonData: Boolean = false
+)
+
 interface TransactionRepository {
     fun getAllTransactions(): Flow<List<Transaction>>
     suspend fun getTransactionById(id: String): Transaction?
@@ -59,9 +99,17 @@ interface TransactionRepository {
     fun getTotalIncomeByDateRange(start: Long, end: Long): Flow<Long?>
 
     // Analysis Aggregations
-    fun getCategorySpending(start: Long, end: Long): Flow<List<CategorySpending>>
-    fun getTimeSpendingTrend(start: Long, end: Long, period: AnalysisPeriod): Flow<List<TimeSpendingPoint>>
-    fun getAnalysisSummary(start: Long, end: Long): Flow<AnalysisSummary>
+    fun getCategorySpending(start: Long, end: Long): Flow<List<CategorySpending>> = getCategorySpending(start, end, null)
+    fun getCategorySpending(start: Long, end: Long, accountId: String?): Flow<List<CategorySpending>> = flowOf(emptyList())
+
+    fun getTimeSpendingTrend(start: Long, end: Long, period: AnalysisPeriod): Flow<List<TimeSpendingPoint>> = getTimeSpendingTrend(start, end, period, null)
+    fun getTimeSpendingTrend(start: Long, end: Long, period: AnalysisPeriod, accountId: String?): Flow<List<TimeSpendingPoint>> = flowOf(emptyList())
+
+    fun getAnalysisSummary(start: Long, end: Long): Flow<AnalysisSummary> = getAnalysisSummary(start, end, null)
+    fun getAnalysisSummary(start: Long, end: Long, accountId: String?): Flow<AnalysisSummary> = flowOf(AnalysisSummary())
+
+    fun getAccountSpending(start: Long, end: Long): Flow<List<AccountSpending>> = flowOf(emptyList())
+    fun getPeriodComparison(currentStart: Long, currentEnd: Long, previousStart: Long, previousEnd: Long, accountId: String? = null): Flow<PeriodComparisonData> = flowOf(PeriodComparisonData())
 }
 
 @Singleton
@@ -161,52 +209,189 @@ class TransactionRepositoryImpl @Inject constructor(
     override fun getTotalIncomeByDateRange(start: Long, end: Long): Flow<Long?> =
         transactionDao.getTotalIncomeByDateRange(start, end)
 
-    override fun getCategorySpending(start: Long, end: Long): Flow<List<CategorySpending>> =
-        combine(
-            transactionDao.getCategoryExpensesByDateRange(start, end),
-            categoryDao?.getAll() ?: flowOf(emptyList())
-        ) { rawList, categories ->
-            val total = rawList.sumOf { it.totalExpensePaise }
-            val colorMap = categories.associate { it.name to it.color }
-            rawList.map { raw ->
-                val pct = if (total > 0L) {
-                    (raw.totalExpensePaise.toFloat() / total.toFloat()) * 100f
-                } else 0f
-                CategorySpending(
-                    category = raw.category,
-                    totalExpensePaise = raw.totalExpensePaise,
-                    transactionCount = raw.transactionCount,
-                    colorHex = colorMap[raw.category],
-                    percentage = pct
-                )
+    override fun getCategorySpending(
+        start: Long,
+        end: Long,
+        accountId: String?
+    ): Flow<List<CategorySpending>> =
+        if (accountId == null) {
+            combine(
+                transactionDao.getCategoryExpensesByDateRange(start, end),
+                categoryDao?.getAll() ?: flowOf(emptyList())
+            ) { rawList, categories ->
+                val total = rawList.sumOf { it.totalExpensePaise }
+                val colorMap = categories.associate { it.name to it.color }
+                rawList.map { raw ->
+                    val pct = if (total > 0L) {
+                        (raw.totalExpensePaise.toFloat() / total.toFloat()) * 100f
+                    } else 0f
+                    CategorySpending(
+                        category = raw.category,
+                        totalExpensePaise = raw.totalExpensePaise,
+                        transactionCount = raw.transactionCount,
+                        colorHex = colorMap[raw.category],
+                        percentage = pct
+                    )
+                }
+            }
+        } else {
+            combine(
+                transactionDao.getByDateRange(start, end),
+                categoryDao?.getAll() ?: flowOf(emptyList())
+            ) { txs, categories ->
+                val filtered = txs.filter { it.accountId == accountId && it.amount < 0 }
+                val total = filtered.sumOf { abs(it.amount) }
+                val colorMap = categories.associate { it.name to it.color }
+                filtered.groupBy { it.category }
+                    .map { (cat, catTxs) ->
+                        val catTotal = catTxs.sumOf { abs(it.amount) }
+                        val pct = if (total > 0L) {
+                            (catTotal.toFloat() / total.toFloat()) * 100f
+                        } else 0f
+                        CategorySpending(
+                            category = cat,
+                            totalExpensePaise = catTotal,
+                            transactionCount = catTxs.size,
+                            colorHex = colorMap[cat],
+                            percentage = pct
+                        )
+                    }
+                    .sortedByDescending { it.totalExpensePaise }
             }
         }
 
     override fun getTimeSpendingTrend(
         start: Long,
         end: Long,
-        period: AnalysisPeriod
+        period: AnalysisPeriod,
+        accountId: String?
     ): Flow<List<TimeSpendingPoint>> =
         transactionDao.getByDateRange(start, end).map { transactions ->
-            aggregateTimeSpending(transactions, start, end, period)
+            val filtered = if (accountId != null) transactions.filter { it.accountId == accountId } else transactions
+            aggregateTimeSpending(filtered, start, end, period)
         }
 
-    override fun getAnalysisSummary(start: Long, end: Long): Flow<AnalysisSummary> =
+    override fun getAnalysisSummary(
+        start: Long,
+        end: Long,
+        accountId: String?
+    ): Flow<AnalysisSummary> =
+        if (accountId == null) {
+            combine(
+                transactionDao.getTotalIncomeByDateRange(start, end),
+                transactionDao.getTotalExpensesByDateRange(start, end)
+            ) { income, expense ->
+                val totalIncome = income ?: 0L
+                val totalExpense = abs(expense ?: 0L)
+                val netSavings = totalIncome - totalExpense
+                val savingsRate = if (totalIncome > 0L) {
+                    (netSavings.toFloat() / totalIncome.toFloat()).coerceIn(0f, 1f)
+                } else 0f
+                AnalysisSummary(
+                    totalIncomePaise = totalIncome,
+                    totalExpensePaise = totalExpense,
+                    netSavingsPaise = netSavings,
+                    savingsRate = savingsRate
+                )
+            }
+        } else {
+            transactionDao.getByDateRange(start, end).map { txs ->
+                val filtered = txs.filter { it.accountId == accountId }
+                val totalIncome = filtered.filter { it.amount > 0 }.sumOf { it.amount }
+                val totalExpense = filtered.filter { it.amount < 0 }.sumOf { abs(it.amount) }
+                val netSavings = totalIncome - totalExpense
+                val savingsRate = if (totalIncome > 0L) {
+                    (netSavings.toFloat() / totalIncome.toFloat()).coerceIn(0f, 1f)
+                } else 0f
+                AnalysisSummary(
+                    totalIncomePaise = totalIncome,
+                    totalExpensePaise = totalExpense,
+                    netSavingsPaise = netSavings,
+                    savingsRate = savingsRate
+                )
+            }
+        }
+
+    override fun getAccountSpending(start: Long, end: Long): Flow<List<AccountSpending>> =
         combine(
-            transactionDao.getTotalIncomeByDateRange(start, end),
-            transactionDao.getTotalExpensesByDateRange(start, end)
-        ) { income, expense ->
-            val totalIncome = income ?: 0L
-            val totalExpense = abs(expense ?: 0L)
-            val netSavings = totalIncome - totalExpense
-            val savingsRate = if (totalIncome > 0L) {
-                (netSavings.toFloat() / totalIncome.toFloat()).coerceIn(0f, 1f)
+            transactionDao.getByDateRange(start, end),
+            accountDao?.getAll() ?: flowOf(emptyList())
+        ) { txs, accounts ->
+            val accountMap = accounts.associateBy { it.id }
+            val expenseTxs = txs.filter { it.amount < 0 }
+            val totalExpense = expenseTxs.sumOf { abs(it.amount) }
+
+            expenseTxs.groupBy { it.accountId }
+                .map { (accId, accTxs) ->
+                    val accTotal = accTxs.sumOf { abs(it.amount) }
+                    val acc = accountMap[accId]
+                    val pct = if (totalExpense > 0L) {
+                        (accTotal.toFloat() / totalExpense.toFloat()) * 100f
+                    } else 0f
+                    AccountSpending(
+                        accountId = accId,
+                        accountName = acc?.name ?: "Unknown Account",
+                        accountType = acc?.type ?: "general",
+                        totalExpensePaise = accTotal,
+                        transactionCount = accTxs.size,
+                        percentage = pct
+                    )
+                }
+                .sortedByDescending { it.totalExpensePaise }
+        }
+
+    override fun getPeriodComparison(
+        currentStart: Long,
+        currentEnd: Long,
+        previousStart: Long,
+        previousEnd: Long,
+        accountId: String?
+    ): Flow<PeriodComparisonData> =
+        combine(
+            getAnalysisSummary(currentStart, currentEnd, accountId),
+            getAnalysisSummary(previousStart, previousEnd, accountId),
+            getCategorySpending(currentStart, currentEnd, accountId),
+            getCategorySpending(previousStart, previousEnd, accountId)
+        ) { currentSummary, prevSummary, currentCategories, prevCategories ->
+            val deltaExpense = currentSummary.totalExpensePaise - prevSummary.totalExpensePaise
+            val pctChange = if (prevSummary.totalExpensePaise > 0L) {
+                ((deltaExpense.toFloat() / prevSummary.totalExpensePaise.toFloat()) * 100f)
+            } else if (currentSummary.totalExpensePaise > 0L) {
+                100f
             } else 0f
-            AnalysisSummary(
-                totalIncomePaise = totalIncome,
-                totalExpensePaise = totalExpense,
-                netSavingsPaise = netSavings,
-                savingsRate = savingsRate
+
+            val prevCatMap = prevCategories.associateBy { it.category }
+            val currentCatMap = currentCategories.associateBy { it.category }
+            val allCategoryNames = (currentCatMap.keys + prevCatMap.keys).toSet()
+
+            val movers = allCategoryNames.map { cat ->
+                val curVal = currentCatMap[cat]?.totalExpensePaise ?: 0L
+                val prevVal = prevCatMap[cat]?.totalExpensePaise ?: 0L
+                val catDelta = curVal - prevVal
+                val catPct = if (prevVal > 0L) {
+                    ((catDelta.toFloat() / prevVal.toFloat()) * 100f)
+                } else if (curVal > 0L) 100f else 0f
+                val color = currentCatMap[cat]?.colorHex ?: prevCatMap[cat]?.colorHex
+
+                CategoryComparison(
+                    category = cat,
+                    currentExpensePaise = curVal,
+                    previousExpensePaise = prevVal,
+                    deltaPaise = catDelta,
+                    percentageChange = catPct,
+                    colorHex = color
+                )
+            }.sortedByDescending { abs(it.deltaPaise) }
+
+            PeriodComparisonData(
+                currentTotalExpensePaise = currentSummary.totalExpensePaise,
+                previousTotalExpensePaise = prevSummary.totalExpensePaise,
+                currentTotalIncomePaise = currentSummary.totalIncomePaise,
+                previousTotalIncomePaise = prevSummary.totalIncomePaise,
+                expenseDeltaPaise = deltaExpense,
+                expensePercentageChange = pctChange,
+                isExpenseIncreasing = deltaExpense > 0L,
+                categoryMovers = movers
             )
         }
 

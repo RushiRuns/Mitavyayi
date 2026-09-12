@@ -2,10 +2,16 @@ package com.rushi.mitavyay.ui.screens.Analysis
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rushi.mitavyay.data.model.AccountDisplayItem
+import com.rushi.mitavyay.data.model.toDisplayItem
+import com.rushi.mitavyay.data.repository.AccountRepository
+import com.rushi.mitavyay.data.repository.AccountSpending
 import com.rushi.mitavyay.data.repository.AnalysisPeriod
 import com.rushi.mitavyay.data.repository.AnalysisSummary
 import com.rushi.mitavyay.data.repository.CategoryRepository
 import com.rushi.mitavyay.data.repository.CategorySpending
+import com.rushi.mitavyay.data.repository.PeriodComparisonData
+import com.rushi.mitavyay.data.repository.SpendingTrendInsight
 import com.rushi.mitavyay.data.repository.TimeSpendingPoint
 import com.rushi.mitavyay.data.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,12 +21,18 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+
+enum class TrendChartType {
+    LINE,
+    BAR
+}
 
 data class CalculatedDateRange(
     val startTimestamp: Long,
@@ -32,55 +44,159 @@ data class AnalysisUiState(
     val isLoading: Boolean = false,
     val selectedPeriod: AnalysisPeriod = AnalysisPeriod.MONTH,
     val periodOffset: Int = 0,
+    val selectedAccountId: String? = null,
+    val chartType: TrendChartType = TrendChartType.LINE,
     val dateRangeLabel: String = "",
     val summary: AnalysisSummary = AnalysisSummary(),
     val totalIncomePaise: Long = 0L,
     val totalExpensePaise: Long = 0L,
     val netSavingsPaise: Long = 0L,
     val categorySpendings: List<CategorySpending> = emptyList(),
+    val accountSpendings: List<AccountSpending> = emptyList(),
     val timeTrendPoints: List<TimeSpendingPoint> = emptyList(),
+    val trendInsight: SpendingTrendInsight = SpendingTrendInsight(),
+    val periodComparison: PeriodComparisonData? = null,
+    val availableAccounts: List<AccountDisplayItem> = emptyList(),
     val isEmpty: Boolean = true
+)
+
+private data class FilterConfig(
+    val period: AnalysisPeriod,
+    val offset: Int,
+    val accountId: String?,
+    val chartType: TrendChartType
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AnalysisViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val accountRepository: AccountRepository? = null
 ) : ViewModel() {
 
     private val _selectedPeriod = MutableStateFlow(AnalysisPeriod.MONTH)
     private val _periodOffset = MutableStateFlow(0)
+    private val _selectedAccountId = MutableStateFlow<String?>(null)
+    private val _chartType = MutableStateFlow(TrendChartType.LINE)
 
-    val uiState: StateFlow<AnalysisUiState> = combine(_selectedPeriod, _periodOffset, ::Pair)
-        .flatMapLatest { (period, offset) ->
-            val range = calculateDateRange(period, offset)
-            combine(
-                transactionRepository.getCategorySpending(range.startTimestamp, range.endTimestamp),
-                transactionRepository.getTimeSpendingTrend(range.startTimestamp, range.endTimestamp, period),
-                transactionRepository.getAnalysisSummary(range.startTimestamp, range.endTimestamp)
-            ) { categories, trend, summary ->
-                val isEmpty = categories.isEmpty() && summary.totalIncomePaise == 0L && summary.totalExpensePaise == 0L
-                AnalysisUiState(
-                    isLoading = false,
-                    selectedPeriod = period,
-                    periodOffset = offset,
-                    dateRangeLabel = range.label,
-                    summary = summary,
-                    totalIncomePaise = summary.totalIncomePaise,
-                    totalExpensePaise = summary.totalExpensePaise,
-                    netSavingsPaise = summary.netSavingsPaise,
-                    categorySpendings = categories,
-                    timeTrendPoints = trend,
-                    isEmpty = isEmpty
-                )
-            }
+    val uiState: StateFlow<AnalysisUiState> = combine(
+        _selectedPeriod,
+        _periodOffset,
+        _selectedAccountId,
+        _chartType
+    ) { period, offset, accountId, chartType ->
+        FilterConfig(period, offset, accountId, chartType)
+    }.flatMapLatest { config ->
+        val period = config.period
+        val offset = config.offset
+        val accountId = config.accountId
+        val chartType = config.chartType
+
+        val currentRange = calculateDateRange(period, offset)
+        val previousRange = calculateDateRange(period, offset - 1)
+
+        val accountsFlow = accountRepository?.getActiveAccounts() ?: flowOf(emptyList())
+
+        val baseMetricsFlow = combine(
+            transactionRepository.getCategorySpending(currentRange.startTimestamp, currentRange.endTimestamp, accountId),
+            transactionRepository.getTimeSpendingTrend(currentRange.startTimestamp, currentRange.endTimestamp, period, accountId),
+            transactionRepository.getAnalysisSummary(currentRange.startTimestamp, currentRange.endTimestamp, accountId)
+        ) { categories, trend, summary ->
+            Triple(categories, trend, summary)
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = AnalysisUiState(isLoading = true)
-        )
+
+        val extendedMetricsFlow = combine(
+            transactionRepository.getAccountSpending(currentRange.startTimestamp, currentRange.endTimestamp),
+            transactionRepository.getPeriodComparison(
+                currentRange.startTimestamp,
+                currentRange.endTimestamp,
+                previousRange.startTimestamp,
+                previousRange.endTimestamp,
+                accountId
+            ),
+            accountsFlow
+        ) { accountSpendings, comparison, accounts ->
+            Triple(accountSpendings, comparison, accounts)
+        }
+
+        combine(baseMetricsFlow, extendedMetricsFlow) { base, ext ->
+            val categories = base.first
+            val trend = base.second
+            val summary = base.third
+
+            val accountSpendings = ext.first
+            val comparison = ext.second
+            val accounts = ext.third
+
+            val isEmpty = categories.isEmpty() && summary.totalIncomePaise == 0L && summary.totalExpensePaise == 0L
+
+            // Calculate burn rate and run-rate forecast if in the current period (offset == 0)
+            val now = System.currentTimeMillis()
+            val cal = Calendar.getInstance().apply { timeInMillis = now }
+            val (elapsedDays, totalDays) = when (period) {
+                AnalysisPeriod.WEEK -> {
+                    val dayOfWeek = (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7 + 1
+                    dayOfWeek to 7
+                }
+                AnalysisPeriod.MONTH -> {
+                    val dayOfMonth = cal.get(Calendar.DAY_OF_MONTH)
+                    val maxDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+                    dayOfMonth to maxDays
+                }
+                AnalysisPeriod.YEAR -> {
+                    val dayOfYear = cal.get(Calendar.DAY_OF_YEAR)
+                    val maxDays = cal.getActualMaximum(Calendar.DAY_OF_YEAR)
+                    dayOfYear to maxDays
+                }
+            }
+
+            val dailyBurnRate = if (offset == 0 && elapsedDays > 0) {
+                summary.totalExpensePaise / elapsedDays
+            } else 0L
+
+            val projectedTotal = if (offset == 0) {
+                dailyBurnRate * totalDays
+            } else 0L
+
+            val hasComparison = comparison.previousTotalExpensePaise > 0L || comparison.currentTotalExpensePaise > 0L
+
+            val trendInsight = SpendingTrendInsight(
+                currentExpensePaise = summary.totalExpensePaise,
+                previousExpensePaise = comparison.previousTotalExpensePaise,
+                deltaExpensePaise = comparison.expenseDeltaPaise,
+                percentageChange = comparison.expensePercentageChange,
+                isIncreasing = comparison.isExpenseIncreasing,
+                dailyBurnRatePaise = dailyBurnRate,
+                projectedPeriodExpensePaise = projectedTotal,
+                hasComparisonData = hasComparison
+            )
+
+            AnalysisUiState(
+                isLoading = false,
+                selectedPeriod = period,
+                periodOffset = offset,
+                selectedAccountId = accountId,
+                chartType = chartType,
+                dateRangeLabel = currentRange.label,
+                summary = summary,
+                totalIncomePaise = summary.totalIncomePaise,
+                totalExpensePaise = summary.totalExpensePaise,
+                netSavingsPaise = summary.netSavingsPaise,
+                categorySpendings = categories,
+                accountSpendings = accountSpendings,
+                timeTrendPoints = trend,
+                trendInsight = trendInsight,
+                periodComparison = comparison,
+                availableAccounts = accounts.map { it.toDisplayItem() },
+                isEmpty = isEmpty
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = AnalysisUiState(isLoading = true)
+    )
 
     fun selectPeriod(period: AnalysisPeriod) {
         _selectedPeriod.value = period
@@ -99,6 +215,14 @@ class AnalysisViewModel @Inject constructor(
 
     fun resetPeriod() {
         _periodOffset.value = 0
+    }
+
+    fun selectAccount(accountId: String?) {
+        _selectedAccountId.value = accountId
+    }
+
+    fun setChartType(type: TrendChartType) {
+        _chartType.value = type
     }
 
     companion object {

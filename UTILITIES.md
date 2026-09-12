@@ -81,10 +81,14 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `ErrorState`: Centered error icon, message, and retry button.
 - `EmptyState`: Centered empty placeholder icon, title, description, and optional action CTA.
 
-### Charts & Data Visualization (`ui/components/PieChart.kt`, `ui/screens/Analysis/AnalysisScreen.kt`)
+### Charts & Data Visualization (`ui/components/PieChart.kt`, `ui/components/AnalysisCharts.kt`, `ui/screens/Analysis/AnalysisScreen.kt`)
 - `CategoryDonutChart`: Theme-aware animated Compose Canvas Donut/Pie chart displaying category spending distribution with centered total spent readout.
 - `CategorySpendingLegendList`: Ranked category spending list with color indicators, transaction counts, percentage badges, and formatted amounts.
-- `SpendingTrendCard`: Vico `LineChart` card with Material 3 dynamic styling (`m3ChartStyle()`), formatted start currency axis, and bottom date axis.
+- `CategoryCompositionStackedBar`: Animated horizontal stacked segmented bar showing proportional category spending composition with percentage badges.
+- `SpendingTrendCard`: Vico chart card supporting dynamic toggle between Line (`lineChart()`) and Bar (`columnChart()`) visualizations with formatted currency and date axes.
+- `TrendForecastCard`: Directional spending indicator (increasing/decreasing vs prior period), daily burn rate (₹/day), and projected period-end forecast.
+- `PeriodComparisonCard`: Side-by-side comparative analysis (Year-over-Year, Month-over-Month, Week-over-Week) with net delta badges and top category movers.
+- `AccountBreakdownCard`: Multi-dimensional breakdown of spending across accounts and payment methods with percentage progress bars.
 - `parseCategoryColor`: Pure Kotlin color hex parser with fallback palette for safe JVM unit testing and Android device rendering.
 
 ### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`)

@@ -3,6 +3,26 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 5.4: Enhanced Analysis complete.
+  - Added multi-dimensional repository queries in `TransactionRepository` and `TransactionRepositoryImpl`:
+    - `getAccountSpending(start, end)`: Aggregates total spent, transaction count, and percentage distribution per account.
+    - `getPeriodComparison(currentStart, currentEnd, previousStart, previousEnd, accountId)`: Side-by-side comparative analysis comparing current period vs prior period (Year-over-Year, Month-over-Month, Week-over-Week) with category movers.
+    - Updated `getCategorySpending`, `getTimeSpendingTrend`, and `getAnalysisSummary` with optional `accountId` filter for account drill-down analytics.
+  - Created reusable charting and analytics components in `AnalysisCharts.kt`:
+    - `CategoryCompositionStackedBar`: Animated horizontal stacked segmented bar chart displaying category spending composition with percentage badges.
+    - `TrendForecastCard`: Directional spending status (increasing/decreasing vs prior period), daily burn rate (₹/day), and period-end run-rate projection.
+    - `PeriodComparisonCard`: Comparative cards showing previous vs current spending, net change badge, and top category shifts.
+    - `AccountBreakdownCard`: Multi-dimensional breakdown of spending across accounts and payment methods with progress bars.
+  - Enhanced `AnalysisViewModel` with:
+    - Multi-dimensional reactive flow architecture cleanly splitting base metrics and extended metrics into two stages to adhere to Kotlinx Coroutines flow combination limits.
+    - Account filtering (`selectAccount(id)`) and chart type toggling (`setChartType(TrendChartType)` between `LINE` and `BAR`).
+  - Enhanced `AnalysisScreen` with:
+    - Account filter chips row ("All Accounts" and individual accounts).
+    - Vico chart Line (`lineChart()`) vs Bar (`columnChart()`) toggle buttons.
+    - Integrated `TrendForecastCard`, `PeriodComparisonCard`, `CategoryCompositionStackedBar`, and `AccountBreakdownCard`.
+  - Added unit test suite in `EnhancedAnalysisTest.kt` (5 tests covering account filtering, trend calculations, run-rate forecast, Year-over-Year date math, and chart type toggle).
+  - Verified all 124+ unit tests passing in `testDebugUnitTest` and clean build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 5.3: Goals Tracking complete.
   - Implemented dual savings goal tracking computation:
     - If dedicated fund: `progress = dedicated balance (currentAmount) / target`
