@@ -7,6 +7,7 @@ import com.rushi.mitavyay.data.db.Transaction
 import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.CategoryRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
+import com.rushi.mitavyay.data.repository.TransferRepository
 import com.rushi.mitavyay.ui.navigation.NavDestination
 import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailViewModel
 import com.rushi.mitavyay.ui.screens.TransactionList.TransactionListViewModel
@@ -392,5 +393,85 @@ class TransactionListAndDetailTest {
         assertEquals("Big Snack", updated?.description)
         // Bank balance should now be 500,000 - 15,000 = 485,000
         assertEquals(485000L, fakeAccountRepo.getAccount("acc_bank")!!.balance)
+    }
+
+    @Test
+    fun transactionDetail_transferRecordShowsIsTransferFlagAndDeletesAtomically() = runBlocking {
+        val transferId = "transfer_test_123"
+        val transferTx = Transaction(
+            id = "tx_transfer_debit",
+            accountId = "acc_bank",
+            amount = -200000L,
+            description = "Transfer to Cash",
+            timestamp = 1000L,
+            category = "Transfer",
+            transferId = transferId
+        )
+        fakeTxRepo.addTransaction(transferTx)
+
+        var deletedTransferId: String? = null
+        val fakeTransferRepo = object : TransferRepository {
+            override suspend fun createTransfer(fromAccountId: String, toAccountId: String, amountPaise: Long, timestamp: Long, notes: String?): String = ""
+            override suspend fun deleteTransfer(transferId: String) {
+                deletedTransferId = transferId
+                fakeTxRepo.deleteTransaction("tx_transfer_debit")
+            }
+            override suspend fun getTransferTransactions(transferId: String): List<Transaction> = emptyList()
+        }
+
+        val savedStateHandle = SavedStateHandle(mapOf(NavDestination.TransactionDetail.ARG_TRANSACTION_ID to transferTx.id))
+        val viewModel = TransactionDetailViewModel(
+            savedStateHandle = savedStateHandle,
+            transactionRepository = fakeTxRepo,
+            accountRepository = fakeAccountRepo,
+            categoryRepository = fakeCategoryRepo,
+            transferRepository = fakeTransferRepo
+        )
+
+        val state = viewModel.uiState.first { it.transaction != null }
+        assertNotNull(state.transaction)
+        assertTrue(state.displayItem?.isTransfer == true)
+
+        var deleteCallbackCalled = false
+        viewModel.deleteTransaction { deleteCallbackCalled = true }
+
+        assertTrue(deleteCallbackCalled)
+        assertEquals(transferId, deletedTransferId)
+        assertNull(fakeTxRepo.getTransactionById("tx_transfer_debit"))
+    }
+
+    @Test
+    fun transactionList_displaysTransferBadge() = runBlocking {
+        val transferTx = Transaction(
+            id = "tx_transfer_1",
+            accountId = "acc_bank",
+            amount = -50000L,
+            description = "Transfer Out",
+            timestamp = 2000L,
+            category = "Transfer",
+            transferId = "transfer_abc"
+        )
+        val normalTx = Transaction(
+            id = "tx_normal_1",
+            accountId = "acc_bank",
+            amount = -25000L,
+            description = "Dinner",
+            timestamp = 1000L,
+            category = "Food & Dining",
+            transferId = null
+        )
+        fakeTxRepo.addTransaction(transferTx)
+        fakeTxRepo.addTransaction(normalTx)
+
+        val viewModel = TransactionListViewModel(fakeTxRepo, fakeAccountRepo)
+        val state = viewModel.uiState.first { it.transactions.size >= 2 }
+
+        val transferItem = state.transactions.find { it.id == "tx_transfer_1" }
+        val normalItem = state.transactions.find { it.id == "tx_normal_1" }
+
+        assertNotNull(transferItem)
+        assertNotNull(normalItem)
+        assertTrue(transferItem!!.isTransfer)
+        assertFalse(normalItem!!.isTransfer)
     }
 }

@@ -11,6 +11,7 @@ import com.rushi.mitavyay.data.model.toDisplayItem
 import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.CategoryRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
+import com.rushi.mitavyay.data.repository.TransferRepository
 import com.rushi.mitavyay.ui.navigation.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +40,8 @@ class TransactionDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val transferRepository: TransferRepository? = null
 ) : ViewModel() {
 
     val transactionId: String = savedStateHandle[NavDestination.TransactionDetail.ARG_TRANSACTION_ID] ?: ""
@@ -81,7 +83,13 @@ class TransactionDetailViewModel @Inject constructor(
     fun deleteTransaction(onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             try {
-                transactionRepository.deleteTransaction(transactionId)
+                val currentTx = uiState.value.transaction
+                val transferId = currentTx?.transferId
+                if (!transferId.isNullOrBlank() && transferRepository != null) {
+                    transferRepository.deleteTransfer(transferId)
+                } else {
+                    transactionRepository.deleteTransaction(transactionId)
+                }
                 _actionState.value = _actionState.value.copy(isDeleted = true)
                 onSuccess()
             } catch (e: Exception) {

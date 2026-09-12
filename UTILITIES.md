@@ -24,6 +24,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - **UI Display Model Mappers** (`com.rushi.mitavyay.data.model.*`):
   - `toDisplayItem()` extension functions for `Transaction`, `Account`, `Goal`, `Debt`, `RepeatExpense`, and `Category`.
   - Ensures entities are never exposed directly to UI components.
+  - Includes transfer flags (`transferId`, `isTransfer`) on `TransactionDisplayItem`.
   - *Location*: `data/model/*DisplayItem.kt`
 - **Category Icon & Color Utilities** (`com.rushi.mitavyay.ui.components`):
   - `getCategoryIcon(iconName: String): ImageVector`: Maps icon identifiers to safe `material-icons-core` vectors.
@@ -42,7 +43,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `DangerButton`: Destructive button with error color for deletions and destructive confirmations.
 
 ### Cards (`ui/components/Cards.kt`)
-- `TransactionCard`: Card displaying title, category, formatted amount (green for income, red for expenses), and formatted date.
+- `TransactionCard`: Card displaying title, category, formatted amount (green for income, red for expenses), formatted date, and "Transfer" badge for paired transfer records.
 - `AccountCard`: Card displaying account name, type chip (Cash/Bank/Credit), formatted balance, and active status.
 - `GoalCard`: Card displaying goal progress bar, saved vs target amount, deadline, and percentage.
 
@@ -51,9 +52,10 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, and direct `Long` paise conversion.
 - `DatePickerField` & `AppDatePickerDialog`: Date selection field launching a Material 3 DatePickerDialog and emitting Unix timestamp ms (`Long`).
 
-### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`, `ui/components/AddCategoryDialog.kt`)
+### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/Transfer/TransferDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`, `ui/components/AddCategoryDialog.kt`)
 - `AppAlertDialog`: Standardized confirmation and alert dialog with theme typography, colors, and confirm/dismiss actions.
 - `AddAccountDialog`: Form dialog for creating and editing accounts with validated name, type selection, and initial balance input.
+- `TransferDialog`: Dialog allowing fund transfers between two distinct active accounts with currency input, swap button, balance preview, notes, validation, and atomic ledger creation.
 - `AddCategoryDialog`: Form dialog for creating and editing custom categories with live preview, color swatch picker, and icon grid.
 - `QuickAddExpenseSheet`: Material 3 ModalBottomSheet for rapid transaction entry with CurrencyInput, Expense/Income toggle, single-tap account/category chips, and atomic balance syncing.
 - `EditTransactionDialog`: Form dialog for editing transaction amount, expense/income type, category, account, and description.

@@ -1,5 +1,6 @@
 package com.rushi.mitavyay.data.repository
 
+import com.rushi.mitavyay.data.db.AccountDao
 import com.rushi.mitavyay.data.db.DatabaseTransactionRunner
 import com.rushi.mitavyay.data.db.Transaction
 import com.rushi.mitavyay.data.db.TransactionDao
@@ -17,16 +18,19 @@ interface TransferRepository {
     ): String
 
     suspend fun deleteTransfer(transferId: String)
+    suspend fun getTransferTransactions(transferId: String): List<Transaction>
 }
 
 /**
  * Manages transfers as dual paired transaction records (debit and credit).
- * Ensures consistency: debit + credit are always committed or deleted atomically.
+ * Ensures consistency: debit + credit are always committed or deleted atomically,
+ * and account balances are updated concurrently.
  */
 @Singleton
 class TransferRepositoryImpl @Inject constructor(
     private val transactionRunner: DatabaseTransactionRunner,
-    private val transactionDao: TransactionDao
+    private val transactionDao: TransactionDao,
+    private val accountDao: AccountDao? = null
 ) : TransferRepository {
 
     override suspend fun createTransfer(
@@ -36,33 +40,75 @@ class TransferRepositoryImpl @Inject constructor(
         timestamp: Long,
         notes: String?
     ): String {
+        val trimmedFrom = fromAccountId.trim()
+        val trimmedTo = toAccountId.trim()
+
+        if (trimmedFrom.isBlank() || trimmedTo.isBlank()) {
+            throw IllegalArgumentException("Source and destination accounts must be specified")
+        }
+
+        if (trimmedFrom == trimmedTo) {
+            throw IllegalArgumentException("Cannot transfer to the same account")
+        }
+
+        if (amountPaise <= 0L) {
+            throw IllegalArgumentException("Transfer amount must be greater than zero")
+        }
+
         val transferId = UUID.randomUUID().toString()
         val absAmount = kotlin.math.abs(amountPaise)
 
+        val fromAccount = accountDao?.getById(trimmedFrom)
+        val toAccount = accountDao?.getById(trimmedTo)
+
+        val debitDesc = if (!notes.isNullOrBlank()) {
+            notes.trim()
+        } else if (toAccount != null) {
+            "Transfer to ${toAccount.name}"
+        } else {
+            "Transfer Out"
+        }
+
+        val creditDesc = if (!notes.isNullOrBlank()) {
+            notes.trim()
+        } else if (fromAccount != null) {
+            "Transfer from ${fromAccount.name}"
+        } else {
+            "Transfer In"
+        }
+
         val debitTransaction = Transaction(
             id = UUID.randomUUID().toString(),
-            accountId = fromAccountId,
+            accountId = trimmedFrom,
             amount = -absAmount,
-            description = "Transfer Out",
+            description = debitDesc,
             timestamp = timestamp,
             category = "Transfer",
             transferId = transferId,
-            notes = notes
+            notes = notes?.trim()?.ifBlank { null }
         )
 
         val creditTransaction = Transaction(
             id = UUID.randomUUID().toString(),
-            accountId = toAccountId,
+            accountId = trimmedTo,
             amount = absAmount,
-            description = "Transfer In",
+            description = creditDesc,
             timestamp = timestamp,
             category = "Transfer",
             transferId = transferId,
-            notes = notes
+            notes = notes?.trim()?.ifBlank { null }
         )
 
         transactionRunner {
             transactionDao.insertAll(listOf(debitTransaction, creditTransaction))
+            accountDao?.let { dao ->
+                if (fromAccount != null) {
+                    dao.updateBalance(fromAccount.id, fromAccount.balance - absAmount)
+                }
+                if (toAccount != null) {
+                    dao.updateBalance(toAccount.id, toAccount.balance + absAmount)
+                }
+            }
         }
 
         return transferId
@@ -70,7 +116,20 @@ class TransferRepositoryImpl @Inject constructor(
 
     override suspend fun deleteTransfer(transferId: String) {
         transactionRunner {
+            val linked = transactionDao.getByTransferId(transferId)
+            accountDao?.let { dao ->
+                linked.forEach { tx ->
+                    val account = dao.getById(tx.accountId)
+                    if (account != null) {
+                        dao.updateBalance(account.id, account.balance - tx.amount)
+                    }
+                }
+            }
             transactionDao.deleteByTransferId(transferId)
         }
+    }
+
+    override suspend fun getTransferTransactions(transferId: String): List<Transaction> {
+        return transactionDao.getByTransferId(transferId)
     }
 }

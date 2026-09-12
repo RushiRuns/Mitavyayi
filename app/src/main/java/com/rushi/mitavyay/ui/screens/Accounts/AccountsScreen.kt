@@ -7,15 +7,20 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.R
 import com.rushi.mitavyay.data.model.AccountDisplayItem
+import com.rushi.mitavyay.ui.screens.Transfer.TransferDialog
 import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.EmptyState
 import com.rushi.mitavyay.ui.components.LoadingState
@@ -59,8 +65,25 @@ fun AccountsScreen(
         onEditClick = { viewModel.onEditClick(it) },
         onDeleteClick = { viewModel.onDeleteClick(it) },
         onToggleActive = { viewModel.toggleActiveStatus(it) },
+        onTransferClick = { viewModel.onTransferClick(it) },
         modifier = modifier
     )
+
+    if (uiState.isTransferOpen) {
+        TransferDialog(
+            accounts = uiState.accounts,
+            initialFromAccountId = uiState.transferInitialFromAccountId,
+            onDismiss = { viewModel.dismissDialogs() },
+            onTransfer = { fromId, toId, amountPaise, notes ->
+                viewModel.executeTransfer(
+                    fromAccountId = fromId,
+                    toAccountId = toId,
+                    amountPaise = amountPaise,
+                    notes = notes
+                )
+            }
+        )
+    }
 
     if (uiState.isAddEditOpen) {
         AddAccountDialog(
@@ -102,6 +125,7 @@ fun AccountsContent(
     onEditClick: (AccountDisplayItem) -> Unit,
     onDeleteClick: (AccountDisplayItem) -> Unit,
     onToggleActive: (AccountDisplayItem) -> Unit,
+    onTransferClick: (String?) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -118,20 +142,52 @@ fun AccountsContent(
                 )
             }
             else -> {
+                val hasMultipleActive = uiState.accounts.count { it.isActive } >= 2
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Accounts (${uiState.accounts.size})",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            if (hasMultipleActive) {
+                                FilledTonalButton(
+                                    onClick = { onTransferClick(null) },
+                                    shape = MaterialTheme.appShapes.small,
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = "Transfer Between Accounts",
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Transfer", style = MaterialTheme.typography.labelMedium)
+                                }
+                            }
+                        }
+                    }
+
                     items(
                         items = uiState.accounts,
                         key = { it.id }
                     ) { item ->
                         AccountItemCard(
                             account = item,
+                            canTransfer = hasMultipleActive,
                             onEdit = { onEditClick(item) },
                             onDelete = { onDeleteClick(item) },
-                            onToggleActive = { onToggleActive(item) }
+                            onToggleActive = { onToggleActive(item) },
+                            onTransfer = { onTransferClick(item.id) }
                         )
                     }
                 }
@@ -159,9 +215,11 @@ fun AccountsContent(
 @Composable
 fun AccountItemCard(
     account: AccountDisplayItem,
+    canTransfer: Boolean = false,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onToggleActive: () -> Unit,
+    onTransfer: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -209,6 +267,15 @@ fun AccountItemCard(
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (account.isActive && canTransfer) {
+                        IconButton(onClick = onTransfer) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Transfer from ${account.name}",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                     IconButton(onClick = onEdit) {
                         Icon(
                             imageVector = Icons.Default.Edit,

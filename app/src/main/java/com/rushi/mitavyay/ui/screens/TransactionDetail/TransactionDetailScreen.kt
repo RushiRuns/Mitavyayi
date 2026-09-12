@@ -74,6 +74,7 @@ fun TransactionDetailScreen(
             val tx = uiState.transaction!!
             val display = uiState.displayItem
             val isCredit = tx.amount >= 0
+            val isTransfer = uiState.displayItem?.isTransfer == true || !tx.transferId.isNullOrBlank()
             val amountColor = if (isCredit) {
                 MaterialTheme.extendedColorScheme.success
             } else {
@@ -128,6 +129,17 @@ fun TransactionDetailScreen(
                                 label = { Text(tx.category) },
                                 shape = MaterialTheme.appShapes.small
                             )
+                            if (isTransfer) {
+                                SuggestionChip(
+                                    onClick = {},
+                                    label = { Text("Transfer") },
+                                    colors = SuggestionChipDefaults.suggestionChipColors(
+                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                        labelColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                    ),
+                                    shape = MaterialTheme.appShapes.small
+                                )
+                            }
                         }
 
                         SpacerSm()
@@ -201,39 +213,41 @@ fun TransactionDetailScreen(
 
                 SpacerLg()
 
-                // Actions Section
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
-                ) {
-                    SecondaryButton(
-                        text = "Edit",
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = null)
-                        },
-                        onClick = { showEditDialog = true },
-                        modifier = Modifier.weight(1f)
-                    )
+                if (!isTransfer) {
+                    // Actions Section
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
+                    ) {
+                        SecondaryButton(
+                            text = "Edit",
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+                            },
+                            onClick = { showEditDialog = true },
+                            modifier = Modifier.weight(1f)
+                        )
 
-                    SecondaryButton(
-                        text = "Duplicate",
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = null)
-                        },
-                        onClick = {
-                            viewModel.duplicateTransaction {
-                                Toast.makeText(context, "Transaction duplicated", Toast.LENGTH_SHORT).show()
-                                onNavigateBack()
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
+                        SecondaryButton(
+                            text = "Duplicate",
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                            },
+                            onClick = {
+                                viewModel.duplicateTransaction {
+                                    Toast.makeText(context, "Transaction duplicated", Toast.LENGTH_SHORT).show()
+                                    onNavigateBack()
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    SpacerMd()
                 }
 
-                SpacerMd()
-
                 DangerButton(
-                    text = "Delete Transaction",
+                    text = if (isTransfer) "Delete Transfer" else "Delete Transaction",
                     onClick = { showDeleteDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -243,14 +257,22 @@ fun TransactionDetailScreen(
             if (showDeleteDialog) {
                 AppAlertDialog(
                     onDismissRequest = { showDeleteDialog = false },
-                    title = "Delete Transaction",
-                    text = "Are you sure you want to delete this transaction? Your account balance will be automatically adjusted.",
-                    confirmText = "Delete",
+                    title = if (isTransfer) "Delete Transfer" else "Delete Transaction",
+                    text = if (isTransfer) {
+                        "This transaction is part of a transfer. Deleting it will delete both linked transactions and restore balances for both accounts."
+                    } else {
+                        "Are you sure you want to delete this transaction? Your account balance will be automatically adjusted."
+                    },
+                    confirmText = if (isTransfer) "Delete Transfer" else "Delete",
                     isDestructive = true,
                     onConfirm = {
                         showDeleteDialog = false
                         viewModel.deleteTransaction {
-                            Toast.makeText(context, "Transaction deleted", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                if (isTransfer) "Transfer deleted" else "Transaction deleted",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             onNavigateBack()
                         }
                     }

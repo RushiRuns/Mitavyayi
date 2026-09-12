@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.model.toDisplayItem
 import com.rushi.mitavyay.data.repository.AccountRepository
+import com.rushi.mitavyay.data.repository.TransferRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,12 +23,15 @@ data class AccountsUiState(
     val accountToDelete: AccountDisplayItem? = null,
     val showCannotDeleteDialog: Boolean = false,
     val accountToArchive: AccountDisplayItem? = null,
+    val isTransferOpen: Boolean = false,
+    val transferInitialFromAccountId: String? = null,
     val errorMessage: String? = null
 )
 
 @HiltViewModel
 class AccountsViewModel @Inject constructor(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val transferRepository: TransferRepository? = null
 ) : ViewModel() {
 
     private val _dialogState = MutableStateFlow(DialogState())
@@ -38,6 +42,8 @@ class AccountsViewModel @Inject constructor(
         val accountToDelete: AccountDisplayItem? = null,
         val showCannotDeleteDialog: Boolean = false,
         val accountToArchive: AccountDisplayItem? = null,
+        val isTransferOpen: Boolean = false,
+        val transferInitialFromAccountId: String? = null,
         val errorMessage: String? = null
     )
 
@@ -53,11 +59,13 @@ class AccountsViewModel @Inject constructor(
             accountToDelete = dialogState.accountToDelete,
             showCannotDeleteDialog = dialogState.showCannotDeleteDialog,
             accountToArchive = dialogState.accountToArchive,
+            isTransferOpen = dialogState.isTransferOpen,
+            transferInitialFromAccountId = dialogState.transferInitialFromAccountId,
             errorMessage = dialogState.errorMessage
         )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
+        started = SharingStarted.Eagerly,
         initialValue = AccountsUiState(isLoading = true)
     )
 
@@ -134,5 +142,41 @@ class AccountsViewModel @Inject constructor(
 
     fun dismissDialogs() {
         _dialogState.value = DialogState()
+    }
+
+    fun onTransferClick(initialFromAccountId: String? = null) {
+        _dialogState.value = _dialogState.value.copy(
+            isTransferOpen = true,
+            transferInitialFromAccountId = initialFromAccountId
+        )
+    }
+
+    fun executeTransfer(
+        fromAccountId: String,
+        toAccountId: String,
+        amountPaise: Long,
+        notes: String?,
+        onSuccess: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            val repo = transferRepository
+            if (repo == null) {
+                onError("Transfer repository unavailable")
+                return@launch
+            }
+            try {
+                repo.createTransfer(
+                    fromAccountId = fromAccountId,
+                    toAccountId = toAccountId,
+                    amountPaise = amountPaise,
+                    notes = notes
+                )
+                dismissDialogs()
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e.localizedMessage ?: "Failed to execute transfer")
+            }
+        }
     }
 }

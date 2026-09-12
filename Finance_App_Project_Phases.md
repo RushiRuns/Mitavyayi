@@ -478,24 +478,24 @@
 ### Feature 4.7: Transfers (Between Accounts)
 
 **Planning**
-- [ ] User can transfer money between two accounts
-- [ ] Stored as two linked Transaction records (debit + credit)
-- [ ] Appears in transaction list for both accounts
+- [x] User can transfer money between two accounts
+- [x] Stored as two linked Transaction records (debit + credit)
+- [x] Appears in transaction list for both accounts
 
 **Implementation**
-- [ ] Create `ui/screens/Transfer/TransferDialog.kt`
+- [x] Create `ui/screens/Transfer/TransferDialog.kt`
   - From account, to account, amount
   - Submit creates transfer via `TransferRepository.createTransfer()`
-- [ ] Repository creates two transactions atomically (linked by transferId)
-- [ ] Show transfers in transaction list (with special marker)
+- [x] Repository creates two transactions atomically (linked by transferId)
+- [x] Show transfers in transaction list (with special marker)
 
 **Testing**
-- [ ] Test: Create transfer, verify two transactions created
-- [ ] Test: Transfer amount deducted from source, added to destination
-- [ ] Test: Delete transfer, both transactions deleted atomically
+- [x] Test: Create transfer, verify two transactions created
+- [x] Test: Transfer amount deducted from source, added to destination
+- [x] Test: Delete transfer, both transactions deleted atomically
 
 **Closure**
-- [ ] Commit: "Feature 4.7: Transfers"
+- [x] Commit: "Feature 4.7: Transfers"
 
 ### Feature 4.8: Import/Export (CSV)
 

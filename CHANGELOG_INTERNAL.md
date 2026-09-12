@@ -3,6 +3,17 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.7: Transfers (Between Accounts) complete.
+  - Implemented dual paired linked transactions per `ADR-002: Transfers Stored as Dual Linked Transaction Records`: debit record (`amount = -amountPaise`) on source account, credit record (`amount = +amountPaise`) on destination account sharing a unique `transferId`.
+  - Upgraded `TransferRepositoryImpl` with atomic ledger synchronization inside `DatabaseTransactionRunner`, updating source and destination account balances simultaneously, and reverting account balances on transfer deletion.
+  - Added transfer validation to `TransferRepositoryImpl`: rejecting identical source/destination accounts and zero or negative amounts with informative errors.
+  - Built `TransferDialog` Material 3 dialog with active account selectors, account swap button, disabled self-selection, real-time balance feedback, `CurrencyInput` for amount, optional notes, and validation messages.
+  - Updated `Cards.kt` (`TransactionCard`) to display a distinct "Transfer" chip badge using theme container tokens (`tertiaryContainer`) whenever `item.isTransfer` is true.
+  - Enhanced `AccountsViewModel` and `AccountsScreen` with a top-level "Transfer" action button (enabled when at least 2 active accounts exist) and per-account transfer quick actions.
+  - Enhanced `TransactionDetailViewModel` and `TransactionDetailScreen` to detect transfers, render the "Transfer" badge, hide non-atomic editing/duplication, and atomically delete both paired transfer records and restore account balances when deleted from detail view.
+  - Added unit test suites in `TransferRepositoryTest.kt` (6 tests), `AccountsTransferTest.kt` (5 tests), and `TransactionListAndDetailTest.kt` (2 tests).
+  - Verified all tests passing in `testDebugUnitTest` and clean build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 4.6: Category Management complete.
   - Implemented pre-population of default categories in `DatabaseModule.kt` via `RoomDatabase.Callback()` using SQLite `INSERT OR IGNORE` and automatic reactive fallback seeding in `CategoryRepositoryImpl.getAllCategories()`.
   - Added custom category management methods to `CategoryRepository`: `createCustomCategory(name, colorHex, icon)`, `updateCustomCategory(id, name, colorHex, icon)`, and `canDeleteCategory(id)` with immutability enforcement for default categories (`isCustom = false`).
