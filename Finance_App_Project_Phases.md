@@ -254,7 +254,7 @@
 
 ### Navigation Setup
 
-- [ ] Create `ui/navigation/NavDestinations.kt`
+- [x] Create `ui/navigation/NavDestinations.kt`
   - Sealed class for all routes:
     ```kotlin
     sealed class NavDestination {
@@ -264,31 +264,31 @@
       // Add others as features are built
     }
     ```
-- [ ] Create `ui/navigation/NavHost.kt`
+- [x] Create `ui/navigation/NavHost.kt`
   - Single NavHost in the main Activity
   - Routes mapped to screen Composables
   - No Fragments — Compose only
 
 ### Main Activity & App-level Structure
 
-- [ ] Create `MainActivity.kt`
+- [x] Create `MainActivity.kt`
   - Single Activity, full-screen Compose
   - Sets up theme based on DataStore preference
   - Passes NavHost as content
-- [ ] Create `ui/AppState.kt`
+- [x] Create `ui/AppState.kt`
   - Holds navigation state
   - Holds global preferences (theme, language)
 
 ### Bottom Navigation
 
-- [ ] Create `ui/components/BottomNavBar.kt`
+- [x] Create `ui/components/BottomNavBar.kt`
   - Tabs: Transactions, Analysis, Accounts, More (if needed)
   - Navigation between tabs
   - Uses theme colors and spacing
 
 ### Scaffold Structure
 
-- [ ] Create base scaffold Composable
+- [x] Create base scaffold Composable
   - TopAppBar
   - BottomNavBar
   - Floating Action Button (for quick add)
@@ -296,19 +296,19 @@
 
 ### Screen Templates
 
-- [ ] Create `ui/screens/TransactionList/TransactionListScreen.kt` (empty, structure only)
-- [ ] Create `ui/screens/Analysis/AnalysisScreen.kt` (empty, structure only)
-- [ ] Create `ui/screens/Accounts/AccountsScreen.kt` (empty, structure only)
-- [ ] Each screen has a ViewModel (empty, to be populated)
+- [x] Create `ui/screens/TransactionList/TransactionListScreen.kt` (empty, structure only)
+- [x] Create `ui/screens/Analysis/AnalysisScreen.kt` (empty, structure only)
+- [x] Create `ui/screens/Accounts/AccountsScreen.kt` (empty, structure only)
+- [x] Each screen has a ViewModel (empty, to be populated)
 
 ### Governance Update
 
-- [ ] Create `docs/decisions/ADR-004-Single-Activity-Navigation.md`
+- [x] Create `docs/decisions/ADR-004-Single-Activity-Navigation.md`
   - Decision: One Activity, all screens via Jetpack Navigation Compose
   - Reasoning: Simpler state management, no Fragment lifecycle complexity
   - Consequences: No Fragments anywhere, all state in ViewModels
-- [ ] Update `CHANGELOG_INTERNAL.md`: "Phase 3: Navigation structure and screen templates."
-- [ ] Commit to git: "Phase 3 complete: Navigation and base UI structure"
+- [x] Update `CHANGELOG_INTERNAL.md`: "Phase 3: Navigation structure and screen templates."
+- [x] Commit to git: "Phase 3 complete: Navigation and base UI structure"
 
 ---
 

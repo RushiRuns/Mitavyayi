@@ -65,10 +65,11 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
-    // Hilt
+    // Hilt & Navigation
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // Glance
     implementation(libs.androidx.glance.appwidget)
@@ -86,6 +87,7 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

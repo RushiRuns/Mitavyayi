@@ -59,6 +59,14 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `ErrorState`: Centered error icon, message, and retry button.
 - `EmptyState`: Centered empty placeholder icon, title, description, and optional action CTA.
 
+### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`)
+- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`), tab labels, and icons.
+- `MitavyayNavHost` (`ui/navigation/NavHost.kt`): Top-level NavHost mapping routes to Compose screens without Fragments.
+- `MitavyayAppState` & `rememberMitavyayAppState` (`ui/AppState.kt`): State holder for navigation controller, backstack resolution, and tab switching.
+- `MitavyayBottomBar` (`ui/components/BottomNavBar.kt`): Material 3 navigation bar utilizing theme tokens.
+- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar, BottomNavBar, FAB, and NavHost.
+
+
 ## DO NOT CREATE
 - Do not create a second currency formatter. Use `CurrencyFormatter.format`.
 - Do not create ad-hoc date formatting in UI components. Use `DateTimeFormatter.formatDate`.

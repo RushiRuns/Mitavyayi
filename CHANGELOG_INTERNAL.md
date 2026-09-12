@@ -3,6 +3,18 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Phase 3: Navigation structure and screen templates.
+  - Implemented sealed navigation routing in `ui/navigation/NavDestinations.kt` (`TransactionList`, `Analysis`, `Accounts`).
+  - Implemented single `MitavyayNavHost` in `ui/navigation/NavHost.kt` without Fragments.
+  - Implemented `MitavyayAppState` state holder in `ui/AppState.kt` managing route tracking, top-level tab state saving, and restoration.
+  - Implemented `MitavyayBottomBar` in `ui/components/BottomNavBar.kt` using theme tokens.
+  - Implemented `MitavyayApp` in `ui/MitavyayApp.kt` root scaffold with TopAppBar, BottomNavBar, and FloatingActionButton.
+  - Implemented screen templates and `@HiltViewModel`s for `TransactionList`, `Analysis`, and `Accounts` in `ui/screens/`.
+  - Implemented `MainViewModel` and integrated dynamic theme/font scaling with `MitavyayApp` in `MainActivity.kt`.
+  - Locked `androidx-navigation-compose` v2.7.7 in `libs.versions.toml` and documented in `DEPENDENCIES.md`.
+  - Created architectural decision record `docs/decisions/ADR-004-Single-Activity-Navigation.md`.
+  - Added unit tests for navigation destinations and ViewModels in `ui/navigation/NavigationTest.kt` and `ui/screens/ViewModelsTest.kt`.
+  - Updated `UTILITIES.md`.
 - Phase 2: Core database schema and repositories complete.
   - Implemented Room entities in `data/db/` (`Transaction.kt`, `Account.kt`, `Transfer.kt`, `Goal.kt`, `Debt.kt`, `RepeatExpense.kt`, `Category.kt`).
   - Implemented Room DAOs in `data/db/` (`TransactionDao.kt`, `AccountDao.kt`, `GoalDao.kt`, `DebtDao.kt`, `RepeatExpenseDao.kt`, `CategoryDao.kt`).

@@ -17,7 +17,9 @@ data class TransactionDisplayItem(
     val tags: List<String> = emptyList(),
     val isCredit: Boolean,
     val accountName: String? = null
-)
+) {
+    val isIncome: Boolean get() = isCredit
+}
 
 fun Transaction.toDisplayItem(accountName: String? = null): TransactionDisplayItem {
     return TransactionDisplayItem(

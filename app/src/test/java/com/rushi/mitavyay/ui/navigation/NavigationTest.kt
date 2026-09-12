@@ -1,0 +1,34 @@
+package com.rushi.mitavyay.ui.navigation
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class NavigationTest {
+
+    @Test
+    fun testDestinationRoutes() {
+        assertEquals("transactions", NavDestination.TransactionList.route)
+        assertEquals("analysis", NavDestination.Analysis.route)
+        assertEquals("accounts", NavDestination.Accounts.route)
+    }
+
+    @Test
+    fun testTopLevelDestinationsList() {
+        val topLevel = NavDestination.topLevelDestinations
+        assertEquals(3, topLevel.size)
+        assertTrue(topLevel.contains(NavDestination.TransactionList))
+        assertTrue(topLevel.contains(NavDestination.Analysis))
+        assertTrue(topLevel.contains(NavDestination.Accounts))
+    }
+
+    @Test
+    fun testFromRoute() {
+        assertEquals(NavDestination.TransactionList, NavDestination.fromRoute("transactions"))
+        assertEquals(NavDestination.Analysis, NavDestination.fromRoute("analysis"))
+        assertEquals(NavDestination.Accounts, NavDestination.fromRoute("accounts"))
+        assertEquals(NavDestination.TransactionList, NavDestination.fromRoute("transactions/item_123"))
+        assertEquals(NavDestination.TransactionList, NavDestination.fromRoute("unknown_route"))
+        assertEquals(NavDestination.TransactionList, NavDestination.fromRoute(null))
+    }
+}

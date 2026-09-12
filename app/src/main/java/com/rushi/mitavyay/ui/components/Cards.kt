@@ -22,6 +22,8 @@ import com.rushi.mitavyay.R
 import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.extendedColorScheme
 import com.rushi.mitavyay.ui.theme.spacing
+import com.rushi.mitavyay.data.model.AccountDisplayItem
+import com.rushi.mitavyay.data.model.TransactionDisplayItem
 import com.rushi.mitavyay.util.CurrencyFormatter
 import com.rushi.mitavyay.util.DateTimeFormatter
 
@@ -99,6 +101,81 @@ fun TransactionCard(
 
             Text(
                 text = CurrencyFormatter.format(amountPaise),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = amountColor
+            )
+        }
+    }
+}
+
+/**
+ * Overload for [TransactionCard] accepting a decoupled [TransactionDisplayItem].
+ */
+@Composable
+fun TransactionCard(
+    item: TransactionDisplayItem,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    val amountColor = if (item.isCredit) {
+        MaterialTheme.extendedColorScheme.success
+    } else {
+        MaterialTheme.colorScheme.error
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.appShapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = MaterialTheme.spacing.xs
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.cardContent),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item.description,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                SpacerXs()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)
+                ) {
+                    Text(
+                        text = item.category,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (item.accountName != null) {
+                        Text(
+                            text = "• ${item.accountName}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                SpacerXs()
+                Text(
+                    text = item.date,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+
+            Text(
+                text = item.amountFormatted,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = amountColor
             )
@@ -186,6 +263,92 @@ fun AccountCard(
                 ),
                 style = MaterialTheme.typography.labelSmall,
                 color = if (isActive) {
+                    MaterialTheme.extendedColorScheme.success
+                } else {
+                    MaterialTheme.colorScheme.outline
+                }
+            )
+        }
+    }
+}
+
+/**
+ * Overload for [AccountCard] accepting a decoupled [AccountDisplayItem].
+ */
+@Composable
+fun AccountCard(
+    item: AccountDisplayItem,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.appShapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = MaterialTheme.spacing.xs
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.cardContent)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                SuggestionChip(
+                    onClick = {},
+                    label = {
+                        Text(
+                            text = item.type,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    },
+                    shape = MaterialTheme.appShapes.small,
+                    colors = SuggestionChipDefaults.suggestionChipColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    border = null
+                )
+            }
+
+            SpacerSm()
+
+            Text(
+                text = stringResource(
+                    R.string.account_balance,
+                    item.balanceFormatted
+                ),
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                color = if (!item.isNegative) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.error
+                }
+            )
+
+            SpacerXs()
+
+            Text(
+                text = stringResource(
+                    if (item.isActive) R.string.account_status_active else R.string.account_status_inactive
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                color = if (item.isActive) {
                     MaterialTheme.extendedColorScheme.success
                 } else {
                     MaterialTheme.colorScheme.outline

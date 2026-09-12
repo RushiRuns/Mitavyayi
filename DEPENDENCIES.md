@@ -7,6 +7,7 @@
 - **Android Gradle Plugin (AGP)**: Build system (v9.3.2)
 - **Kotlin**: Primary language (v2.2.10)
 - **Jetpack Compose**: UI framework (BOM 2024.02.00, Compose Compiler plugin v2.2.10)
+- **Navigation Compose**: Declarative screen routing for Single Activity architecture (v2.7.7)
 - **Room (SQLite)**: Local database (v2.8.4)
 - **DataStore**: Preferences & Settings (v1.0.0) (No SharedPreferences)
 - **Hilt**: Dependency Injection (v2.59.2, hilt-navigation-compose v1.2.0)
@@ -15,6 +16,7 @@
 - **Vico**: Charts & Analytics Visualization (v1.13.1)
 - **OpenCSV**: Import / Export functionality (v5.9)
 - **Compose Animations & Lottie**: Animations (v6.4.0)
+- **Kotlinx Coroutines Test**: Coroutine testing & Dispatchers.setMain for ViewModels (v1.8.1)
 
 ## Banned Alternatives (DO NOT USE)
 
