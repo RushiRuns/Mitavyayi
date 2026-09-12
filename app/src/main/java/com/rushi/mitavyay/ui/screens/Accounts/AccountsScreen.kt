@@ -43,6 +43,7 @@ import com.rushi.mitavyay.ui.screens.Transfer.TransferDialog
 import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.EmptyState
 import com.rushi.mitavyay.ui.components.LoadingState
+import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.components.SpacerSm
 import com.rushi.mitavyay.ui.components.SpacerXs
 import com.rushi.mitavyay.ui.theme.appShapes
@@ -181,13 +182,15 @@ fun AccountsContent(
                         items = uiState.accounts,
                         key = { it.id }
                     ) { item ->
+                        @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                         AccountItemCard(
                             account = item,
                             canTransfer = hasMultipleActive,
                             onEdit = { onEditClick(item) },
                             onDelete = { onDeleteClick(item) },
                             onToggleActive = { onToggleActive(item) },
-                            onTransfer = { onTransferClick(item.id) }
+                            onTransfer = { onTransferClick(item.id) },
+                            modifier = Modifier.animateItemPlacement()
                         )
                     }
                 }
@@ -203,6 +206,7 @@ fun AccountsContent(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
+                .pressScale()
         ) {
             Icon(
                 imageVector = Icons.Default.Add,

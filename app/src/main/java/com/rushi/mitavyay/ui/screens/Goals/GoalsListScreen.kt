@@ -37,6 +37,7 @@ import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.EmptyState
 import com.rushi.mitavyay.ui.components.GoalCard
 import com.rushi.mitavyay.ui.components.LoadingState
+import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.components.SpacerSm
 import com.rushi.mitavyay.ui.components.SpacerXs
 import com.rushi.mitavyay.ui.theme.appShapes
@@ -153,10 +154,12 @@ fun GoalsListScreen(
                             items = uiState.displayedGoals,
                             key = { it.id }
                         ) { goal ->
+                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                             GoalCard(
                                 item = goal,
                                 onAddSavingsClick = { viewModel.onAddSavingsClick(goal) },
-                                onDeleteClick = { viewModel.onDeleteClick(goal) }
+                                onDeleteClick = { viewModel.onDeleteClick(goal) },
+                                modifier = Modifier.animateItemPlacement()
                             )
                         }
                     }
@@ -173,6 +176,7 @@ fun GoalsListScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(MaterialTheme.spacing.md)
+                .pressScale()
         ) {
             Icon(
                 imageVector = Icons.Default.Add,

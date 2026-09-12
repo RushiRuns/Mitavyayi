@@ -90,6 +90,9 @@ sealed class NavDestination(
             Accounts
         )
 
+        fun isTopLevel(route: String?): Boolean =
+            topLevelDestinations.any { it.route == route }
+
         fun fromRoute(route: String?): NavDestination {
             return when (route?.substringBefore("/")) {
                 TransactionList.route -> TransactionList

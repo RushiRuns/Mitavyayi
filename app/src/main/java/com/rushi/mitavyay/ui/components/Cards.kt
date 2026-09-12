@@ -1,5 +1,8 @@
 package com.rushi.mitavyay.ui.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -474,8 +478,14 @@ fun GoalCard(
 
             SpacerSm()
 
+            val animProgress by animateFloatAsState(
+                targetValue = progress.coerceIn(0f, 1f),
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+                label = "goal_card_progress"
+            )
+
             LinearProgressIndicator(
-                progress = { progress },
+                progress = { animProgress },
                 modifier = Modifier.fillMaxWidth(),
                 color = progressColor,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
@@ -627,8 +637,14 @@ fun GoalCard(
 
             SpacerSm()
 
+            val animProgress by animateFloatAsState(
+                targetValue = item.progress.coerceIn(0f, 1f),
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+                label = "goal_item_progress"
+            )
+
             LinearProgressIndicator(
-                progress = { item.progress },
+                progress = { animProgress },
                 modifier = Modifier.fillMaxWidth(),
                 color = statusColor,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant

@@ -36,6 +36,7 @@ import com.rushi.mitavyay.ui.components.LoadingState
 import com.rushi.mitavyay.ui.components.RepeatExpenseCard
 import com.rushi.mitavyay.ui.components.SpacerSm
 import com.rushi.mitavyay.ui.components.SpacerXs
+import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.spacing
 import com.rushi.mitavyay.util.CurrencyFormatter
@@ -110,10 +111,12 @@ fun RepeatExpenseListScreen(
                         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
                     ) {
                         items(currentList, key = { it.id }) { item ->
+                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                             RepeatExpenseCard(
                                 item = item,
                                 onToggleActive = { viewModel.toggleActive(item.id) },
-                                onDeleteClick = { viewModel.onDeleteClick(item) }
+                                onDeleteClick = { viewModel.onDeleteClick(item) },
+                                modifier = Modifier.animateItemPlacement()
                             )
                         }
                     }
@@ -129,6 +132,7 @@ fun RepeatExpenseListScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(MaterialTheme.spacing.lg)
+                .pressScale()
         ) {
             Icon(
                 imageVector = Icons.Default.Add,

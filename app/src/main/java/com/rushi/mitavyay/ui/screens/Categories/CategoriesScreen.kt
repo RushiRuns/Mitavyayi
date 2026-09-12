@@ -43,6 +43,7 @@ import com.rushi.mitavyay.ui.components.AddCategoryDialog
 import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.LoadingState
 import com.rushi.mitavyay.ui.components.getCategoryIcon
+import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.components.parseCategoryColor
 import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.spacing
@@ -82,6 +83,7 @@ fun CategoriesContent(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddClick,
+                modifier = Modifier.pressScale(),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
@@ -140,10 +142,12 @@ fun CategoriesContent(
                         }
                     } else {
                         items(uiState.customCategories, key = { it.id }) { category ->
+                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                             CategoryItemRow(
                                 category = category,
                                 onEditClick = { onEditClick(category) },
-                                onDeleteClick = { onDeleteClick(category) }
+                                onDeleteClick = { onDeleteClick(category) },
+                                modifier = Modifier.animateItemPlacement()
                             )
                         }
                     }
@@ -160,10 +164,12 @@ fun CategoriesContent(
                     }
 
                     items(uiState.defaultCategories, key = { it.id }) { category ->
+                        @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                         CategoryItemRow(
                             category = category,
                             onEditClick = null,
-                            onDeleteClick = null
+                            onDeleteClick = null,
+                            modifier = Modifier.animateItemPlacement()
                         )
                     }
                 }

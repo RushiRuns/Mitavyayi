@@ -33,6 +33,7 @@ import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.DebtCard
 import com.rushi.mitavyay.ui.components.EmptyState
 import com.rushi.mitavyay.ui.components.LoadingState
+import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.components.SpacerSm
 import com.rushi.mitavyay.ui.components.SpacerXs
 import com.rushi.mitavyay.ui.theme.appShapes
@@ -118,11 +119,13 @@ fun DebtListScreen(
                             items = currentList,
                             key = { it.id }
                         ) { debt ->
+                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                             DebtCard(
                                 item = debt,
                                 onMarkSettled = if (!debt.isSettled) {
                                     { viewModel.onSettleClick(debt) }
-                                } else null
+                                } else null,
+                                modifier = Modifier.animateItemPlacement()
                             )
                         }
                     }
@@ -139,6 +142,7 @@ fun DebtListScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
+                .pressScale()
         ) {
             Icon(
                 imageVector = Icons.Default.Add,

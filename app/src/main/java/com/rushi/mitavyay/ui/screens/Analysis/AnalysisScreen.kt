@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -42,6 +43,7 @@ import com.patrykandpatrick.vico.compose.chart.column.columnChart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.m3.style.m3ChartStyle
 import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.rushi.mitavyay.data.model.AccountDisplayItem
@@ -535,8 +537,10 @@ fun SpendingTrendCard(
                         FloatEntry(index.toFloat(), (point.expensePaise.toFloat() / 100f))
                     }
                 }
-                val chartModel = remember(chartEntries) {
-                    entryModelOf(chartEntries)
+                val chartModelProducer = remember { ChartEntryModelProducer() }
+
+                LaunchedEffect(chartEntries) {
+                    chartModelProducer.setEntries(chartEntries)
                 }
 
                 ProvideChartStyle(m3ChartStyle()) {
@@ -548,7 +552,7 @@ fun SpendingTrendCard(
 
                     Chart(
                         chart = chart,
-                        model = chartModel,
+                        chartModelProducer = chartModelProducer,
                         startAxis = rememberStartAxis(
                             valueFormatter = { value, _ ->
                                 if (value >= 1000f) {

@@ -1,6 +1,8 @@
 package com.rushi.mitavyay.ui.screens.Budget
 
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -403,8 +405,14 @@ fun BudgetVsActualChart(
 
                     Spacer(modifier = Modifier.height(2.dp))
 
+                    val animProgress by animateFloatAsState(
+                        targetValue = item.progress.coerceIn(0f, 1f),
+                        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+                        label = "actual_vs_budget_progress"
+                    )
+
                     LinearProgressIndicator(
-                        progress = { item.progress.coerceIn(0f, 1f) },
+                        progress = { animProgress },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(6.dp)

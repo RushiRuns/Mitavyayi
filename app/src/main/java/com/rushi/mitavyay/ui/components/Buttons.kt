@@ -30,10 +30,12 @@ fun PrimaryButton(
     loading: Boolean = false,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
+    val interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     Button(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.pressScale(interactionSource = interactionSource, enabled = enabled && !loading),
         enabled = enabled && !loading,
+        interactionSource = interactionSource,
         shape = MaterialTheme.appShapes.small,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -68,10 +70,12 @@ fun SecondaryButton(
     loading: Boolean = false,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
+    val interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.pressScale(interactionSource = interactionSource, enabled = enabled && !loading),
         enabled = enabled && !loading,
+        interactionSource = interactionSource,
         shape = MaterialTheme.appShapes.small,
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.primary,
@@ -103,10 +107,12 @@ fun TertiaryButton(
     enabled: Boolean = true,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
+    val interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     TextButton(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.pressScale(interactionSource = interactionSource, enabled = enabled),
         enabled = enabled,
+        interactionSource = interactionSource,
         shape = MaterialTheme.appShapes.small,
         colors = ButtonDefaults.textButtonColors(
             contentColor = MaterialTheme.colorScheme.tertiary,
@@ -142,10 +148,12 @@ fun DangerButton(
     enabled: Boolean = true,
     loading: Boolean = false
 ) {
+    val interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     Button(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.pressScale(interactionSource = interactionSource, enabled = enabled && !loading),
         enabled = enabled && !loading,
+        interactionSource = interactionSource,
         shape = MaterialTheme.appShapes.small,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.error,

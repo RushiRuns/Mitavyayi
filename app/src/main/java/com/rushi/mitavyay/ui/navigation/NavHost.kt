@@ -16,9 +16,12 @@ import com.rushi.mitavyay.ui.screens.Settings.ImportExportScreen
 import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailScreen
 import com.rushi.mitavyay.ui.screens.TransactionList.TransactionListScreen
 
+import androidx.compose.material3.MaterialTheme
+import com.rushi.mitavyay.ui.theme.appMotion
+
 /**
  * Top-level Jetpack Navigation Host for Mitavyay.
- * Declares all screen composables and routes.
+ * Declares all screen composables and routes with smooth standardized transitions.
  */
 @Composable
 fun MitavyayNavHost(
@@ -26,10 +29,36 @@ fun MitavyayNavHost(
     modifier: Modifier = Modifier,
     startDestination: String = NavDestination.TransactionList.route
 ) {
+    val motion = MaterialTheme.appMotion
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = {
+            val targetRoute = targetState.destination.route
+            val initialRoute = initialState.destination.route
+            if (NavDestination.isTopLevel(targetRoute) && NavDestination.isTopLevel(initialRoute)) {
+                motion.tabCrossfadeEnter()
+            } else {
+                motion.screenEnterTransition()
+            }
+        },
+        exitTransition = {
+            val targetRoute = targetState.destination.route
+            val initialRoute = initialState.destination.route
+            if (NavDestination.isTopLevel(targetRoute) && NavDestination.isTopLevel(initialRoute)) {
+                motion.tabCrossfadeExit()
+            } else {
+                motion.screenExitTransition()
+            }
+        },
+        popEnterTransition = {
+            motion.screenPopEnterTransition()
+        },
+        popExitTransition = {
+            motion.screenPopExitTransition()
+        }
     ) {
         composable(NavDestination.TransactionList.route) {
             TransactionListScreen(

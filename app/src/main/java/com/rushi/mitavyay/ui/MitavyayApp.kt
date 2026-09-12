@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.ui.components.MitavyayBottomBar
 import com.rushi.mitavyay.ui.components.ThemeSelectionDialog
+import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
 import com.rushi.mitavyay.ui.navigation.NavDestination
 import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
@@ -140,6 +141,7 @@ fun MitavyayApp(
                             showQuickAddSheet = true
                         }
                     },
+                    modifier = Modifier.pressScale(),
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = MaterialTheme.shapes.large

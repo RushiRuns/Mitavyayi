@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.data.model.BudgetDisplayItem
 import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.EmptyState
@@ -160,10 +161,12 @@ fun BudgetListScreen(
 
                         // Budget Cards
                         items(uiState.items, key = { it.id }) { item ->
+                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                             BudgetCard(
                                 item = item,
                                 onEditClick = { editingBudget = item },
-                                onDeleteClick = { budgetToDelete = item }
+                                onDeleteClick = { budgetToDelete = item },
+                                modifier = Modifier.animateItemPlacement()
                             )
                         }
                     }
@@ -176,7 +179,8 @@ fun BudgetListScreen(
             onClick = { showSetDialog = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(MaterialTheme.spacing.lg),
+                .padding(MaterialTheme.spacing.lg)
+                .pressScale(),
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ) {

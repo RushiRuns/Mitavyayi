@@ -162,9 +162,11 @@ fun TransactionListContent(
                             items = uiState.transactions,
                             key = { it.id }
                         ) { item ->
+                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                             TransactionCard(
                                 item = item,
-                                onClick = { onTransactionClick(item.id) }
+                                onClick = { onTransactionClick(item.id) },
+                                modifier = Modifier.animateItemPlacement()
                             )
                         }
                     }

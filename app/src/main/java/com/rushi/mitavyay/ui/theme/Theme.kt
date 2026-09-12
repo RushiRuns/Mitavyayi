@@ -38,6 +38,7 @@ fun MitavyayTheme(
     val appTypography = getAppTypography(fontScale)
     val spacing = Spacing()
     val appShapes = AppShapes()
+    val appMotion = AppMotion()
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -57,7 +58,8 @@ fun MitavyayTheme(
         LocalExtendedColorScheme provides extendedColorScheme,
         LocalSpacing provides spacing,
         LocalAppShapes provides appShapes,
-        LocalAppTypography provides appTypography
+        LocalAppTypography provides appTypography,
+        LocalAppMotion provides appMotion
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

@@ -41,14 +41,26 @@ This file serves as the index for all shared utilities, formatters, extensions, 
   - OpenCSV-powered streaming CSV reader and writer.
   - Implements ADR-006 strict All-or-Nothing pre-validation, atomic Room transaction commit/rollback, dynamic column mapping, and automatic account reconciliation.
   - *Location*: `data/repository/CsvRepository.kt`
+- **Motion & Animation Tokens** (`com.rushi.mitavyay.ui.theme.AppMotion`):
+  - Centralized motion tokens: `durationFast` (150ms), `durationNormal` (300ms), `durationSlow` (500ms).
+  - Standardized easing curves (`standard`, `emphasizedDecelerate`, `emphasizedAccelerate`, `linear`) and specs (`fastTween`, `normalTween`, `slowTween`, `bouncySpring`).
+  - Screen transition generators (`screenEnterTransition`, `screenExitTransition`, `screenPopEnterTransition`, `screenPopExitTransition`, `tabCrossfadeEnter`, `tabCrossfadeExit`).
+  - Access via `MaterialTheme.appMotion`.
+  - *Location*: `ui/theme/Motion.kt`
 
 ## Reusable UI Components (`com.rushi.mitavyay.ui.components`)
 
 ### Buttons (`ui/components/Buttons.kt`)
-- `PrimaryButton`: Main CTA button with primary brand color, loading spinner, and theme shape.
-- `SecondaryButton`: Outlined button for secondary actions.
-- `TertiaryButton`: Text button for low-emphasis actions.
-- `DangerButton`: Destructive button with error color for deletions and destructive confirmations.
+- `PrimaryButton`: Main CTA button with primary brand color, loading spinner, theme shape, and tactile bouncy press-scale micro-interaction (`pressScale`).
+- `SecondaryButton`: Outlined button for secondary actions with `pressScale`.
+- `TertiaryButton`: Text button for low-emphasis actions with `pressScale`.
+- `DangerButton`: Destructive button with error color for deletions and destructive confirmations with `pressScale`.
+
+### Animation Modifiers & Effects (`ui/components/AnimationModifiers.kt`, `ui/components/DelightfulAnimations.kt`)
+- `Modifier.pressScale(pressedScale: Float = 0.96f)`: Reusable modifier animating an interactive bouncy scale reduction on touch press with spring release.
+- `Modifier.bounceClickable(onClick: () -> Unit)`: Combines clickable with tactile spring bounce feedback.
+- `CelebrationEffect`: Offline Compose Canvas confetti particle explosion for financial milestones and goal achievements.
+- `OfflineLottieAnimation`: Reusable component for playing offline local Lottie JSON vector animations from raw resources.
 
 ### Cards (`ui/components/Cards.kt`)
 - `TransactionCard`: Card displaying title, category, formatted amount (green for income, red for expenses), formatted date, and "Transfer" badge for paired transfer records.
