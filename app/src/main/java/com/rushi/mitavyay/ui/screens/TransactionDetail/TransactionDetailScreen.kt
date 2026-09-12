@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -18,9 +21,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,11 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.DangerButton
 import com.rushi.mitavyay.ui.components.EmptyState
 import com.rushi.mitavyay.ui.components.LoadingState
+import com.rushi.mitavyay.ui.components.NotesField
+import com.rushi.mitavyay.ui.components.PrimaryButton
 import com.rushi.mitavyay.ui.components.SecondaryButton
 import com.rushi.mitavyay.ui.components.SpacerLg
 import com.rushi.mitavyay.ui.components.SpacerMd
@@ -57,6 +65,7 @@ fun TransactionDetailScreen(
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var showEditNoteDialog by remember { mutableStateOf(false) }
 
     when {
         uiState.isLoading -> {
@@ -213,6 +222,63 @@ fun TransactionDetailScreen(
 
                 SpacerLg()
 
+                // Dedicated Notes Card
+                Card(
+                    shape = MaterialTheme.appShapes.medium,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = MaterialTheme.spacing.xs
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.spacing.cardContent)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Transaction Notes",
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            if (!isTransfer) {
+                                IconButton(onClick = { showEditNoteDialog = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = if (tx.notes.isNullOrBlank()) "Add Note" else "Edit Note",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+
+                        if (!tx.notes.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+                            Text(
+                                text = tx.notes,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+                            Text(
+                                text = "No notes attached. Tap edit to add receipt details, tags, or reminders.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+                }
+
+                SpacerLg()
+
                 if (!isTransfer) {
                     // Actions Section
                     Row(
@@ -286,19 +352,76 @@ fun TransactionDetailScreen(
                     accounts = uiState.availableAccounts,
                     categories = uiState.availableCategories,
                     onDismiss = { showEditDialog = false },
-                    onSave = { amountPaise, isExpense, description, category, accountId ->
+                    onSave = { amountPaise, isExpense, description, category, accountId, notes ->
                         viewModel.updateTransaction(
                             amountPaise = amountPaise,
                             isExpense = isExpense,
                             description = description,
                             category = category,
-                            accountId = accountId
+                            accountId = accountId,
+                            notes = notes
                         ) {
                             showEditDialog = false
                             Toast.makeText(context, "Transaction updated", Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
+            }
+
+            // Edit Note Dialog
+            if (showEditNoteDialog) {
+                var noteText by remember { mutableStateOf(tx.notes ?: "") }
+                Dialog(onDismissRequest = { showEditNoteDialog = false }) {
+                    Surface(
+                        shape = MaterialTheme.appShapes.large,
+                        color = MaterialTheme.colorScheme.surface,
+                        tonalElevation = MaterialTheme.spacing.sm,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(MaterialTheme.spacing.lg)
+                        ) {
+                            Text(
+                                text = if (tx.notes.isNullOrBlank()) "Add Note" else "Edit Note",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            SpacerMd()
+                            NotesField(
+                                value = noteText,
+                                onValueChange = { noteText = it },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            SpacerLg()
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                SecondaryButton(
+                                    text = "Cancel",
+                                    onClick = { showEditNoteDialog = false },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                PrimaryButton(
+                                    text = "Save",
+                                    onClick = {
+                                        viewModel.updateNotes(noteText.trim().ifBlank { null }) {
+                                            showEditNoteDialog = false
+                                            Toast.makeText(context, "Note updated", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

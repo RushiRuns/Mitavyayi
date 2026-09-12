@@ -41,6 +41,17 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE category = :category ORDER BY timestamp DESC")
     fun getByCategory(category: String): Flow<List<Transaction>>
 
+    @Query(
+        """
+        SELECT * FROM transactions
+        WHERE description LIKE '%' || :query || '%'
+           OR category LIKE '%' || :query || '%'
+           OR (notes IS NOT NULL AND notes LIKE '%' || :query || '%')
+        ORDER BY timestamp DESC
+        """
+    )
+    fun search(query: String): Flow<List<Transaction>>
+
     @Query("SELECT * FROM transactions WHERE transferId = :transferId")
     suspend fun getByTransferId(transferId: String): List<Transaction>
 

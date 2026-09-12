@@ -125,6 +125,7 @@ class TransactionDetailViewModel @Inject constructor(
         description: String,
         category: String,
         accountId: String,
+        notes: String? = null,
         onSuccess: () -> Unit = {}
     ) {
         viewModelScope.launch {
@@ -135,13 +136,34 @@ class TransactionDetailViewModel @Inject constructor(
                     amount = finalAmount,
                     description = description.trim().ifBlank { category },
                     category = category,
-                    accountId = accountId
+                    accountId = accountId,
+                    notes = notes?.trim()?.ifBlank { null }
                 )
                 transactionRepository.updateTransaction(updated)
                 onSuccess()
             } catch (e: Exception) {
                 _actionState.value = _actionState.value.copy(
                     errorMessage = e.localizedMessage ?: "Failed to update transaction"
+                )
+            }
+        }
+    }
+
+    fun updateNotes(
+        notes: String?,
+        onSuccess: () -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            val currentTx = uiState.value.transaction ?: return@launch
+            try {
+                val updated = currentTx.copy(
+                    notes = notes?.trim()?.ifBlank { null }
+                )
+                transactionRepository.updateTransaction(updated)
+                onSuccess()
+            } catch (e: Exception) {
+                _actionState.value = _actionState.value.copy(
+                    errorMessage = e.localizedMessage ?: "Failed to update notes"
                 )
             }
         }

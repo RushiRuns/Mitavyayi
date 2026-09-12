@@ -664,20 +664,20 @@
 ### Feature 5.5: Notes on Transactions
 
 **Planning**
-- [ ] Transactions can have rich notes
-- [ ] Notes searchable later
+- [x] Transactions can have rich notes
+- [x] Notes searchable later
 
 **Implementation**
-- [ ] Add notes field to Transaction entity (already in schema)
-- [ ] Create `ui/components/NotesField.kt` — rich text input
-- [ ] Edit notes from transaction detail screen
+- [x] Add notes field to Transaction entity (already in schema)
+- [x] Create `ui/components/NotesField.kt` — rich text input
+- [x] Edit notes from transaction detail screen
 
 **Testing**
-- [ ] Test: Add notes, saved with transaction
-- [ ] Test: Edit notes
+- [x] Test: Add notes, saved with transaction
+- [x] Test: Edit notes
 
 **Closure**
-- [ ] Commit: "Feature 5.5: Notes on transactions"
+- [x] Commit: "Feature 5.5: Notes on transactions"
 
 ### Feature 5.6: Multiple Transactions (Batch Add)
 

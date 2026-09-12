@@ -68,6 +68,13 @@ class AnalysisTest {
         override fun getByCategory(category: String): Flow<List<Transaction>> =
             flowOf(transactions.filter { it.category == category })
 
+        override fun search(query: String): Flow<List<Transaction>> =
+            flowOf(transactions.filter {
+                it.description.contains(query, ignoreCase = true) ||
+                it.category.contains(query, ignoreCase = true) ||
+                (it.notes != null && it.notes.contains(query, ignoreCase = true))
+            })
+
         override suspend fun getByTransferId(transferId: String): List<Transaction> = emptyList()
         override suspend fun deleteByTransferId(transferId: String) {}
         override fun getBalanceForAccount(accountId: String): Flow<Long?> = flowOf(0L)

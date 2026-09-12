@@ -95,6 +95,7 @@ interface TransactionRepository {
     fun getTransactionsByDateRange(start: Long, end: Long): Flow<List<Transaction>>
     fun getTransactionsByCategory(category: String): Flow<List<Transaction>>
     fun getTransactionsByAccount(accountId: String): Flow<List<Transaction>>
+    fun searchTransactions(query: String): Flow<List<Transaction>> = flowOf(emptyList())
     fun getTotalExpensesByDateRange(start: Long, end: Long): Flow<Long?>
     fun getTotalIncomeByDateRange(start: Long, end: Long): Flow<Long?>
 
@@ -202,6 +203,15 @@ class TransactionRepositoryImpl @Inject constructor(
 
     override fun getTransactionsByAccount(accountId: String): Flow<List<Transaction>> =
         transactionDao.getByAccount(accountId)
+
+    override fun searchTransactions(query: String): Flow<List<Transaction>> {
+        val trimmed = query.trim()
+        return if (trimmed.isBlank()) {
+            transactionDao.getAll()
+        } else {
+            transactionDao.search(trimmed)
+        }
+    }
 
     override fun getTotalExpensesByDateRange(start: Long, end: Long): Flow<Long?> =
         transactionDao.getTotalExpensesByDateRange(start, end)

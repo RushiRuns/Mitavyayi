@@ -17,7 +17,8 @@ data class TransactionDisplayItem(
     val tags: List<String> = emptyList(),
     val isCredit: Boolean,
     val accountName: String? = null,
-    val transferId: String? = null
+    val transferId: String? = null,
+    val notes: String? = null
 ) {
     val isIncome: Boolean get() = isCredit
     val isTransfer: Boolean get() = !transferId.isNullOrBlank()
@@ -38,6 +39,7 @@ fun Transaction.toDisplayItem(accountName: String? = null): TransactionDisplayIt
         } else emptyList(),
         isCredit = amount >= 0,
         accountName = accountName,
-        transferId = transferId
+        transferId = transferId,
+        notes = notes?.trim()?.ifBlank { null }
     )
 }

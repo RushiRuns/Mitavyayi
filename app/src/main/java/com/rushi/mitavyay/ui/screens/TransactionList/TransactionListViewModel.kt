@@ -7,6 +7,7 @@ import com.rushi.mitavyay.data.model.toDisplayItem
 import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -17,6 +18,7 @@ import javax.inject.Inject
 data class TransactionListUiState(
     val isLoading: Boolean = false,
     val transactions: List<TransactionDisplayItem> = emptyList(),
+    val searchQuery: String = "",
     val errorMessage: String? = null
 )
 
@@ -27,25 +29,44 @@ class TransactionListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val accountsFlow = accountRepository?.getAllAccounts() ?: flowOf(emptyList())
+    private val _searchQuery = MutableStateFlow("")
 
     val uiState: StateFlow<TransactionListUiState> = combine(
         transactionRepository.getAllTransactions(),
-        accountsFlow
-    ) { transactions, accounts ->
+        accountsFlow,
+        _searchQuery
+    ) { transactions, accounts, query ->
         val accountMap = accounts.associateBy { it.id }
-        val sortedTransactions = transactions
+        val allDisplayItems = transactions
             .sortedByDescending { it.timestamp }
             .map { tx ->
                 tx.toDisplayItem(accountName = accountMap[tx.accountId]?.name)
             }
 
+        val filtered = if (query.isBlank()) {
+            allDisplayItems
+        } else {
+            val q = query.trim()
+            allDisplayItems.filter { item ->
+                item.description.contains(q, ignoreCase = true) ||
+                item.category.contains(q, ignoreCase = true) ||
+                (item.notes != null && item.notes.contains(q, ignoreCase = true)) ||
+                (item.accountName != null && item.accountName.contains(q, ignoreCase = true))
+            }
+        }
+
         TransactionListUiState(
             isLoading = false,
-            transactions = sortedTransactions
+            transactions = filtered,
+            searchQuery = query
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = TransactionListUiState(isLoading = true)
     )
+
+    fun onSearchQueryChange(query: String) {
+        _searchQuery.value = query
+    }
 }

@@ -89,6 +89,7 @@ class TransferRepositoryTest {
         override fun getByAccount(accountId: String) = flowOf(emptyList<Transaction>())
         override fun getByDateRange(start: Long, end: Long) = flowOf(emptyList<Transaction>())
         override fun getByCategory(category: String) = flowOf(emptyList<Transaction>())
+        override fun search(query: String) = flowOf(emptyList<Transaction>())
 
         override suspend fun getByTransferId(transferId: String): List<Transaction> =
             list.filter { it.transferId == transferId }

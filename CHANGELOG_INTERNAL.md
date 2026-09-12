@@ -3,6 +3,25 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 5.5: Notes on Transactions complete.
+  - Implemented rich note-taking support across transactions:
+    - Updated `TransactionDisplayItem` with `notes: String? = null` and mapped in `toDisplayItem()`.
+    - Added note preview snippet (`📝 excerpt`) to `TransactionCard` for instant visibility in lists.
+    - Added `NotesField` reusable UI component (`ui/components/NotesField.kt`) featuring multi-line input, character counter (`length / max`), clear icon, and quick helper chips (itemized list bullet `• `, timestamp date `[dd MMM]`, and financial quick tags `#tax`, `#reimbursable`, `#split`, `#warranty`, `#bill`).
+  - Added transaction detail note editing:
+    - Dedicated interactive "Transaction Notes" card in `TransactionDetailScreen` with "Add Note" / "Edit Note" actions.
+    - Added `EditNoteDialog` for quick note-only editing directly from the detail screen.
+    - Integrated `NotesField` into `EditTransactionDialog` for updating notes alongside amount, category, account, and description.
+    - Added `updateNotes(notes, onSuccess)` to `TransactionDetailViewModel` and extended `updateTransaction`.
+  - Added note support to Quick Add Expense:
+    - Extended `QuickAddExpenseViewModel` (`FormState` and `submitTransaction`) to persist notes.
+    - Embedded `NotesField` in `QuickAddExpenseSheet` for optional note capture on creation.
+  - Implemented real-time transaction searching (including notes):
+    - Added `search(query)` query to `TransactionDao` and `searchTransactions(query)` to `TransactionRepository`.
+    - Enhanced `TransactionListViewModel` and `TransactionListScreen` with a top search bar filtering across description, category, account name, and notes, with empty state handling.
+  - Added unit test suite in `TransactionNotesTest.kt` (6 tests covering note creation, detail view editing, note clearing, search filtering by note tags, and quick-add note persistence).
+  - Verified 100% tests passing in `testDebugUnitTest` and clean APK build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 5.4: Enhanced Analysis complete.
   - Added multi-dimensional repository queries in `TransactionRepository` and `TransactionRepositoryImpl`:
     - `getAccountSpending(start, end)`: Aggregates total spent, transaction count, and percentage distribution per account.

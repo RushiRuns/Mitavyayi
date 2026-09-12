@@ -38,6 +38,7 @@ import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.model.CategoryDisplayItem
 import com.rushi.mitavyay.ui.components.AppTextField
 import com.rushi.mitavyay.ui.components.CurrencyInput
+import com.rushi.mitavyay.ui.components.NotesField
 import com.rushi.mitavyay.ui.components.PrimaryButton
 import com.rushi.mitavyay.ui.components.SecondaryButton
 import com.rushi.mitavyay.ui.components.SpacerLg
@@ -54,7 +55,7 @@ fun EditTransactionDialog(
     accounts: List<AccountDisplayItem>,
     categories: List<CategoryDisplayItem>,
     onDismiss: () -> Unit,
-    onSave: (amountPaise: Long, isExpense: Boolean, description: String, category: String, accountId: String) -> Unit
+    onSave: (amountPaise: Long, isExpense: Boolean, description: String, category: String, accountId: String, notes: String?) -> Unit
 ) {
     var amountPaise by remember(transaction) {
         mutableLongStateOf(abs(transaction.amount))
@@ -70,6 +71,9 @@ fun EditTransactionDialog(
     }
     var selectedAccountId by remember(transaction) {
         mutableStateOf(transaction.accountId)
+    }
+    var notes by remember(transaction) {
+        mutableStateOf(transaction.notes ?: "")
     }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -214,6 +218,15 @@ fun EditTransactionDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                SpacerMd()
+
+                // Notes
+                NotesField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
                 if (errorMessage != null && amountPaise > 0L) {
                     SpacerSm()
                     Text(
@@ -251,7 +264,7 @@ fun EditTransactionDialog(
                                 errorMessage = "Please select a category"
                                 return@PrimaryButton
                             }
-                            onSave(amountPaise, isExpense, description, selectedCategoryId, selectedAccountId)
+                            onSave(amountPaise, isExpense, description, selectedCategoryId, selectedAccountId, notes.trim().ifBlank { null })
                         },
                         enabled = amountPaise > 0L && selectedAccountId.isNotBlank() && selectedCategoryId.isNotBlank(),
                         modifier = Modifier.weight(1f)

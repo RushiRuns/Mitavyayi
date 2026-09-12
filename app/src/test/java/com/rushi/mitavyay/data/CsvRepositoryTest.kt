@@ -139,6 +139,12 @@ class CsvRepositoryTest {
         override fun getByAccount(accountId: String) = flowOf(emptyList<Transaction>())
         override fun getByDateRange(start: Long, end: Long) = flowOf(emptyList<Transaction>())
         override fun getByCategory(category: String) = flowOf(emptyList<Transaction>())
+        override fun search(query: String): Flow<List<Transaction>> =
+            flowOf(list.filter {
+                it.description.contains(query, ignoreCase = true) ||
+                it.category.contains(query, ignoreCase = true) ||
+                (it.notes != null && it.notes.contains(query, ignoreCase = true))
+            }.sortedByDescending { it.timestamp })
         override suspend fun getByTransferId(transferId: String): List<Transaction> =
             list.filter { it.transferId == transferId }
 

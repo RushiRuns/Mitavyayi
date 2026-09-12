@@ -52,6 +52,13 @@ class TransactionRepositoryTest {
         override fun getByCategory(category: String) =
             flowOf(list.filter { it.category == category }.sortedByDescending { it.timestamp })
 
+        override fun search(query: String) =
+            flowOf(list.filter {
+                it.description.contains(query, ignoreCase = true) ||
+                it.category.contains(query, ignoreCase = true) ||
+                (it.notes != null && it.notes.contains(query, ignoreCase = true))
+            }.sortedByDescending { it.timestamp })
+
         override suspend fun getByTransferId(transferId: String) =
             list.filter { it.transferId == transferId }
 

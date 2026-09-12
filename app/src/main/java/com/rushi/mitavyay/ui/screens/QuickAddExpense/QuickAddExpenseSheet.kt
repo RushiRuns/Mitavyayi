@@ -50,6 +50,7 @@ import com.rushi.mitavyay.data.model.CategoryDisplayItem
 import com.rushi.mitavyay.ui.components.AddCategoryDialog
 import com.rushi.mitavyay.ui.components.AppTextField
 import com.rushi.mitavyay.ui.components.CurrencyInput
+import com.rushi.mitavyay.ui.components.NotesField
 import com.rushi.mitavyay.ui.components.PrimaryButton
 import com.rushi.mitavyay.ui.components.SpacerLg
 import com.rushi.mitavyay.ui.components.SpacerMd
@@ -106,6 +107,7 @@ fun QuickAddExpenseSheet(
             onCategorySelect = viewModel::onCategorySelect,
             onAddCategoryClick = { showAddCategoryDialog = true },
             onDescriptionChange = viewModel::onDescriptionChange,
+            onNotesChange = viewModel::onNotesChange,
             onSubmit = { viewModel.saveTransaction() }
         )
     }
@@ -144,6 +146,7 @@ fun QuickAddExpenseContent(
     onCategorySelect: (String) -> Unit,
     onAddCategoryClick: () -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onNotesChange: (String) -> Unit = {},
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -317,6 +320,17 @@ fun QuickAddExpenseContent(
             onValueChange = onDescriptionChange,
             label = "Description (Optional)",
             placeholder = "e.g. Grocery shopping, Lunch, Salary",
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        SpacerMd()
+
+        // Notes Input (Optional)
+        NotesField(
+            value = uiState.notes,
+            onValueChange = onNotesChange,
+            minLines = 2,
+            maxLines = 4,
             modifier = Modifier.fillMaxWidth()
         )
 

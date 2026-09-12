@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rushi.mitavyay.R
 import com.rushi.mitavyay.ui.theme.appShapes
@@ -210,6 +211,16 @@ fun TransactionCard(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
+                if (!item.notes.isNullOrBlank()) {
+                    SpacerXs()
+                    Text(
+                        text = "📝 ${item.notes.lines().firstOrNull() ?: ""}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             Text(

@@ -29,6 +29,7 @@ data class QuickAddExpenseUiState(
     val amountPaise: Long = 0L,
     val isExpense: Boolean = true,
     val description: String = "",
+    val notes: String = "",
     val errorMessage: String? = null,
     val isSavedSuccessfully: Boolean = false,
     val isSaving: Boolean = false
@@ -49,6 +50,7 @@ class QuickAddExpenseViewModel @Inject constructor(
         val selectedAccountId: String? = null,
         val selectedCategory: String? = null,
         val description: String = "",
+        val notes: String = "",
         val errorMessage: String? = null,
         val isSavedSuccessfully: Boolean = false,
         val isSaving: Boolean = false
@@ -87,6 +89,7 @@ class QuickAddExpenseViewModel @Inject constructor(
             amountPaise = form.amountPaise,
             isExpense = form.isExpense,
             description = form.description,
+            notes = form.notes,
             errorMessage = form.errorMessage,
             isSavedSuccessfully = form.isSavedSuccessfully,
             isSaving = form.isSaving
@@ -126,6 +129,10 @@ class QuickAddExpenseViewModel @Inject constructor(
         _formState.value = _formState.value.copy(description = newDescription)
     }
 
+    fun onNotesChange(newNotes: String) {
+        _formState.value = _formState.value.copy(notes = newNotes)
+    }
+
     suspend fun submitTransaction(): Boolean {
         val current = uiState.first { !it.isLoading }
         if (current.amountPaise <= 0L) {
@@ -155,7 +162,7 @@ class QuickAddExpenseViewModel @Inject constructor(
                 category = category,
                 tags = "[]",
                 transferId = null,
-                notes = null
+                notes = current.notes.trim().ifBlank { null }
             )
             transactionRepository.addTransaction(transaction)
             _formState.value = FormState(isSavedSuccessfully = true)
