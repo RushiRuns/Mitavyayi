@@ -49,6 +49,8 @@ class TransferRepositoryTest {
         override fun getTransactionCount() = flowOf(0)
         override suspend fun getTransactionCountForAccount(accountId: String) =
             list.count { it.accountId == accountId }
+        override fun getCategoryExpensesByDateRange(start: Long, end: Long) =
+            flowOf(emptyList<com.rushi.mitavyay.data.db.CategorySpendingRaw>())
     }
 
     @Test

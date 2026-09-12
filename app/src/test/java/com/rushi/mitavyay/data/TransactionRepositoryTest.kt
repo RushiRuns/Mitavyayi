@@ -72,6 +72,20 @@ class TransactionRepositoryTest {
 
         override suspend fun getTransactionCountForAccount(accountId: String) =
             list.count { it.accountId == accountId }
+
+        override fun getCategoryExpensesByDateRange(start: Long, end: Long) =
+            flowOf(
+                list.filter { it.timestamp in start..end && it.amount < 0 }
+                    .groupBy { it.category }
+                    .map { (cat, txs) ->
+                        com.rushi.mitavyay.data.db.CategorySpendingRaw(
+                            category = cat,
+                            totalExpensePaise = txs.sumOf { kotlin.math.abs(it.amount) },
+                            transactionCount = txs.size
+                        )
+                    }
+                    .sortedByDescending { it.totalExpensePaise }
+            )
     }
 
     @Test

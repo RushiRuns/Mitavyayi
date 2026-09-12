@@ -61,4 +61,21 @@ interface TransactionDao {
 
     @Query("SELECT COUNT(*) FROM transactions WHERE accountId = :accountId")
     suspend fun getTransactionCountForAccount(accountId: String): Int
+
+    @Query(
+        """
+        SELECT category, ABS(SUM(amount)) AS totalExpensePaise, COUNT(*) AS transactionCount
+        FROM transactions
+        WHERE timestamp BETWEEN :start AND :end AND amount < 0
+        GROUP BY category
+        ORDER BY totalExpensePaise DESC
+        """
+    )
+    fun getCategoryExpensesByDateRange(start: Long, end: Long): Flow<List<CategorySpendingRaw>>
 }
+
+data class CategorySpendingRaw(
+    val category: String,
+    val totalExpensePaise: Long,
+    val transactionCount: Int
+)

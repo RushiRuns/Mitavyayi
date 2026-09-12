@@ -81,6 +81,9 @@ class ViewModelsTest {
             override suspend fun deleteTransaction(id: String) {}
             override fun getTotalExpensesByDateRange(start: Long, end: Long): Flow<Long?> = flowOf(0L)
             override fun getTotalIncomeByDateRange(start: Long, end: Long): Flow<Long?> = flowOf(0L)
+            override fun getCategorySpending(start: Long, end: Long): Flow<List<com.rushi.mitavyay.data.repository.CategorySpending>> = flowOf(emptyList())
+            override fun getTimeSpendingTrend(start: Long, end: Long, period: com.rushi.mitavyay.data.repository.AnalysisPeriod): Flow<List<com.rushi.mitavyay.data.repository.TimeSpendingPoint>> = flowOf(emptyList())
+            override fun getAnalysisSummary(start: Long, end: Long): Flow<com.rushi.mitavyay.data.repository.AnalysisSummary> = flowOf(com.rushi.mitavyay.data.repository.AnalysisSummary())
         }
 
         val viewModel = TransactionListViewModel(fakeRepo)
@@ -150,6 +153,9 @@ class ViewModelsTest {
             override suspend fun deleteTransaction(id: String) {}
             override fun getTotalExpensesByDateRange(start: Long, end: Long): Flow<Long?> = flowOf(0L)
             override fun getTotalIncomeByDateRange(start: Long, end: Long): Flow<Long?> = flowOf(0L)
+            override fun getCategorySpending(start: Long, end: Long): Flow<List<com.rushi.mitavyay.data.repository.CategorySpending>> = flowOf(emptyList())
+            override fun getTimeSpendingTrend(start: Long, end: Long, period: com.rushi.mitavyay.data.repository.AnalysisPeriod): Flow<List<com.rushi.mitavyay.data.repository.TimeSpendingPoint>> = flowOf(emptyList())
+            override fun getAnalysisSummary(start: Long, end: Long): Flow<com.rushi.mitavyay.data.repository.AnalysisSummary> = flowOf(com.rushi.mitavyay.data.repository.AnalysisSummary())
         }
         val fakeCatRepo = object : CategoryRepository {
             override fun getAllCategories(): Flow<List<Category>> = flowOf(emptyList())
@@ -163,7 +169,7 @@ class ViewModelsTest {
         val viewModel = AnalysisViewModel(fakeTxRepo, fakeCatRepo)
         val state = viewModel.uiState.value
         assertNotNull(state)
-        assertEquals("MONTHLY", state.selectedPeriod)
+        assertEquals(com.rushi.mitavyay.data.repository.AnalysisPeriod.MONTH, state.selectedPeriod)
     }
 
     @Test

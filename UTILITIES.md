@@ -63,6 +63,12 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `ErrorState`: Centered error icon, message, and retry button.
 - `EmptyState`: Centered empty placeholder icon, title, description, and optional action CTA.
 
+### Charts & Data Visualization (`ui/components/PieChart.kt`, `ui/screens/Analysis/AnalysisScreen.kt`)
+- `CategoryDonutChart`: Theme-aware animated Compose Canvas Donut/Pie chart displaying category spending distribution with centered total spent readout.
+- `CategorySpendingLegendList`: Ranked category spending list with color indicators, transaction counts, percentage badges, and formatted amounts.
+- `SpendingTrendCard`: Vico `LineChart` card with Material 3 dynamic styling (`m3ChartStyle()`), formatted start currency axis, and bottom date axis.
+- `parseCategoryColor`: Pure Kotlin color hex parser with fallback palette for safe JVM unit testing and Android device rendering.
+
 ### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`)
 - `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, and `transaction_detail/{transactionId}`), tab labels, and icons.
 - `MitavyayNavHost` (`ui/navigation/NavHost.kt`): Top-level NavHost mapping routes to Compose screens without Fragments.

@@ -430,29 +430,29 @@
 ### Feature 4.5: Basic Analysis (Charts)
 
 **Planning**
-- [ ] Analysis screen shows high-level spending insights
-- [ ] Charts: spending by category (pie), spending over time (line)
+- [x] Analysis screen shows high-level spending insights
+- [x] Charts: spending by category (pie), spending over time (line)
 
 **Implementation**
-- [ ] Create `ui/screens/Analysis/AnalysisViewModel.kt`
+- [x] Create `ui/screens/Analysis/AnalysisViewModel.kt`
   - Fetches transactions
   - Aggregates by category (sum of amounts)
   - Aggregates by week/month (sum over time ranges)
   - All aggregation in repository layer, not in composable
-- [ ] Create `ui/screens/Analysis/AnalysisScreen.kt`
+- [x] Create `ui/screens/Analysis/AnalysisScreen.kt`
   - Pie chart (Vico): category breakdown
   - Line chart (Vico): spending trend
   - Date range picker (week/month/year)
   - Use theme colors for chart
-- [ ] Integrations with Vico library
+- [x] Integrations with Vico library
 
 **Testing**
-- [ ] Test: Chart renders with sample data
-- [ ] Test: Date range filter works
-- [ ] Test: Category aggregation correct
+- [x] Test: Chart renders with sample data
+- [x] Test: Date range filter works
+- [x] Test: Category aggregation correct
 
 **Closure**
-- [ ] Commit: "Feature 4.5: Basic analysis"
+- [x] Commit: "Feature 4.5: Basic analysis"
 
 ### Feature 4.6: Category Management
 

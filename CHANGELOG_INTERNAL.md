@@ -3,6 +3,16 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.5: Basic Analysis (Charts) complete.
+  - Implemented database- and repository-level aggregations in `TransactionDao` and `TransactionRepository` (`getCategorySpending`, `getTimeSpendingTrend`, `getAnalysisSummary`) guaranteeing business logic is in the repository layer, not composables.
+  - Added support for dynamic time periods (`AnalysisPeriod.WEEK`, `AnalysisPeriod.MONTH`, `AnalysisPeriod.YEAR`) and period offset navigation with date boundaries.
+  - Built `CategoryDonutChart` and `CategorySpendingLegendList` using Compose `Canvas` with animated sweep angles, center total spent readout, and dynamic theme-safe color hex parsing.
+  - Built `SpendingTrendCard` with Vico 1.13.1 `LineChart`, Material 3 theme styling (`m3ChartStyle()`), formatted start currency axis, and bottom date axis.
+  - Implemented `AnalysisViewModel` orchestrating state for period selection, date range filtering, summary cards (Net Savings, Income, Expense, Savings Rate), and empty states.
+  - Updated `AnalysisScreen` with PeriodSelectorBar, PeriodNavigatorRow, SummaryMetricsSection, SpendingTrendCard, and CategoryBreakdownSection.
+  - Created unit tests in `AnalysisTest.kt` verifying category spending aggregation, time trend bucketing, summary calculations, ViewModel period switching, and date range calculation.
+  - Updated existing repository test fakes in `TransactionRepositoryTest`, `RepeatExpenseRepositoryTest`, `TransferRepositoryTest`, `QuickAddExpenseTest`, `TransactionListAndDetailTest`, and `ViewModelsTest`.
+  - Updated `UTILITIES.md`.
 - Feature 4.4: Dual Theme (Light & Dark) complete.
   - Added `setThemeMode(mode: ThemeMode)` and `toggleTheme()` to `MainViewModel`, writing to DataStore via `PreferencesRepository`.
   - Created `ThemeSelectionDialog` component allowing users to pick System default, Light theme, or Dark theme with immediate effect and persistence.

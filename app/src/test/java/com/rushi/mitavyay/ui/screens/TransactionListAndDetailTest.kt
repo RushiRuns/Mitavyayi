@@ -114,6 +114,10 @@ class TransactionListAndDetailTest {
 
         override fun getTotalIncomeByDateRange(start: Long, end: Long): Flow<Long?> =
             flowOf(transactions.filter { it.timestamp in start..end && it.amount > 0 }.map { it.amount }.sum())
+
+        override fun getCategorySpending(start: Long, end: Long): Flow<List<com.rushi.mitavyay.data.repository.CategorySpending>> = flowOf(emptyList())
+        override fun getTimeSpendingTrend(start: Long, end: Long, period: com.rushi.mitavyay.data.repository.AnalysisPeriod): Flow<List<com.rushi.mitavyay.data.repository.TimeSpendingPoint>> = flowOf(emptyList())
+        override fun getAnalysisSummary(start: Long, end: Long): Flow<com.rushi.mitavyay.data.repository.AnalysisSummary> = flowOf(com.rushi.mitavyay.data.repository.AnalysisSummary())
     }
 
     private class FakeAccountRepository : AccountRepository {
