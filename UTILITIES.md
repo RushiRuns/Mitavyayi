@@ -46,10 +46,11 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, and direct `Long` paise conversion.
 - `DatePickerField` & `AppDatePickerDialog`: Date selection field launching a Material 3 DatePickerDialog and emitting Unix timestamp ms (`Long`).
 
-### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`)
+### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`)
 - `AppAlertDialog`: Standardized confirmation and alert dialog with theme typography, colors, and confirm/dismiss actions.
 - `AddAccountDialog`: Form dialog for creating and editing accounts with validated name, type selection, and initial balance input.
 - `QuickAddExpenseSheet`: Material 3 ModalBottomSheet for rapid transaction entry with CurrencyInput, Expense/Income toggle, single-tap account/category chips, and atomic balance syncing.
+- `EditTransactionDialog`: Form dialog for editing transaction amount, expense/income type, category, account, and description.
 
 ### Layout & Spacers (`ui/components/Spacing.kt`)
 - `VerticalSpacer(height: Dp)` / `HorizontalSpacer(width: Dp)`
@@ -62,11 +63,11 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `EmptyState`: Centered empty placeholder icon, title, description, and optional action CTA.
 
 ### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`)
-- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`), tab labels, and icons.
+- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, and `transaction_detail/{transactionId}`), tab labels, and icons.
 - `MitavyayNavHost` (`ui/navigation/NavHost.kt`): Top-level NavHost mapping routes to Compose screens without Fragments.
 - `MitavyayAppState` & `rememberMitavyayAppState` (`ui/AppState.kt`): State holder for navigation controller, backstack resolution, and tab switching.
 - `MitavyayBottomBar` (`ui/components/BottomNavBar.kt`): Material 3 navigation bar utilizing theme tokens.
-- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar, BottomNavBar, FAB, and NavHost.
+- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar (with back button on detail destinations), BottomNavBar, FAB, and NavHost.
 
 
 ## DO NOT CREATE

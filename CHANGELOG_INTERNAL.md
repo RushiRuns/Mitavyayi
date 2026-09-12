@@ -3,6 +3,17 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.3: Transaction List & Display complete.
+  - Enhanced `TransactionListViewModel` to combine `getAllTransactions()` with `getAllAccounts()`, mapping each transaction's account name and explicitly sorting by timestamp descending (newest first).
+  - Enhanced `TransactionListScreen` to handle transaction card taps, navigate to details, render with `LazyColumn`, and show `EmptyState` when 0 transactions exist.
+  - Added `NavDestination.TransactionDetail` route (`transaction_detail/{transactionId}`) and updated `MitavyayNavHost`.
+  - Added top bar back navigation icon in `MitavyayApp` for non-top-level destinations.
+  - Implemented `TransactionDetailViewModel` and `TransactionDetailScreen` with full transaction metadata display (amount, income/expense chip, date & time, category, account, notes).
+  - Added **Delete** action with `AppAlertDialog` confirmation and atomic balance update.
+  - Added **Duplicate** action creating a clone with a fresh UUID and timestamp.
+  - Added **Edit** action with `EditTransactionDialog` supporting in-place modification of amount, expense/income type, category, account, and description with atomic balance recalculation.
+  - Created unit tests in `TransactionListAndDetailTest.kt` and updated `NavigationTest.kt`.
+  - Updated `UTILITIES.md`.
 - Feature 4.2: Quick Add Expense complete.
   - Implemented atomic balance synchronization in `TransactionRepositoryImpl` (injecting `AccountDao` and `DatabaseTransactionRunner`).
   - Implemented `QuickAddExpenseViewModel` with auto-selection of active accounts and default categories, transaction validation, and negative/positive sign convention for expenses/incomes.

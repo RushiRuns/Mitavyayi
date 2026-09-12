@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rushi.mitavyay.data.model.TransactionDisplayItem
 import com.rushi.mitavyay.data.model.toDisplayItem
+import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -20,19 +22,30 @@ data class TransactionListUiState(
 
 @HiltViewModel
 class TransactionListViewModel @Inject constructor(
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val accountRepository: AccountRepository? = null
 ) : ViewModel() {
 
-    val uiState: StateFlow<TransactionListUiState> = transactionRepository.getAllTransactions()
-        .map { list ->
-            TransactionListUiState(
-                isLoading = false,
-                transactions = list.map { it.toDisplayItem() }
-            )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = TransactionListUiState(isLoading = true)
+    private val accountsFlow = accountRepository?.getAllAccounts() ?: flowOf(emptyList())
+
+    val uiState: StateFlow<TransactionListUiState> = combine(
+        transactionRepository.getAllTransactions(),
+        accountsFlow
+    ) { transactions, accounts ->
+        val accountMap = accounts.associateBy { it.id }
+        val sortedTransactions = transactions
+            .sortedByDescending { it.timestamp }
+            .map { tx ->
+                tx.toDisplayItem(accountName = accountMap[tx.accountId]?.name)
+            }
+
+        TransactionListUiState(
+            isLoading = false,
+            transactions = sortedTransactions
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = TransactionListUiState(isLoading = true)
+    )
 }

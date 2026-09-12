@@ -377,34 +377,34 @@
 ### Feature 4.3: Transaction List & Display
 
 **Planning**
-- [ ] Main screen shows list of all transactions
-- [ ] Sorted by date (newest first)
-- [ ] Shows: date, description, amount, category, account
+- [x] Main screen shows list of all transactions
+- [x] Sorted by date (newest first)
+- [x] Shows: date, description, amount, category, account
 
 **Implementation**
-- [ ] Create `ui/screens/TransactionList/TransactionListViewModel.kt`
+- [x] Create `ui/screens/TransactionList/TransactionListViewModel.kt`
   - Fetches transactions from repository via Flow
   - Exposes as StateFlow<UiState>
-- [ ] Create `ui/screens/TransactionList/TransactionListScreen.kt`
+- [x] Create `ui/screens/TransactionList/TransactionListScreen.kt`
   - LazyColumn of transactions (not plain Column — performance rule)
   - Each item is `TransactionCard` from components
   - Empty state when no transactions
   - Tap on transaction → detail view
-- [ ] Create `ui/screens/TransactionDetail/TransactionDetailScreen.kt`
+- [x] Create `ui/screens/TransactionDetail/TransactionDetailScreen.kt`
   - Shows full transaction info
   - Edit, delete, duplicate buttons
   - Back navigation
 
 **Testing**
-- [ ] Test: Add transaction, see it in list
-- [ ] Test: Sort by date (newest first)
-- [ ] Test: Empty state when no transactions
-- [ ] Test: List uses LazyColumn (performance)
-- [ ] Test: Amount formatting in list
+- [x] Test: Add transaction, see it in list
+- [x] Test: Sort by date (newest first)
+- [x] Test: Empty state when no transactions
+- [x] Test: List uses LazyColumn (performance)
+- [x] Test: Amount formatting in list
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: "Feature 4.3: Transaction list and display"
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: "Feature 4.3: Transaction list and display"
 
 ### Feature 4.4: Dual Theme (Light & Dark)
 

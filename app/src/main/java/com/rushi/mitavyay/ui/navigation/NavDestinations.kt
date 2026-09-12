@@ -32,6 +32,15 @@ sealed class NavDestination(
         icon = Icons.Default.AccountBox
     )
 
+    data object TransactionDetail : NavDestination(
+        route = "transaction_detail/{transactionId}",
+        title = "Transaction Details",
+        icon = Icons.Default.List
+    ) {
+        const val ARG_TRANSACTION_ID = "transactionId"
+        fun createRoute(transactionId: String) = "transaction_detail/$transactionId"
+    }
+
     companion object {
         val topLevelDestinations = listOf(
             TransactionList,
@@ -44,6 +53,7 @@ sealed class NavDestination(
                 TransactionList.route -> TransactionList
                 Analysis.route -> Analysis
                 Accounts.route -> Accounts
+                "transaction_detail" -> TransactionDetail
                 else -> TransactionList
             }
         }

@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.rushi.mitavyay.ui.screens.Accounts.AccountsScreen
 import com.rushi.mitavyay.ui.screens.Analysis.AnalysisScreen
+import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailScreen
 import com.rushi.mitavyay.ui.screens.TransactionList.TransactionListScreen
 
 /**
@@ -25,13 +26,22 @@ fun MitavyayNavHost(
         modifier = modifier
     ) {
         composable(NavDestination.TransactionList.route) {
-            TransactionListScreen()
+            TransactionListScreen(
+                onTransactionClick = { transactionId ->
+                    navController.navigate(NavDestination.TransactionDetail.createRoute(transactionId))
+                }
+            )
         }
         composable(NavDestination.Analysis.route) {
             AnalysisScreen()
         }
         composable(NavDestination.Accounts.route) {
             AccountsScreen()
+        }
+        composable(NavDestination.TransactionDetail.route) {
+            TransactionDetailScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
