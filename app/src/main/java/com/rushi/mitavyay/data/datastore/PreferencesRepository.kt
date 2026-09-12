@@ -14,12 +14,14 @@ interface PreferencesRepository {
     val currencySymbol: Flow<String>
     val language: Flow<String>
     val appOpenCount: Flow<Int>
+    val hapticFeedbackEnabled: Flow<Boolean>
 
     suspend fun setThemeMode(mode: String)
     suspend fun setFontScaleMultiplier(scale: Float)
     suspend fun setCurrencySymbol(symbol: String)
     suspend fun setLanguage(lang: String)
     suspend fun incrementAppOpenCount()
+    suspend fun setHapticFeedbackEnabled(enabled: Boolean)
 }
 
 @Singleton
@@ -45,6 +47,10 @@ class PreferencesRepositoryImpl @Inject constructor(
 
     override val appOpenCount: Flow<Int> = dataStore.data.map { prefs ->
         prefs[PreferenceKeys.APP_OPEN_COUNT] ?: 0
+    }
+
+    override val hapticFeedbackEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferenceKeys.HAPTIC_FEEDBACK_ENABLED] ?: true
     }
 
     override suspend fun setThemeMode(mode: String) {
@@ -75,6 +81,12 @@ class PreferencesRepositoryImpl @Inject constructor(
         dataStore.edit { prefs ->
             val current = prefs[PreferenceKeys.APP_OPEN_COUNT] ?: 0
             prefs[PreferenceKeys.APP_OPEN_COUNT] = current + 1
+        }
+    }
+
+    override suspend fun setHapticFeedbackEnabled(enabled: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[PreferenceKeys.HAPTIC_FEEDBACK_ENABLED] = enabled
         }
     }
 }

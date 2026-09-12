@@ -186,6 +186,7 @@ class ViewModelsTest {
             override val currencySymbol: Flow<String> = flowOf("₹")
             override val language: Flow<String> = flowOf("en")
             override val appOpenCount: Flow<Int> = flowOf(1)
+            override val hapticFeedbackEnabled: Flow<Boolean> = flowOf(true)
 
             override suspend fun setThemeMode(mode: String) {}
             override suspend fun setFontScaleMultiplier(scale: Float) {}
@@ -194,6 +195,7 @@ class ViewModelsTest {
             override suspend fun incrementAppOpenCount() {
                 openCountIncremented = true
             }
+            override suspend fun setHapticFeedbackEnabled(enabled: Boolean) {}
         }
 
         val viewModel = MainViewModel(fakePrefs)

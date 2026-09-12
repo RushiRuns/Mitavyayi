@@ -3,6 +3,35 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 7.4: Haptic Feedback complete.
+  - Implemented tactile haptic feedback across touch interactions, action confirmations, and error alerts:
+    - Added `<uses-permission android:name="android.permission.VIBRATE" />` to `AndroidManifest.xml`.
+    - Created `HapticFeedbackHelper.kt` (`util/HapticFeedbackHelper.kt`):
+      - `fun Context.hapticLight(enabled: Boolean = true)`: Light tactile tap (ticks/light click) for chips, toggles, icon buttons.
+      - `fun Context.hapticMedium(enabled: Boolean = true)`: Medium tactile click for buttons and navigation items.
+      - `fun Context.hapticHeavy(enabled: Boolean = true)`: Heavy tactile feedback for primary/prominent actions.
+      - `fun Context.hapticSuccess(enabled: Boolean = true)`: Double-pulse confirmation pattern for save / success actions.
+      - `fun Context.hapticError(enabled: Boolean = true)`: Multi-pulse tactile pattern for validation failures and destructive alerts.
+      - Safe multi-version Android support: API 31+ `VibratorManager`, API 26+ `VibrationEffect` (`createPredefined`, `createWaveform`, `createOneShot`), and legacy API fallbacks with error suppression.
+    - Added DataStore preference persistence:
+      - `PreferenceKeys.HAPTIC_FEEDBACK_ENABLED` in `PreferenceKeys.kt`.
+      - `hapticFeedbackEnabled: Flow<Boolean>` and `setHapticFeedbackEnabled(enabled: Boolean)` in `PreferencesRepository` and `PreferencesRepositoryImpl` (defaults to `true`).
+      - Exposed `hapticFeedbackEnabled: StateFlow<Boolean>` and `setHapticFeedbackEnabled` in `MainViewModel`.
+    - Settings Integration:
+      - Added Haptic Feedback switch toggle to `ThemeSelectionDialog.kt` ("Appearance & Settings") allowing users to enable or disable vibration feedback.
+      - Wired toggle through `MitavyayApp.kt`.
+    - Screen & Component Integrations:
+      - `QuickAddExpenseSheet.kt`: Integrated tactile `hapticLight` on button/chip presses (account, category, type toggle, submit), `hapticSuccess` on transaction save confirmation, and `hapticError` on validation or save failure.
+      - `AppAlertDialog` in `Dialogs.kt`: Integrated `hapticError` when displaying destructive confirmation dialogs.
+      - Main FloatingActionButton in `MitavyayApp.kt`: Integrated `hapticLight` on press.
+    - Automated Unit Tests:
+      - Created `HapticFeedbackHelperTest.kt` verifying safe execution with enabled/disabled flag, null service, and exception suppression.
+      - Created `HapticFeedbackTest.kt` verifying DataStore default values, toggle changes, and `MainViewModel` state observation.
+      - Updated `DualThemeTest.kt` and `ViewModelsTest.kt` fake preference repositories.
+    - Verification:
+      - All 164 unit tests pass cleanly (`testDebugUnitTest`).
+      - Debug APK builds cleanly (`assembleDebug`).
+    - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 7.3: Cool Animations complete.
   - Implemented comprehensive, performant animation system across theme, navigation, components, and charts:
     - Created `AppMotion` motion tokens (`ui/theme/Motion.kt`):

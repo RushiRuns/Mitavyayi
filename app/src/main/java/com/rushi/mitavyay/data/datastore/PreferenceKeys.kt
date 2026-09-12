@@ -1,5 +1,6 @@
 package com.rushi.mitavyay.data.datastore
 
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -10,4 +11,5 @@ object PreferenceKeys {
     val CURRENCY_SYMBOL = stringPreferencesKey("currency_symbol")
     val LANGUAGE = stringPreferencesKey("language")
     val APP_OPEN_COUNT = intPreferencesKey("app_open_count")
+    val HAPTIC_FEEDBACK_ENABLED = booleanPreferencesKey("haptic_feedback_enabled")
 }

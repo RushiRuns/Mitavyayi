@@ -27,11 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.ui.components.MitavyayBottomBar
 import com.rushi.mitavyay.ui.components.ThemeSelectionDialog
+import androidx.compose.ui.platform.LocalContext
 import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
 import com.rushi.mitavyay.ui.navigation.NavDestination
 import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
 import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseSheet
+import com.rushi.mitavyay.util.hapticLight
 
 /**
  * Root scaffold Composable for Mitavyay.
@@ -44,12 +46,14 @@ fun MitavyayApp(
     onQuickAddClick: (() -> Unit)? = null,
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     var showQuickAddSheet by remember { mutableStateOf(false) }
     var showBatchAddDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     val currentDestination = appState.currentDestination
     val currentRoute = appState.currentRoute
     val currentThemeMode by mainViewModel.themeMode.collectAsState()
+    val hapticFeedbackEnabled by mainViewModel.hapticFeedbackEnabled.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -135,6 +139,7 @@ fun MitavyayApp(
             if (appState.isTopLevelDestination) {
                 FloatingActionButton(
                     onClick = {
+                        context.hapticLight(hapticFeedbackEnabled)
                         if (onQuickAddClick != null) {
                             onQuickAddClick()
                         } else {
@@ -168,7 +173,8 @@ fun MitavyayApp(
             onBatchAddClick = {
                 showQuickAddSheet = false
                 showBatchAddDialog = true
-            }
+            },
+            hapticFeedbackEnabled = hapticFeedbackEnabled
         )
     }
 
@@ -183,6 +189,10 @@ fun MitavyayApp(
             currentThemeMode = currentThemeMode,
             onThemeSelected = { mode ->
                 mainViewModel.setThemeMode(mode)
+            },
+            hapticFeedbackEnabled = hapticFeedbackEnabled,
+            onHapticFeedbackToggled = { enabled ->
+                mainViewModel.setHapticFeedbackEnabled(enabled)
             },
             onDismiss = { showThemeDialog = false }
         )

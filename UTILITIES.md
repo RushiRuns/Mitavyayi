@@ -47,6 +47,15 @@ This file serves as the index for all shared utilities, formatters, extensions, 
   - Screen transition generators (`screenEnterTransition`, `screenExitTransition`, `screenPopEnterTransition`, `screenPopExitTransition`, `tabCrossfadeEnter`, `tabCrossfadeExit`).
   - Access via `MaterialTheme.appMotion`.
   - *Location*: `ui/theme/Motion.kt`
+- **Haptic Feedback Utilities** (`com.rushi.mitavyay.util.HapticFeedbackHelper`):
+  - `fun Context.hapticLight(enabled: Boolean = true)`: Light tactile tap for chips, toggles, icon buttons.
+  - `fun Context.hapticMedium(enabled: Boolean = true)`: Medium tactile click for button presses and navigation items.
+  - `fun Context.hapticHeavy(enabled: Boolean = true)`: Heavy tactile feedback for primary/prominent actions.
+  - `fun Context.hapticSuccess(enabled: Boolean = true)`: Double-pulse tactile confirmation pattern for save/creation actions.
+  - `fun Context.hapticError(enabled: Boolean = true)`: Multi-pulse tactile pattern for validation failures, rejected actions, and destructive alerts.
+  - Honors Android API level capabilities (API 31+ `VibratorManager`, API 26+ `VibrationEffect`) with complete exception suppression and safe degradation.
+  - Controlled by user preference toggle in DataStore (`haptic_feedback_enabled`).
+  - *Location*: `util/HapticFeedbackHelper.kt`
 
 ## Reusable UI Components (`com.rushi.mitavyay.ui.components`)
 

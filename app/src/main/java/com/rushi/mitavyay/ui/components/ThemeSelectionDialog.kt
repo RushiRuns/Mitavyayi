@@ -7,22 +7,27 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.window.Dialog
 import com.rushi.mitavyay.ui.theme.ThemeMode
 import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.spacing
+import com.rushi.mitavyay.util.hapticLight
 
 /**
- * Modal dialog for switching app theme between System default, Light mode, and Dark mode.
+ * Modal dialog for switching app theme and general preferences (including haptic feedback).
  * Styled with theme tokens.
  */
 @Composable
@@ -30,8 +35,12 @@ fun ThemeSelectionDialog(
     currentThemeMode: ThemeMode,
     onThemeSelected: (ThemeMode) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hapticFeedbackEnabled: Boolean = true,
+    onHapticFeedbackToggled: ((Boolean) -> Unit)? = null
 ) {
+    val context = LocalContext.current
+
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = MaterialTheme.appShapes.large,
@@ -47,7 +56,7 @@ fun ThemeSelectionDialog(
                     .padding(MaterialTheme.spacing.lg)
             ) {
                 Text(
-                    text = "Choose Theme",
+                    text = "Appearance & Settings",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -59,22 +68,81 @@ fun ThemeSelectionDialog(
                     label = "System default",
                     description = "Follows your device settings",
                     selected = currentThemeMode == ThemeMode.SYSTEM,
-                    onClick = { onThemeSelected(ThemeMode.SYSTEM) }
+                    onClick = {
+                        context.hapticLight(hapticFeedbackEnabled)
+                        onThemeSelected(ThemeMode.SYSTEM)
+                    }
                 )
 
                 ThemeOptionRow(
                     label = "Light theme",
                     description = "Always use bright colors",
                     selected = currentThemeMode == ThemeMode.LIGHT,
-                    onClick = { onThemeSelected(ThemeMode.LIGHT) }
+                    onClick = {
+                        context.hapticLight(hapticFeedbackEnabled)
+                        onThemeSelected(ThemeMode.LIGHT)
+                    }
                 )
 
                 ThemeOptionRow(
                     label = "Dark theme",
                     description = "Easy on the eyes in low light",
                     selected = currentThemeMode == ThemeMode.DARK,
-                    onClick = { onThemeSelected(ThemeMode.DARK) }
+                    onClick = {
+                        context.hapticLight(hapticFeedbackEnabled)
+                        onThemeSelected(ThemeMode.DARK)
+                    }
                 )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = MaterialTheme.spacing.md),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+
+                Text(
+                    text = "Preferences",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                SpacerSm()
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val next = !hapticFeedbackEnabled
+                            context.hapticLight(next)
+                            onHapticFeedbackToggled?.invoke(next)
+                        }
+                        .padding(vertical = MaterialTheme.spacing.xs),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Haptic feedback",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "Vibrate on button taps and actions",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = hapticFeedbackEnabled,
+                        onCheckedChange = { isChecked ->
+                            context.hapticLight(isChecked)
+                            onHapticFeedbackToggled?.invoke(isChecked)
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    )
+                }
 
                 SpacerLg()
 

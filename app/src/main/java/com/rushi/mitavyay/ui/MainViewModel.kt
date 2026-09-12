@@ -68,9 +68,22 @@ class MainViewModel @Inject constructor(
             initialValue = 1.0f
         )
 
+    val hapticFeedbackEnabled: StateFlow<Boolean> = preferencesRepository.hapticFeedbackEnabled
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = true
+        )
+
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch {
             preferencesRepository.setThemeMode(mode.name)
+        }
+    }
+
+    fun setHapticFeedbackEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setHapticFeedbackEnabled(enabled)
         }
     }
 

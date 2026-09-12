@@ -29,12 +29,14 @@ class DualThemeTest {
         private val _currency = MutableStateFlow("₹")
         private val _language = MutableStateFlow("en")
         private val _openCount = MutableStateFlow(0)
+        private val _hapticEnabled = MutableStateFlow(true)
 
         override val themeMode: Flow<String> = _themeMode
         override val fontScaleMultiplier: Flow<Float> = _fontScale
         override val currencySymbol: Flow<String> = _currency
         override val language: Flow<String> = _language
         override val appOpenCount: Flow<Int> = _openCount
+        override val hapticFeedbackEnabled: Flow<Boolean> = _hapticEnabled
 
         override suspend fun setThemeMode(mode: String) {
             _themeMode.value = mode
@@ -54,6 +56,10 @@ class DualThemeTest {
 
         override suspend fun incrementAppOpenCount() {
             _openCount.value += 1
+        }
+
+        override suspend fun setHapticFeedbackEnabled(enabled: Boolean) {
+            _hapticEnabled.value = enabled
         }
     }
 

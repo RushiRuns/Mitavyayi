@@ -4,10 +4,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.rushi.mitavyay.R
 import com.rushi.mitavyay.ui.theme.appShapes
+import com.rushi.mitavyay.util.hapticError
 
 /**
  * Standard AlertDialog wrapper enforcing theme tokens for typography, shapes, and colors.
@@ -22,8 +25,17 @@ fun AppAlertDialog(
     confirmText: String = stringResource(R.string.action_confirm),
     dismissText: String? = stringResource(R.string.action_cancel),
     onDismiss: (() -> Unit)? = onDismissRequest,
-    isDestructive: Boolean = false
+    isDestructive: Boolean = false,
+    hapticFeedbackEnabled: Boolean = true
 ) {
+    val context = LocalContext.current
+
+    LaunchedEffect(isDestructive) {
+        if (isDestructive) {
+            context.hapticError(hapticFeedbackEnabled)
+        }
+    }
+
     AlertDialog(
         onDismissRequest = onDismissRequest,
         modifier = modifier,

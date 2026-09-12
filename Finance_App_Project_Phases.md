@@ -849,31 +849,31 @@
 ### Feature 7.4: Haptic Feedback
 
 **Planning**
-- [ ] Vibration feedback on:
+- [x] Vibration feedback on:
   - Button press (light tap)
   - Success action (confirmed)
   - Error (denied)
 
 **Implementation**
-- [ ] Create `util/HapticFeedbackHelper.kt`:
+- [x] Create `util/HapticFeedbackHelper.kt`:
   ```kotlin
   fun Context.hapticLight()
   fun Context.hapticMedium()
   fun Context.hapticHeavy()
   ```
-- [ ] Use Android's `VibrationEffect` (requires VIBRATE permission)
-- [ ] Integrate into:
+- [x] Use Android's `VibrationEffect` (requires VIBRATE permission)
+- [x] Integrate into:
   - Button presses in QuickAddExpense
   - Success toast after save
   - Error dialog on failed action
-- [ ] Settings: toggle haptic feedback on/off
+- [x] Settings: toggle haptic feedback on/off
 
 **Testing**
-- [ ] Test: Perform actions, feel haptic feedback
-- [ ] Test: Toggle setting disables feedback
+- [x] Test: Perform actions, feel haptic feedback
+- [x] Test: Toggle setting disables feedback
 
 **Closure**
-- [ ] Commit: "Feature 7.4: Haptic feedback"
+- [x] Commit: "Feature 7.4: Haptic feedback"
 
 ### Feature 7.5: Micro-Interactions
 

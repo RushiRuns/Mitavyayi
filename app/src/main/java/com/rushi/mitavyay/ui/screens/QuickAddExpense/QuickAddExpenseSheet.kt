@@ -61,6 +61,10 @@ import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.extendedColorScheme
 import com.rushi.mitavyay.ui.theme.spacing
 
+import com.rushi.mitavyay.util.hapticError
+import com.rushi.mitavyay.util.hapticLight
+import com.rushi.mitavyay.util.hapticSuccess
+
 /**
  * Material 3 ModalBottomSheet providing the fastest path to log an expense or income transaction.
  *
@@ -76,6 +80,7 @@ fun QuickAddExpenseSheet(
     onDismiss: () -> Unit,
     onBatchAddClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    hapticFeedbackEnabled: Boolean = true,
     viewModel: QuickAddExpenseViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -86,10 +91,17 @@ fun QuickAddExpenseSheet(
 
     LaunchedEffect(uiState.isSavedSuccessfully) {
         if (uiState.isSavedSuccessfully) {
+            context.hapticSuccess(hapticFeedbackEnabled)
             val typeStr = if (uiState.isExpense) "Expense" else "Income"
             Toast.makeText(context, "$typeStr added successfully!", Toast.LENGTH_SHORT).show()
             viewModel.resetForm()
             onDismiss()
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        if (uiState.errorMessage != null) {
+            context.hapticError(hapticFeedbackEnabled)
         }
     }
 
@@ -111,7 +123,8 @@ fun QuickAddExpenseSheet(
             onDescriptionChange = viewModel::onDescriptionChange,
             onNotesChange = viewModel::onNotesChange,
             onSubmit = { viewModel.saveTransaction() },
-            onBatchAddClick = onBatchAddClick
+            onBatchAddClick = onBatchAddClick,
+            hapticFeedbackEnabled = hapticFeedbackEnabled
         )
     }
 
@@ -125,10 +138,12 @@ fun QuickAddExpenseSheet(
                 viewModel.createAndSelectCategory(name, colorHex, icon) { result ->
                     result.fold(
                         onSuccess = {
+                            context.hapticSuccess(hapticFeedbackEnabled)
                             showAddCategoryDialog = false
                             categoryErrorMessage = null
                         },
                         onFailure = { error ->
+                            context.hapticError(hapticFeedbackEnabled)
                             categoryErrorMessage = error.localizedMessage
                         }
                     )
@@ -152,8 +167,11 @@ fun QuickAddExpenseContent(
     onNotesChange: (String) -> Unit = {},
     onSubmit: () -> Unit,
     onBatchAddClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hapticFeedbackEnabled: Boolean = true
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -175,11 +193,17 @@ fun QuickAddExpenseContent(
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (onBatchAddClick != null) {
-                    TextButton(onClick = onBatchAddClick) {
+                    TextButton(onClick = {
+                        context.hapticLight(hapticFeedbackEnabled)
+                        onBatchAddClick()
+                    }) {
                         Text("Batch Add")
                     }
                 }
-                IconButton(onClick = onDismiss) {
+                IconButton(onClick = {
+                    context.hapticLight(hapticFeedbackEnabled)
+                    onDismiss()
+                }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
@@ -198,7 +222,10 @@ fun QuickAddExpenseContent(
         ) {
             FilterChip(
                 selected = uiState.isExpense,
-                onClick = { onTypeToggle(true) },
+                onClick = {
+                    context.hapticLight(hapticFeedbackEnabled)
+                    onTypeToggle(true)
+                },
                 label = {
                     Text(
                         text = "Expense",
@@ -216,7 +243,10 @@ fun QuickAddExpenseContent(
 
             FilterChip(
                 selected = !uiState.isExpense,
-                onClick = { onTypeToggle(false) },
+                onClick = {
+                    context.hapticLight(hapticFeedbackEnabled)
+                    onTypeToggle(false)
+                },
                 label = {
                     Text(
                         text = "Income",
@@ -270,7 +300,10 @@ fun QuickAddExpenseContent(
                     AccountChip(
                         account = account,
                         isSelected = uiState.selectedAccountId == account.id,
-                        onClick = { onAccountSelect(account.id) }
+                        onClick = {
+                            context.hapticLight(hapticFeedbackEnabled)
+                            onAccountSelect(account.id)
+                        }
                     )
                 }
             }
@@ -294,12 +327,18 @@ fun QuickAddExpenseContent(
                 CategoryChip(
                     category = category,
                     isSelected = uiState.selectedCategory == category.name,
-                    onClick = { onCategorySelect(category.name) }
+                    onClick = {
+                        context.hapticLight(hapticFeedbackEnabled)
+                        onCategorySelect(category.name)
+                    }
                 )
             }
             item {
                 AssistChip(
-                    onClick = onAddCategoryClick,
+                    onClick = {
+                        context.hapticLight(hapticFeedbackEnabled)
+                        onAddCategoryClick()
+                    },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -365,7 +404,10 @@ fun QuickAddExpenseContent(
 
         PrimaryButton(
             text = if (uiState.isExpense) "Add Expense" else "Add Income",
-            onClick = onSubmit,
+            onClick = {
+                context.hapticLight(hapticFeedbackEnabled)
+                onSubmit()
+            },
             enabled = canSubmit,
             loading = uiState.isSaving,
             modifier = Modifier.fillMaxWidth()
