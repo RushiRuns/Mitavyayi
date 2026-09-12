@@ -3,6 +3,34 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 7.5: Micro-Interactions complete.
+  - Implemented subtle, delightful micro-interactions across Mitavyay:
+    - Loading Skeleton Screens (`SkeletonLoader.kt`):
+      - Created `shimmerBrush()` with linear gradient sweeps across theme surface tokens.
+      - Created `Modifier.shimmerPlaceholder(visible, shape)` for custom containers.
+      - Created `SkeletonTransactionCard` and `SkeletonTransactionList(count = 6)` mimicking `TransactionCard` layout during initial load and filter updates.
+      - Created `SkeletonCard(height)` generic card placeholder.
+    - Offline Vector Illustrations (`IllustrationAssets.kt`):
+      - Designed lightweight offline Compose Canvas illustrations dynamically matching theme color palettes:
+        - `EmptyTransactionsIllustration`: Stylized wallet with floating coins.
+        - `EmptySearchIllustration`: Document with magnifying glass and search lines.
+        - `EmptyBudgetIllustration`: Category target ring and balance scale.
+        - `EmptyGoalsIllustration`: Flag platform milestone with stars.
+      - Enhanced `EmptyState` in `States.kt` to accept an optional `illustration: (@Composable () -> Unit)?` slot.
+    - Swipe-to-Dismiss on Transaction Cards (`TransactionListScreen.kt`):
+      - Wrapped each transaction item in `SwipeToDismissBox` with `SwipeToDismissBoxValue.EndToStart` gesture.
+      - Revealed red delete container with trash icon on swipe.
+      - Connected with `AppAlertDialog` confirmation dialog specifying the transaction description, triggering atomic deletion and balance reversal upon confirmation.
+    - Pull-to-Refresh on Transaction List (`TransactionListScreen.kt` & `TransactionListViewModel.kt`):
+      - Added `isRefreshing` state, `refresh()`, and `deleteTransaction(id)` in `TransactionListViewModel`.
+      - Wrapped `LazyColumn` in `PullToRefreshContainer` with `rememberPullToRefreshState()` and `nestedScroll`.
+      - Integrated tactile `hapticLight()` feedback on pull trigger and `hapticSuccess()` on delete confirmation.
+    - Automated Unit Tests:
+      - Created `MicroInteractionsTest.kt` (4 tests verifying loading to empty state transition, pull-to-refresh state lifecycle, swipe-to-delete with account balance reversal, and search filtering).
+    - Verification:
+      - All 168 unit tests pass cleanly (`testDebugUnitTest`).
+      - Debug APK builds cleanly (`assembleDebug`).
+    - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 7.4: Haptic Feedback complete.
   - Implemented tactile haptic feedback across touch interactions, action confirmations, and error alerts:
     - Added `<uses-permission android:name="android.permission.VIBRATE" />` to `AndroidManifest.xml`.

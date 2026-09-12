@@ -878,25 +878,25 @@
 ### Feature 7.5: Micro-Interactions
 
 **Planning**
-- [ ] Subtle UI refinements that delight:
+- [x] Subtle UI refinements that delight:
   - Swipe to delete gesture (with confirmation)
   - Pull-to-refresh on transaction list
   - Empty state illustrations
   - Loading skeleton screens
 
 **Implementation**
-- [ ] SwipeToDismiss on transaction cards
-- [ ] LazyColumn pull-to-refresh (Compose refresh)
-- [ ] Create illustration assets (SVG or Lottie)
-- [ ] SkeletonLoader Composable while data loads
+- [x] SwipeToDismiss on transaction cards
+- [x] LazyColumn pull-to-refresh (Compose refresh)
+- [x] Create illustration assets (SVG or Lottie)
+- [x] SkeletonLoader Composable while data loads
 
 **Testing**
-- [ ] Test: Swipe to delete works
-- [ ] Test: Pull to refresh reloads data
-- [ ] Test: Skeleton appears, then replaced by data
+- [x] Test: Swipe to delete works
+- [x] Test: Pull to refresh reloads data
+- [x] Test: Skeleton appears, then replaced by data
 
 **Closure**
-- [ ] Commit: "Feature 7.5: Micro-interactions"
+- [x] Commit: "Feature 7.5: Micro-interactions"
 
 ### Feature 7.6: Home Screen Widgets
 

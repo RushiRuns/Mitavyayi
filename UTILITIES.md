@@ -65,11 +65,24 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `TertiaryButton`: Text button for low-emphasis actions with `pressScale`.
 - `DangerButton`: Destructive button with error color for deletions and destructive confirmations with `pressScale`.
 
-### Animation Modifiers & Effects (`ui/components/AnimationModifiers.kt`, `ui/components/DelightfulAnimations.kt`)
+### Animation Modifiers & Effects (`ui/components/AnimationModifiers.kt`, `ui/components/DelightfulAnimations.kt`, `ui/components/SkeletonLoader.kt`, `ui/components/IllustrationAssets.kt`)
 - `Modifier.pressScale(pressedScale: Float = 0.96f)`: Reusable modifier animating an interactive bouncy scale reduction on touch press with spring release.
 - `Modifier.bounceClickable(onClick: () -> Unit)`: Combines clickable with tactile spring bounce feedback.
 - `CelebrationEffect`: Offline Compose Canvas confetti particle explosion for financial milestones and goal achievements.
 - `OfflineLottieAnimation`: Reusable component for playing offline local Lottie JSON vector animations from raw resources.
+- `SkeletonLoader` & `shimmerBrush`:
+  - `shimmerBrush()`: Linear gradient transition across theme surface variant tokens.
+  - `Modifier.shimmerPlaceholder(visible, shape)`: Applies shimmer brush placeholder to any component.
+  - `SkeletonTransactionCard`, `SkeletonTransactionList(count)`: Mimics transaction card layout during loading.
+  - `SkeletonCard(height)`: Generic card placeholder.
+  - *Location*: `ui/components/SkeletonLoader.kt`
+- `IllustrationAssets`:
+  - Modern offline Compose Canvas vector illustrations for empty and state feedback:
+    - `EmptyTransactionsIllustration`: Stylized wallet with floating coins.
+    - `EmptySearchIllustration`: Stylized document with magnifying glass and search lines.
+    - `EmptyBudgetIllustration`: Category target ring and balance scale.
+    - `EmptyGoalsIllustration`: Flag platform milestone with stars.
+  - *Location*: `ui/components/IllustrationAssets.kt`
 
 ### Cards (`ui/components/Cards.kt`)
 - `TransactionCard`: Card displaying title, category, formatted amount (green for income, red for expenses), formatted date, and "Transfer" badge for paired transfer records.

@@ -39,7 +39,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
+import androidx.compose.foundation.background
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import com.rushi.mitavyay.data.model.TransactionDisplayItem
+import com.rushi.mitavyay.ui.components.AppAlertDialog
+import com.rushi.mitavyay.ui.components.EmptySearchIllustration
+import com.rushi.mitavyay.ui.components.EmptyTransactionsIllustration
+import com.rushi.mitavyay.ui.components.SkeletonTransactionList
+import com.rushi.mitavyay.util.hapticError
+import com.rushi.mitavyay.util.hapticLight
+import com.rushi.mitavyay.util.hapticSuccess
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionListScreen(
     onTransactionClick: (String) -> Unit = {},
@@ -54,6 +74,8 @@ fun TransactionListScreen(
         onSearchQueryChange = viewModel::onSearchQueryChange,
         onTransactionClick = onTransactionClick,
         onBatchAddClick = { showBatchAddDialog = true },
+        onRefresh = viewModel::refresh,
+        onDeleteTransaction = viewModel::deleteTransaction,
         modifier = modifier
     )
 
@@ -64,14 +86,54 @@ fun TransactionListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionListContent(
     uiState: TransactionListUiState,
     onSearchQueryChange: (String) -> Unit = {},
     onTransactionClick: (String) -> Unit = {},
     onBatchAddClick: () -> Unit = {},
+    onRefresh: () -> Unit = {},
+    onDeleteTransaction: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    var transactionPendingDelete by remember { mutableStateOf<TransactionDisplayItem?>(null) }
+
+    val pullToRefreshState = rememberPullToRefreshState()
+    if (pullToRefreshState.isRefreshing) {
+        androidx.compose.runtime.LaunchedEffect(true) {
+            context.hapticLight()
+            onRefresh()
+        }
+    }
+    androidx.compose.runtime.LaunchedEffect(uiState.isRefreshing) {
+        if (uiState.isRefreshing) {
+            pullToRefreshState.startRefresh()
+        } else {
+            pullToRefreshState.endRefresh()
+        }
+    }
+
+    if (transactionPendingDelete != null) {
+        AppAlertDialog(
+            onDismissRequest = { transactionPendingDelete = null },
+            title = "Delete Transaction",
+            text = "Are you sure you want to delete \"${transactionPendingDelete?.description}\"? This will automatically update your account balance.",
+            confirmText = "Delete",
+            dismissText = "Cancel",
+            isDestructive = true,
+            onConfirm = {
+                val id = transactionPendingDelete?.id
+                transactionPendingDelete = null
+                if (id != null) {
+                    context.hapticSuccess()
+                    onDeleteTransaction(id)
+                }
+            }
+        )
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         // Search Bar and Batch Add Action
         Row(
@@ -135,7 +197,7 @@ fun TransactionListContent(
         Box(modifier = Modifier.fillMaxSize()) {
             when {
                 uiState.isLoading -> {
-                    LoadingState(message = "Loading transactions...")
+                    SkeletonTransactionList(count = 6)
                 }
                 uiState.transactions.isEmpty() -> {
                     if (uiState.searchQuery.isNotBlank()) {
@@ -143,35 +205,108 @@ fun TransactionListContent(
                             title = "No matching transactions",
                             description = "No transactions found matching \"${uiState.searchQuery}\". Try a different keyword or check notes.",
                             actionText = "Clear Search",
-                            onAction = { onSearchQueryChange("") }
+                            onAction = { onSearchQueryChange("") },
+                            illustration = { EmptySearchIllustration() }
                         )
                     } else {
                         EmptyState(
                             title = "No transactions yet",
-                            description = "Tap + to add your first expense or income."
+                            description = "Tap + to add your first expense or income.",
+                            illustration = { EmptyTransactionsIllustration() }
                         )
                     }
                 }
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(MaterialTheme.spacing.md),
-                        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .nestedScroll(pullToRefreshState.nestedScrollConnection)
                     ) {
-                        items(
-                            items = uiState.transactions,
-                            key = { it.id }
-                        ) { item ->
-                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-                            TransactionCard(
-                                item = item,
-                                onClick = { onTransactionClick(item.id) },
-                                modifier = Modifier.animateItemPlacement()
-                            )
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(MaterialTheme.spacing.md),
+                            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
+                        ) {
+                            items(
+                                items = uiState.transactions,
+                                key = { it.id }
+                            ) { item ->
+                                @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+                                SwipeableTransactionCard(
+                                    item = item,
+                                    onClick = { onTransactionClick(item.id) },
+                                    onSwipeDelete = {
+                                        context.hapticLight()
+                                        transactionPendingDelete = item
+                                    },
+                                    modifier = Modifier.animateItemPlacement()
+                                )
+                            }
                         }
+
+                        PullToRefreshContainer(
+                            state = pullToRefreshState,
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
                     }
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeableTransactionCard(
+    item: TransactionDisplayItem,
+    onClick: () -> Unit,
+    onSwipeDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { dismissValue ->
+            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
+                onSwipeDelete()
+                false
+            } else {
+                false
+            }
+        }
+    )
+
+    SwipeToDismissBox(
+        state = dismissState,
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = true,
+        backgroundContent = {
+            val isSwiping = dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart
+            val backgroundColor = if (isSwiping) {
+                MaterialTheme.colorScheme.errorContainer
+            } else {
+                Color.Transparent
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(backgroundColor, shape = MaterialTheme.appShapes.medium)
+                    .padding(horizontal = MaterialTheme.spacing.lg),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                if (isSwiping) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+        },
+        modifier = modifier
+    ) {
+        TransactionCard(
+            item = item,
+            onClick = onClick
+        )
     }
 }

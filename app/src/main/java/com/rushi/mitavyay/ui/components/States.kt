@@ -116,7 +116,8 @@ fun EmptyState(
     title: String = stringResource(R.string.state_empty_title),
     description: String? = stringResource(R.string.state_empty_desc),
     actionText: String? = null,
-    onAction: (() -> Unit)? = null
+    onAction: (() -> Unit)? = null,
+    illustration: (@Composable () -> Unit)? = null
 ) {
     Box(
         modifier = modifier
@@ -129,12 +130,16 @@ fun EmptyState(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Info,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(48.dp)
-            )
+            if (illustration != null) {
+                illustration()
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
             SpacerMd()
             Text(
                 text = title,
