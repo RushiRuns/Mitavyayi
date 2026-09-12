@@ -110,6 +110,10 @@ class AnalysisTest {
         override suspend fun deleteById(id: String) {}
         override suspend fun getById(id: String): Category? = categories.find { it.id == id }
         override fun getAll(): Flow<List<Category>> = flowOf(categories)
+        override suspend fun getByName(name: String): Category? =
+            categories.find { it.name.equals(name, ignoreCase = true) }
+        override fun getCustomCategories(): Flow<List<Category>> =
+            flowOf(categories.filter { it.isCustom })
     }
 
     @Test
@@ -209,11 +213,16 @@ class AnalysisTest {
         )
         val catRepo = object : CategoryRepository {
             override fun getAllCategories() = flowOf(emptyList<Category>())
+            override fun getCustomCategories() = flowOf(emptyList<Category>())
             override suspend fun getCategoryById(id: String) = null
+            override suspend fun getCategoryByName(name: String) = null
             override suspend fun addCategory(category: Category) {}
             override suspend fun updateCategory(category: Category) {}
             override suspend fun deleteCategory(id: String) {}
             override suspend fun seedDefaultCategories() {}
+            override suspend fun createCustomCategory(name: String, colorHex: String, icon: String) = Result.failure<Category>(NotImplementedError())
+            override suspend fun updateCustomCategory(id: String, name: String, colorHex: String, icon: String) = Result.failure<Unit>(NotImplementedError())
+            override suspend fun canDeleteCategory(id: String) = false
         }
         val txRepo = TransactionRepositoryImpl(dao)
         val viewModel = AnalysisViewModel(txRepo, catRepo)

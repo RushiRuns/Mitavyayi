@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -26,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.ui.components.MitavyayBottomBar
 import com.rushi.mitavyay.ui.components.ThemeSelectionDialog
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
+import com.rushi.mitavyay.ui.navigation.NavDestination
 import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseSheet
 
 /**
@@ -67,6 +69,12 @@ fun MitavyayApp(
                 },
                 actions = {
                     if (appState.isTopLevelDestination) {
+                        IconButton(onClick = { appState.navController.navigate(NavDestination.Categories.route) }) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = "Manage Categories"
+                            )
+                        }
                         IconButton(onClick = { showThemeDialog = true }) {
                             Icon(
                                 imageVector = Icons.Default.Settings,

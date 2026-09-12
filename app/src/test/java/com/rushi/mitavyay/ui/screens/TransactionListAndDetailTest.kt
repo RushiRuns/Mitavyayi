@@ -180,7 +180,10 @@ class TransactionListAndDetailTest {
         private val flow = MutableStateFlow<List<Category>>(emptyList())
 
         override fun getAllCategories(): Flow<List<Category>> = flow
+        override fun getCustomCategories(): Flow<List<Category>> = flowOf(categories.filter { it.isCustom })
         override suspend fun getCategoryById(id: String): Category? = categories.find { it.id == id }
+        override suspend fun getCategoryByName(name: String): Category? =
+            categories.find { it.name.equals(name, ignoreCase = true) }
         override suspend fun addCategory(category: Category) {
             categories.add(category)
             flow.value = categories.toList()
@@ -196,6 +199,11 @@ class TransactionListAndDetailTest {
             )
             flow.value = categories.toList()
         }
+        override suspend fun createCustomCategory(name: String, colorHex: String, icon: String) =
+            Result.failure<Category>(NotImplementedError())
+        override suspend fun updateCustomCategory(id: String, name: String, colorHex: String, icon: String) =
+            Result.failure<Unit>(NotImplementedError())
+        override suspend fun canDeleteCategory(id: String) = false
     }
 
     @Before

@@ -159,11 +159,16 @@ class ViewModelsTest {
         }
         val fakeCatRepo = object : CategoryRepository {
             override fun getAllCategories(): Flow<List<Category>> = flowOf(emptyList())
+            override fun getCustomCategories(): Flow<List<Category>> = flowOf(emptyList())
             override suspend fun getCategoryById(id: String): Category? = null
+            override suspend fun getCategoryByName(name: String): Category? = null
             override suspend fun addCategory(category: Category) {}
             override suspend fun updateCategory(category: Category) {}
             override suspend fun deleteCategory(id: String) {}
             override suspend fun seedDefaultCategories() {}
+            override suspend fun createCustomCategory(name: String, colorHex: String, icon: String) = Result.failure<Category>(NotImplementedError())
+            override suspend fun updateCustomCategory(id: String, name: String, colorHex: String, icon: String) = Result.failure<Unit>(NotImplementedError())
+            override suspend fun canDeleteCategory(id: String) = false
         }
 
         val viewModel = AnalysisViewModel(fakeTxRepo, fakeCatRepo)

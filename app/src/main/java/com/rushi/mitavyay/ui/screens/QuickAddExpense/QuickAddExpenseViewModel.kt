@@ -185,4 +185,27 @@ class QuickAddExpenseViewModel @Inject constructor(
     fun dismissError() {
         _formState.value = _formState.value.copy(errorMessage = null)
     }
+
+    fun createAndSelectCategory(
+        name: String,
+        colorHex: String,
+        icon: String,
+        onComplete: (Result<Unit>) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            val result = categoryRepository.createCustomCategory(name, colorHex, icon)
+            result.fold(
+                onSuccess = { createdCategory ->
+                    _formState.value = _formState.value.copy(
+                        selectedCategory = createdCategory.name,
+                        errorMessage = null
+                    )
+                    onComplete(Result.success(Unit))
+                },
+                onFailure = { error ->
+                    onComplete(Result.failure(error))
+                }
+            )
+        }
+    }
 }

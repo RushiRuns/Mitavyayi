@@ -25,8 +25,13 @@ This file serves as the index for all shared utilities, formatters, extensions, 
   - `toDisplayItem()` extension functions for `Transaction`, `Account`, `Goal`, `Debt`, `RepeatExpense`, and `Category`.
   - Ensures entities are never exposed directly to UI components.
   - *Location*: `data/model/*DisplayItem.kt`
+- **Category Icon & Color Utilities** (`com.rushi.mitavyay.ui.components`):
+  - `getCategoryIcon(iconName: String): ImageVector`: Maps icon identifiers to safe `material-icons-core` vectors.
+  - `CategoryColorOptions`: Curated palette of 16 theme-harmonized hex colors for custom category creation.
+  - `CategoryIconOptions`: List of 13 supported category icons with human-readable labels.
+  - *Location*: `ui/components/CategoryUtils.kt`
 - **Currency Conversion Utilities**: Helper functions for currency processing (if applicable, entirely offline). *Status: Pending*
-- **Transaction Categorization Logic**: Centralized logic for determining default or custom categories. *Status: Pending*
+- **Transaction Categorization Logic**: Centralized logic for determining default or custom categories. *Status: Complete via CategoryRepository & DatabaseModule pre-population*
 
 ## Reusable UI Components (`com.rushi.mitavyay.ui.components`)
 
@@ -46,9 +51,10 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, and direct `Long` paise conversion.
 - `DatePickerField` & `AppDatePickerDialog`: Date selection field launching a Material 3 DatePickerDialog and emitting Unix timestamp ms (`Long`).
 
-### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`)
+### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`, `ui/components/AddCategoryDialog.kt`)
 - `AppAlertDialog`: Standardized confirmation and alert dialog with theme typography, colors, and confirm/dismiss actions.
 - `AddAccountDialog`: Form dialog for creating and editing accounts with validated name, type selection, and initial balance input.
+- `AddCategoryDialog`: Form dialog for creating and editing custom categories with live preview, color swatch picker, and icon grid.
 - `QuickAddExpenseSheet`: Material 3 ModalBottomSheet for rapid transaction entry with CurrencyInput, Expense/Income toggle, single-tap account/category chips, and atomic balance syncing.
 - `EditTransactionDialog`: Form dialog for editing transaction amount, expense/income type, category, account, and description.
 - `ThemeSelectionDialog`: Dialog for selecting app theme (System default, Light mode, Dark mode) with DataStore persistence.
@@ -70,11 +76,11 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `parseCategoryColor`: Pure Kotlin color hex parser with fallback palette for safe JVM unit testing and Android device rendering.
 
 ### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`)
-- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, and `transaction_detail/{transactionId}`), tab labels, and icons.
+- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, `categories`, and `transaction_detail/{transactionId}`), tab labels, and icons.
 - `MitavyayNavHost` (`ui/navigation/NavHost.kt`): Top-level NavHost mapping routes to Compose screens without Fragments.
 - `MitavyayAppState` & `rememberMitavyayAppState` (`ui/AppState.kt`): State holder for navigation controller, backstack resolution, and tab switching.
 - `MitavyayBottomBar` (`ui/components/BottomNavBar.kt`): Material 3 navigation bar utilizing theme tokens.
-- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar (with back button on detail destinations), BottomNavBar, FAB, and NavHost.
+- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar (with Categories navigation and theme dialog), BottomNavBar, FAB, and NavHost.
 
 
 ## DO NOT CREATE

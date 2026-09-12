@@ -3,6 +3,19 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.6: Category Management complete.
+  - Implemented pre-population of default categories in `DatabaseModule.kt` via `RoomDatabase.Callback()` using SQLite `INSERT OR IGNORE` and automatic reactive fallback seeding in `CategoryRepositoryImpl.getAllCategories()`.
+  - Added custom category management methods to `CategoryRepository`: `createCustomCategory(name, colorHex, icon)`, `updateCustomCategory(id, name, colorHex, icon)`, and `canDeleteCategory(id)` with immutability enforcement for default categories (`isCustom = false`).
+  - Added query methods to `CategoryDao`: `getByName(name)` for case-insensitive duplicate collision prevention and `getCustomCategories()`.
+  - Created `CategoryUtils.kt` defining `CategoryColorOptions` (palette of 16 theme-harmonized colors), `CategoryIconOptions`, and `getCategoryIcon` using safe `material-icons-core` vectors.
+  - Built `AddCategoryDialog` Material 3 dialog with live category preview badge, validated name input, horizontal color swatch picker, and icon selection row.
+  - Built `CategoriesViewModel` managing custom and default category separation, dialog state management, and add/edit/delete operations.
+  - Built `CategoriesScreen` providing segregated views for Custom Categories (with edit & delete actions) and Default Categories (with "Default" badge), plus FAB for custom category creation.
+  - Integrated Category Management into app navigation with `NavDestination.Categories` (`route = "categories"`), `MitavyayNavHost`, and a quick access button in `MitavyayApp` `TopAppBar`.
+  - Enhanced `QuickAddExpenseSheet` and `QuickAddExpenseViewModel` with an inline "+ New" category chip that allows users to create custom categories on the fly and immediately select them for transaction logging.
+  - Added test suites in `CategoryRepositoryTest.kt` (10 tests) and `CategoriesViewModelTest.kt` (7 tests), and updated test fakes across `AnalysisTest`, `QuickAddExpenseTest`, `TransactionListAndDetailTest`, and `ViewModelsTest`.
+  - Verified 71/71 tests passing in `testDebugUnitTest` and clean build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 4.5: Basic Analysis (Charts) complete.
   - Implemented database- and repository-level aggregations in `TransactionDao` and `TransactionRepository` (`getCategorySpending`, `getTimeSpendingTrend`, `getAnalysisSummary`) guaranteeing business logic is in the repository layer, not composables.
   - Added support for dynamic time periods (`AnalysisPeriod.WEEK`, `AnalysisPeriod.MONTH`, `AnalysisPeriod.YEAR`) and period offset navigation with date boundaries.

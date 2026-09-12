@@ -457,23 +457,23 @@
 ### Feature 4.6: Category Management
 
 **Planning**
-- [ ] Predefined categories (Food, Transport, Entertainment, etc.)
-- [ ] User can create custom categories
-- [ ] Categories used in transactions and analysis
+- [x] Predefined categories (Food, Transport, Entertainment, etc.)
+- [x] User can create custom categories
+- [x] Categories used in transactions and analysis
 
 **Implementation**
-- [ ] Seed database with default categories on first launch
-- [ ] Create UI to add custom category (name, icon, color)
-- [ ] Store custom categories in database
-- [ ] Dropdown in QuickAddExpense uses category list
+- [x] Seed database with default categories on first launch
+- [x] Create UI to add custom category (name, icon, color)
+- [x] Store custom categories in database
+- [x] Dropdown in QuickAddExpense uses category list
 
 **Testing**
-- [ ] Test: Default categories appear
-- [ ] Test: Add custom category, appears in dropdown
-- [ ] Test: Custom category persists
+- [x] Test: Default categories appear
+- [x] Test: Add custom category, appears in dropdown
+- [x] Test: Custom category persists
 
 **Closure**
-- [ ] Commit: "Feature 4.6: Category management"
+- [x] Commit: "Feature 4.6: Category management"
 
 ### Feature 4.7: Transfers (Between Accounts)
 

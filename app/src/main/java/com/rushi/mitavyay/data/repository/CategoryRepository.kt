@@ -3,16 +3,24 @@ package com.rushi.mitavyay.data.repository
 import com.rushi.mitavyay.data.db.Category
 import com.rushi.mitavyay.data.db.CategoryDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface CategoryRepository {
     fun getAllCategories(): Flow<List<Category>>
+    fun getCustomCategories(): Flow<List<Category>>
     suspend fun getCategoryById(id: String): Category?
+    suspend fun getCategoryByName(name: String): Category?
     suspend fun addCategory(category: Category)
     suspend fun updateCategory(category: Category)
     suspend fun deleteCategory(id: String)
     suspend fun seedDefaultCategories()
+
+    suspend fun createCustomCategory(name: String, colorHex: String, icon: String): Result<Category>
+    suspend fun updateCustomCategory(id: String, name: String, colorHex: String, icon: String): Result<Unit>
+    suspend fun canDeleteCategory(id: String): Boolean
 }
 
 @Singleton
@@ -20,15 +28,91 @@ class CategoryRepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao
 ) : CategoryRepository {
 
-    override fun getAllCategories(): Flow<List<Category>> = categoryDao.getAll()
+    override fun getAllCategories(): Flow<List<Category>> =
+        categoryDao.getAll().onEach { list ->
+            if (list.isEmpty()) {
+                seedDefaultCategories()
+            }
+        }
+
+    override fun getCustomCategories(): Flow<List<Category>> = categoryDao.getCustomCategories()
 
     override suspend fun getCategoryById(id: String): Category? = categoryDao.getById(id)
+
+    override suspend fun getCategoryByName(name: String): Category? = categoryDao.getByName(name)
 
     override suspend fun addCategory(category: Category) = categoryDao.insert(category)
 
     override suspend fun updateCategory(category: Category) = categoryDao.update(category)
 
-    override suspend fun deleteCategory(id: String) = categoryDao.deleteById(id)
+    override suspend fun deleteCategory(id: String) {
+        val cat = categoryDao.getById(id)
+        if (cat != null && cat.isCustom) {
+            categoryDao.deleteById(id)
+        }
+    }
+
+    override suspend fun canDeleteCategory(id: String): Boolean {
+        val cat = categoryDao.getById(id)
+        return cat != null && cat.isCustom
+    }
+
+    override suspend fun createCustomCategory(
+        name: String,
+        colorHex: String,
+        icon: String
+    ): Result<Category> {
+        val trimmed = name.trim()
+        if (trimmed.isBlank()) {
+            return Result.failure(IllegalArgumentException("Category name cannot be blank"))
+        }
+        val existing = categoryDao.getByName(trimmed)
+        if (existing != null) {
+            return Result.failure(IllegalArgumentException("Category '$trimmed' already exists"))
+        }
+
+        val category = Category(
+            id = UUID.randomUUID().toString(),
+            name = trimmed,
+            icon = icon.ifBlank { "star" },
+            color = colorHex.ifBlank { "#006C4C" },
+            isCustom = true
+        )
+        categoryDao.insert(category)
+        return Result.success(category)
+    }
+
+    override suspend fun updateCustomCategory(
+        id: String,
+        name: String,
+        colorHex: String,
+        icon: String
+    ): Result<Unit> {
+        val cat = categoryDao.getById(id)
+            ?: return Result.failure(IllegalArgumentException("Category not found"))
+
+        if (!cat.isCustom) {
+            return Result.failure(IllegalStateException("Default categories cannot be edited"))
+        }
+
+        val trimmed = name.trim()
+        if (trimmed.isBlank()) {
+            return Result.failure(IllegalArgumentException("Category name cannot be blank"))
+        }
+
+        val existing = categoryDao.getByName(trimmed)
+        if (existing != null && existing.id != id) {
+            return Result.failure(IllegalArgumentException("Category '$trimmed' already exists"))
+        }
+
+        val updated = cat.copy(
+            name = trimmed,
+            color = colorHex.ifBlank { cat.color },
+            icon = icon.ifBlank { cat.icon }
+        )
+        categoryDao.update(updated)
+        return Result.success(Unit)
+    }
 
     override suspend fun seedDefaultCategories() {
         val defaults = listOf(

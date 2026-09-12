@@ -31,4 +31,10 @@ interface CategoryDao {
 
     @Query("SELECT * FROM categories ORDER BY isCustom ASC, name ASC")
     fun getAll(): Flow<List<Category>>
+
+    @Query("SELECT * FROM categories WHERE LOWER(name) = LOWER(:name) LIMIT 1")
+    suspend fun getByName(name: String): Category?
+
+    @Query("SELECT * FROM categories WHERE isCustom = 1 ORDER BY name ASC")
+    fun getCustomCategories(): Flow<List<Category>>
 }

@@ -191,7 +191,12 @@ class QuickAddExpenseTest {
 
         override fun getAllCategories(): Flow<List<Category>> = categoriesFlow
 
+        override fun getCustomCategories(): Flow<List<Category>> = flowOf(categoriesMap.values.filter { it.isCustom })
+
         override suspend fun getCategoryById(id: String): Category? = categoriesMap[id]
+
+        override suspend fun getCategoryByName(name: String): Category? =
+            categoriesMap.values.find { it.name.equals(name, ignoreCase = true) }
 
         override suspend fun addCategory(category: Category) {
             categoriesMap[category.id] = category
@@ -217,6 +222,50 @@ class QuickAddExpenseTest {
             defaults.forEach { categoriesMap[it.id] = it }
             updateFlow()
         }
+
+        override suspend fun createCustomCategory(
+            name: String,
+            colorHex: String,
+            icon: String
+        ): Result<Category> {
+            val trimmed = name.trim()
+            if (trimmed.isBlank()) {
+                return Result.failure(IllegalArgumentException("Blank name"))
+            }
+            if (categoriesMap.values.any { it.name.equals(trimmed, ignoreCase = true) }) {
+                return Result.failure(IllegalArgumentException("Duplicate category"))
+            }
+            val cat = Category(
+                id = UUID.randomUUID().toString(),
+                name = trimmed,
+                color = colorHex,
+                icon = icon,
+                isCustom = true
+            )
+            categoriesMap[cat.id] = cat
+            updateFlow()
+            return Result.success(cat)
+        }
+
+        override suspend fun updateCustomCategory(
+            id: String,
+            name: String,
+            colorHex: String,
+            icon: String
+        ): Result<Unit> {
+            val existing = categoriesMap[id] ?: return Result.failure(IllegalArgumentException("Not found"))
+            if (!existing.isCustom) return Result.failure(IllegalStateException("Cannot edit default"))
+            val trimmed = name.trim()
+            if (categoriesMap.values.any { it.name.equals(trimmed, ignoreCase = true) && it.id != id }) {
+                return Result.failure(IllegalArgumentException("Duplicate category"))
+            }
+            categoriesMap[id] = existing.copy(name = trimmed, color = colorHex, icon = icon)
+            updateFlow()
+            return Result.success(Unit)
+        }
+
+        override suspend fun canDeleteCategory(id: String): Boolean =
+            categoriesMap[id]?.isCustom == true
     }
 
     @Before
@@ -363,5 +412,20 @@ class QuickAddExpenseTest {
         assertEquals(0L, state.amountPaise)
         assertEquals("", state.description)
         assertNull(state.errorMessage)
+    }
+
+    @Test
+    fun createAndSelectCategory_addsAndImmediatelySelectsCategory() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        var resultSuccess = false
+
+        viewModel.createAndSelectCategory("Subscriptions", "#EC407A", "star") { res ->
+            resultSuccess = res.isSuccess
+        }
+
+        assertTrue(resultSuccess)
+        val state = viewModel.uiState.first { it.selectedCategory == "Subscriptions" }
+        assertEquals("Subscriptions", state.selectedCategory)
+        assertTrue(state.categories.any { it.name == "Subscriptions" })
     }
 }

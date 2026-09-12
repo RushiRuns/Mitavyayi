@@ -17,7 +17,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -32,6 +35,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,12 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.model.CategoryDisplayItem
+import com.rushi.mitavyay.ui.components.AddCategoryDialog
 import com.rushi.mitavyay.ui.components.AppTextField
 import com.rushi.mitavyay.ui.components.CurrencyInput
 import com.rushi.mitavyay.ui.components.PrimaryButton
 import com.rushi.mitavyay.ui.components.SpacerLg
 import com.rushi.mitavyay.ui.components.SpacerMd
 import com.rushi.mitavyay.ui.components.SpacerSm
+import com.rushi.mitavyay.ui.components.parseCategoryColor
 import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.extendedColorScheme
 import com.rushi.mitavyay.ui.theme.spacing
@@ -70,6 +78,8 @@ fun QuickAddExpenseSheet(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showAddCategoryDialog by remember { mutableStateOf(false) }
+    var categoryErrorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(uiState.isSavedSuccessfully) {
         if (uiState.isSavedSuccessfully) {
@@ -94,8 +104,32 @@ fun QuickAddExpenseSheet(
             onTypeToggle = viewModel::onTypeToggle,
             onAccountSelect = viewModel::onAccountSelect,
             onCategorySelect = viewModel::onCategorySelect,
+            onAddCategoryClick = { showAddCategoryDialog = true },
             onDescriptionChange = viewModel::onDescriptionChange,
             onSubmit = { viewModel.saveTransaction() }
+        )
+    }
+
+    if (showAddCategoryDialog) {
+        AddCategoryDialog(
+            onDismiss = {
+                showAddCategoryDialog = false
+                categoryErrorMessage = null
+            },
+            onSave = { name, colorHex, icon ->
+                viewModel.createAndSelectCategory(name, colorHex, icon) { result ->
+                    result.fold(
+                        onSuccess = {
+                            showAddCategoryDialog = false
+                            categoryErrorMessage = null
+                        },
+                        onFailure = { error ->
+                            categoryErrorMessage = error.localizedMessage
+                        }
+                    )
+                }
+            },
+            errorMessage = categoryErrorMessage
         )
     }
 }
@@ -108,6 +142,7 @@ fun QuickAddExpenseContent(
     onTypeToggle: (Boolean) -> Unit,
     onAccountSelect: (String) -> Unit,
     onCategorySelect: (String) -> Unit,
+    onAddCategoryClick: () -> Unit,
     onDescriptionChange: (String) -> Unit,
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier
@@ -237,18 +272,40 @@ fun QuickAddExpenseContent(
         )
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
 
-        if (uiState.categories.isNotEmpty()) {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(uiState.categories, key = { it.id }) { category ->
-                    CategoryChip(
-                        category = category,
-                        isSelected = uiState.selectedCategory == category.name,
-                        onClick = { onCategorySelect(category.name) }
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(uiState.categories, key = { it.id }) { category ->
+                CategoryChip(
+                    category = category,
+                    isSelected = uiState.selectedCategory == category.name,
+                    onClick = { onCategorySelect(category.name) }
+                )
+            }
+            item {
+                AssistChip(
+                    onClick = onAddCategoryClick,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Custom Category",
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = "New",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    },
+                    shape = MaterialTheme.appShapes.small,
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        labelColor = MaterialTheme.colorScheme.primary,
+                        leadingIconContentColor = MaterialTheme.colorScheme.primary
                     )
-                }
+                )
             }
         }
 
@@ -331,7 +388,7 @@ private fun CategoryChip(
                 modifier = Modifier
                     .size(8.dp)
                     .background(
-                        color = parseHexColor(category.colorHex),
+                        color = parseCategoryColor(category.colorHex, 0),
                         shape = CircleShape
                     )
             )
@@ -349,12 +406,4 @@ private fun CategoryChip(
         ),
         modifier = modifier
     )
-}
-
-private fun parseHexColor(hex: String, fallback: Color = Color.Gray): Color {
-    return try {
-        Color(android.graphics.Color.parseColor(hex))
-    } catch (e: Exception) {
-        fallback
-    }
 }

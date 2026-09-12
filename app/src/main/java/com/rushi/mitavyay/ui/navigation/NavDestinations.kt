@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
@@ -32,6 +33,12 @@ sealed class NavDestination(
         icon = Icons.Default.AccountBox
     )
 
+    data object Categories : NavDestination(
+        route = "categories",
+        title = "Categories",
+        icon = Icons.Default.Star
+    )
+
     data object TransactionDetail : NavDestination(
         route = "transaction_detail/{transactionId}",
         title = "Transaction Details",
@@ -53,6 +60,7 @@ sealed class NavDestination(
                 TransactionList.route -> TransactionList
                 Analysis.route -> Analysis
                 Accounts.route -> Accounts
+                Categories.route -> Categories
                 "transaction_detail" -> TransactionDetail
                 else -> TransactionList
             }
