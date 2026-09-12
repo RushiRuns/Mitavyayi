@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -15,12 +16,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.ui.components.MitavyayBottomBar
+import com.rushi.mitavyay.ui.components.ThemeSelectionDialog
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
 import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseSheet
 
@@ -32,11 +36,14 @@ import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseSheet
 @Composable
 fun MitavyayApp(
     appState: MitavyayAppState = rememberMitavyayAppState(),
-    onQuickAddClick: (() -> Unit)? = null
+    onQuickAddClick: (() -> Unit)? = null,
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     var showQuickAddSheet by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
     val currentDestination = appState.currentDestination
     val currentRoute = appState.currentRoute
+    val currentThemeMode by mainViewModel.themeMode.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -54,6 +61,16 @@ fun MitavyayApp(
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back"
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    if (appState.isTopLevelDestination) {
+                        IconButton(onClick = { showThemeDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Theme Settings"
                             )
                         }
                     }
@@ -105,6 +122,16 @@ fun MitavyayApp(
     if (showQuickAddSheet) {
         QuickAddExpenseSheet(
             onDismiss = { showQuickAddSheet = false }
+        )
+    }
+
+    if (showThemeDialog) {
+        ThemeSelectionDialog(
+            currentThemeMode = currentThemeMode,
+            onThemeSelected = { mode ->
+                mainViewModel.setThemeMode(mode)
+            },
+            onDismiss = { showThemeDialog = false }
         )
     }
 }

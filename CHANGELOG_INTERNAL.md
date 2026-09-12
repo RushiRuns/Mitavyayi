@@ -3,6 +3,13 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.4: Dual Theme (Light & Dark) complete.
+  - Added `setThemeMode(mode: ThemeMode)` and `toggleTheme()` to `MainViewModel`, writing to DataStore via `PreferencesRepository`.
+  - Created `ThemeSelectionDialog` component allowing users to pick System default, Light theme, or Dark theme with immediate effect and persistence.
+  - Added theme settings action icon to `TopAppBar` in `MitavyayApp` for instant theme customization from any top-level destination.
+  - Verified automatic color adaptation across all screens through theme tokens (`MaterialTheme.colorScheme`, `extendedColorScheme`, `appShapes`, `spacing`).
+  - Added unit test suite in `DualThemeTest.kt` verifying DataStore theme persistence, ViewModel state updates, toggle logic, and color token contrast invariants.
+  - Updated `UTILITIES.md`.
 - Feature 4.3: Transaction List & Display complete.
   - Enhanced `TransactionListViewModel` to combine `getAllTransactions()` with `getAllAccounts()`, mapping each transaction's account name and explicitly sorting by timestamp descending (newest first).
   - Enhanced `TransactionListScreen` to handle transaction card taps, navigate to details, render with `LazyColumn`, and show `EmptyState` when 0 transactions exist.

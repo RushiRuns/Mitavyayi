@@ -409,23 +409,23 @@
 ### Feature 4.4: Dual Theme (Light & Dark)
 
 **Planning**
-- [ ] User can toggle light/dark theme
-- [ ] Preference saved to DataStore
-- [ ] Applies to entire app
+- [x] User can toggle light/dark theme
+- [x] Preference saved to DataStore
+- [x] Applies to entire app
 
 **Implementation**
-- [ ] Theme preference UI in settings/more screen
-- [ ] Toggle button → writes to DataStore
-- [ ] MainActivity reads DataStore and sets theme
-- [ ] All colors already use theme tokens (should be automatic)
+- [x] Theme preference UI in settings/more screen
+- [x] Toggle button → writes to DataStore
+- [x] MainActivity reads DataStore and sets theme
+- [x] All colors already use theme tokens (should be automatic)
 
 **Testing**
-- [ ] Test: Toggle theme, all colors change
-- [ ] Test: Theme preference persists on restart
-- [ ] Test: All screens visible in both themes
+- [x] Test: Toggle theme, all colors change
+- [x] Test: Theme preference persists on restart
+- [x] Test: All screens visible in both themes
 
 **Closure**
-- [ ] Commit: "Feature 4.4: Dual theme"
+- [x] Commit: "Feature 4.4: Dual theme"
 
 ### Feature 4.5: Basic Analysis (Charts)
 

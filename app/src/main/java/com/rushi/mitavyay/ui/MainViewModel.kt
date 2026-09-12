@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * App-level ViewModel for MainActivity to observe global preferences (theme, font scale).
+ * App-level ViewModel for MainActivity to observe and modify global preferences (theme, font scale).
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -36,14 +36,31 @@ class MainViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Eagerly,
             initialValue = ThemeMode.SYSTEM
         )
 
     val fontScale: StateFlow<Float> = preferencesRepository.fontScaleMultiplier
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Eagerly,
             initialValue = 1.0f
         )
+
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch {
+            preferencesRepository.setThemeMode(mode.name)
+        }
+    }
+
+    fun toggleTheme() {
+        viewModelScope.launch {
+            val nextMode = when (themeMode.value) {
+                ThemeMode.LIGHT -> ThemeMode.DARK
+                ThemeMode.DARK -> ThemeMode.LIGHT
+                ThemeMode.SYSTEM -> ThemeMode.DARK
+            }
+            preferencesRepository.setThemeMode(nextMode.name)
+        }
+    }
 }
