@@ -73,4 +73,10 @@ abstract class RepositoryModule {
     abstract fun bindCsvRepository(
         impl: CsvRepositoryImpl
     ): CsvRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBudgetRepository(
+        impl: com.rushi.mitavyay.data.repository.BudgetRepositoryImpl
+    ): com.rushi.mitavyay.data.repository.BudgetRepository
 }

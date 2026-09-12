@@ -8,8 +8,10 @@ This document details the complete data model, Room database specifications, con
 
 - **Database Class**: `com.rushi.mitavyay.data.db.AppDatabase`
 - **Database File**: `mitavyay.db`
-- **Schema Version**: 1 (Initial Release)
+- **Schema Version**: 2 (Feature 6.2: Budget Planning & Alerts)
 - **Destructive Migrations**: **BANNED** (`fallbackToDestructiveMigration()` is forbidden by `ARCHITECTURE.md`).
+- **Migrations**:
+  - `MIGRATION_1_2`: Creates table `budgets` with indexes `index_budgets_monthYear` and unique composite index `index_budgets_category_monthYear`.
 
 ---
 
@@ -86,6 +88,16 @@ Predefined and custom user-created transaction categories.
 - `color`: `String` (Hex color token)
 - `isCustom`: `Boolean` (False for default seeded categories, true for user-defined)
 
+### 8. `budgets` (`Budget.kt`)
+Monthly category budget allocations.
+- `id`: `String` (Primary Key, UUID)
+- `category`: `String` (Category identifier)
+- `monthYear`: `String` (Format `yyyy-MM`, e.g. `2026-09`, Indexed)
+- `amount`: `Long` (Budget allocation in smallest currency unit / paise)
+- `isActive`: `Boolean` (Default `true`)
+- **Index**: Indexed on `monthYear`
+- **Unique Constraint**: Unique composite index on `(category, monthYear)`
+
 ---
 
 ## Relationships & Invariants
@@ -105,3 +117,7 @@ Predefined and custom user-created transaction categories.
 5. **Composables Isolation**:
    - Room Entities are NEVER directly used as UI state.
    - UI layers observe decoupled display models (`data/model/*DisplayItem.kt`).
+6. **Budget Uniqueness per Category and Month**:
+   - Budgets are scoped to a specific category and calendar month (`yyyy-MM`).
+   - Composite unique index on `(category, monthYear)` guarantees a category has at most one active budget record per month.
+   - Actual spending is calculated dynamically from ledger transactions within that month's millisecond timestamp boundaries, ensuring the budget entity remains clean and unpolluted by cached spending amounts.

@@ -90,6 +90,12 @@ fun MitavyayApp(
                                 contentDescription = "Savings Goals"
                             )
                         }
+                        IconButton(onClick = { appState.navController.navigate(NavDestination.Budget.route) }) {
+                            Icon(
+                                imageVector = NavDestination.Budget.icon,
+                                contentDescription = "Budget Planning"
+                            )
+                        }
                         IconButton(onClick = { appState.navController.navigate(NavDestination.Categories.route) }) {
                             Icon(
                                 imageVector = Icons.Default.Star,

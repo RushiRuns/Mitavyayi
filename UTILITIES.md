@@ -14,6 +14,10 @@ This file serves as the index for all shared utilities, formatters, extensions, 
   - `formatDate(timestampMs: Long, pattern: String = "dd MMM yyyy"): String`
   - `formatDateTime(timestampMs: Long, pattern: String = "dd MMM yyyy, hh:mm a"): String`
   - `formatShortDate(timestampMs: Long): String` (dd/MM/yyyy)
+  - `getCurrentMonthYear(): String` (yyyy-MM)
+  - `formatMonthYear(monthYear: String): String` (e.g. "September 2026")
+  - `getMonthStartAndEndTimestamps(monthYear: String): Pair<Long, Long>` (epoch millis range)
+  - `getAdjacentMonthYear(monthYear: String, offsetMonths: Int): String`
   - *Location*: `util/Formatters.kt`
 - **Database Transaction Runner** (`com.rushi.mitavyay.data.db.DatabaseTransactionRunner`):
   - `withTransaction<R>(block: suspend () -> R): R`: Executes operations atomically inside a database transaction.
@@ -52,6 +56,9 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `GoalCard`: Card displaying goal progress bar, saved vs target amount, deadline, timeline text, status badge, linked account badge vs dedicated fund badge, and deposit/delete actions.
 - `DebtCard`: Card displaying counterparty name, formatted amount (green for lent, red for borrowed), type chip, creation/settlement dates, notes, and "Mark Settled" CTA for active debts (strictly immutable, never exposes delete per ADR-007).
 - `RepeatExpenseCard`: Card displaying description, formatted amount, frequency chip, category, last generated date, active toggle switch, and delete button.
+- `BudgetCard` (`ui/screens/Budget/BudgetCards.kt`): Card displaying category name, category color indicator, actual spent vs budgeted amount, linear progress bar, % consumed, remaining/exceeded badge, warning indicator (80% / 100%), and edit/delete actions.
+- `BudgetOverviewCard` (`ui/screens/Budget/BudgetCards.kt`): Summary card showing total budgeted, total actual spent, net remaining/exceeded, and overall budget health status.
+- `BudgetVsActualChart` (`ui/screens/Budget/BudgetCards.kt`): Visual comparison chart with side-by-side comparative bars per category for budget vs actual spending.
 
 ### Inputs & Date Selection (`ui/components/Inputs.kt`, `CurrencyInput.kt`, `DatePicker.kt`, `NotesField.kt`)
 - `AppTextField`: Outlined text field wrapper with theme token colors, shapes, and error state validation feedback.
@@ -72,6 +79,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `BatchAddTransactionsDialog`: Full-screen dialog for logging multiple transactions at once with repeatable rows, dynamic add/delete row controls, running expense/income summary banner, single-tap default account setting, notes support, and atomic multi-row commit.
 - `EditTransactionDialog`: Form dialog for editing transaction amount, expense/income type, category, account, description, and notes via NotesField.
 - `EditNoteDialog`: Dedicated lightweight dialog in TransactionDetailScreen for editing transaction notes directly without reopening full transaction form.
+- `SetBudgetDialog` (`ui/screens/Budget/SetBudgetDialog.kt`): Form dialog for setting or updating monthly category budget with category picker chips, color swatches, CurrencyInput, and active toggle.
 - `ThemeSelectionDialog`: Dialog for selecting app theme (System default, Light mode, Dark mode) with DataStore persistence.
 
 ### Layout & Spacers (`ui/components/Spacing.kt`)
@@ -103,6 +111,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `DebtListScreen` (`ui/screens/Debt/DebtListScreen.kt`): Screen managing active and settled debts with summary metrics (Total Lent, Total Borrowed), tab switching, settlement flow, and zero delete capability per ADR-007.
 - `RepeatExpenseListScreen` (`ui/screens/RepeatExpense/RepeatExpenseListScreen.kt`): Screen managing recurring expenses with monthly commitment readout, All/Active/Paused tabs, on-demand due evaluation, and active toggle switch.
 - `GoalsListScreen` (`ui/screens/Goals/GoalsListScreen.kt`): Screen managing savings targets with summary metrics (Total Target, Total Saved, Overall Progress, active/achieved counts), tab switching (All, In Progress, Achieved, Overdue), and savings deposits.
+- `BudgetListScreen` (`ui/screens/Budget/BudgetListScreen.kt`): Screen managing monthly category budgets with month navigation (<, >, Today), threshold warning banner (80% / 100%), overall health summary card, budget vs actual comparative bar chart, copy from previous month action, and category budget item cards.
 - `ImportExportScreen` (`ui/screens/Settings/ImportExportScreen.kt`): Screen managing transaction export, SAF document creation, system sharing, and all-or-nothing CSV import.
 
 

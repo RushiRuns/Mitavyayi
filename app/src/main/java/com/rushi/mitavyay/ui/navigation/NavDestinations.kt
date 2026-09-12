@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -67,6 +68,12 @@ sealed class NavDestination(
         icon = Icons.Default.Favorite
     )
 
+    data object Budget : NavDestination(
+        route = "budgets",
+        title = "Budget Planning",
+        icon = Icons.Default.ShoppingCart
+    )
+
     data object TransactionDetail : NavDestination(
         route = "transaction_detail/{transactionId}",
         title = "Transaction Details",
@@ -93,6 +100,7 @@ sealed class NavDestination(
                 Debt.route -> Debt
                 RepeatExpenses.route -> RepeatExpenses
                 Goals.route -> Goals
+                Budget.route -> Budget
                 "transaction_detail" -> TransactionDetail
                 else -> TransactionList
             }

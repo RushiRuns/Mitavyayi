@@ -736,28 +736,28 @@
 ### Feature 6.2: Budget Planning & Alerts
 
 **Planning**
-- [ ] User sets monthly budgets per category
-- [ ] App warns when approaching/exceeding budget
-- [ ] Compare actual vs. budgeted spending
+- [x] User sets monthly budgets per category
+- [x] App warns when approaching/exceeding budget
+- [x] Compare actual vs. budgeted spending
 
 **Implementation**
-- [ ] Create Budget entity:
+- [x] Create Budget entity:
   - Fields: category, monthYear, amount (Long), isActive
-- [ ] Create `ui/screens/Budget/BudgetListScreen.kt`
-- [ ] Create `ui/screens/Budget/SetBudgetDialog.kt`
-- [ ] BudgetViewModel:
+- [x] Create `ui/screens/Budget/BudgetListScreen.kt`
+- [x] Create `ui/screens/Budget/SetBudgetDialog.kt`
+- [x] BudgetViewModel:
   - Fetches actual spending per category per month
   - Calculates % of budget used
   - Sets alerts (80%, 100%)
-- [ ] Show budget vs. actual in charts
+- [x] Show budget vs. actual in charts
 
 **Testing**
-- [ ] Test: Set budget
-- [ ] Test: Actual spending compared to budget
-- [ ] Test: Alert logic at thresholds
+- [x] Test: Set budget
+- [x] Test: Actual spending compared to budget
+- [x] Test: Alert logic at thresholds
 
 **Closure**
-- [ ] Commit: "Feature 6.2: Budget planning"
+- [x] Commit: "Feature 6.2: Budget planning"
 
 ### Phase 6 Closure
 

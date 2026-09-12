@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.rushi.mitavyay.data.db.AccountDao
 import com.rushi.mitavyay.data.db.AppDatabase
+import com.rushi.mitavyay.data.db.BudgetDao
 import com.rushi.mitavyay.data.db.CategoryDao
 import com.rushi.mitavyay.data.db.DebtDao
 import com.rushi.mitavyay.data.db.GoalDao
@@ -30,7 +31,9 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
-        ).addCallback(object : RoomDatabase.Callback() {
+        )
+            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .addCallback(object : RoomDatabase.Callback() {
             override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 super.onCreate(db)
                 val defaults = listOf(
@@ -68,6 +71,9 @@ object DatabaseModule {
 
     @Provides
     fun provideCategoryDao(database: AppDatabase): CategoryDao = database.categoryDao()
+
+    @Provides
+    fun provideBudgetDao(database: AppDatabase): BudgetDao = database.budgetDao()
 
     @Provides
     @Singleton

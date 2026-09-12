@@ -1,6 +1,7 @@
 package com.rushi.mitavyay.util
 
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -96,5 +97,79 @@ object DateTimeFormatter {
 
     fun formatShortDate(timestampMs: Long): String {
         return formatDate(timestampMs, "dd/MM/yyyy")
+    }
+
+    /**
+     * Returns current month in "yyyy-MM" format (e.g. "2026-09").
+     */
+    fun getCurrentMonthYear(): String {
+        val sdf = SimpleDateFormat("yyyy-MM", Locale.US)
+        return sdf.format(Date())
+    }
+
+    /**
+     * Formats "yyyy-MM" (e.g. "2026-09") into localized human readable string (e.g. "September 2026").
+     */
+    fun formatMonthYear(monthYear: String): String {
+        return try {
+            val inSdf = SimpleDateFormat("yyyy-MM", Locale.US)
+            val date = inSdf.parse(monthYear) ?: return monthYear
+            val outSdf = SimpleDateFormat("MMMM yyyy", locale)
+            outSdf.format(date)
+        } catch (_: Exception) {
+            monthYear
+        }
+    }
+
+    /**
+     * Computes start (00:00:00.000) and end (23:59:59.999) timestamps in ms for a given "yyyy-MM" string.
+     */
+    fun getMonthStartAndEndTimestamps(monthYear: String): Pair<Long, Long> {
+        return try {
+            val parts = monthYear.split("-")
+            val year = parts[0].toInt()
+            val month = parts[1].toInt() - 1
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, month)
+            cal.set(Calendar.DAY_OF_MONTH, 1)
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
+            val start = cal.timeInMillis
+
+            val maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+            cal.set(Calendar.DAY_OF_MONTH, maxDay)
+            cal.set(Calendar.HOUR_OF_DAY, 23)
+            cal.set(Calendar.MINUTE, 59)
+            cal.set(Calendar.SECOND, 59)
+            cal.set(Calendar.MILLISECOND, 999)
+            val end = cal.timeInMillis
+            Pair(start, end)
+        } catch (_: Exception) {
+            val now = System.currentTimeMillis()
+            Pair(now, now)
+        }
+    }
+
+    /**
+     * Offsets a "yyyy-MM" string by [offsetMonths] (e.g. -1 for previous month, +1 for next month).
+     */
+    fun getAdjacentMonthYear(monthYear: String, offsetMonths: Int): String {
+        return try {
+            val parts = monthYear.split("-")
+            val year = parts[0].toInt()
+            val month = parts[1].toInt() - 1
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, month)
+            cal.set(Calendar.DAY_OF_MONTH, 1)
+            cal.add(Calendar.MONTH, offsetMonths)
+            val sdf = SimpleDateFormat("yyyy-MM", Locale.US)
+            sdf.format(cal.time)
+        } catch (_: Exception) {
+            monthYear
+        }
     }
 }

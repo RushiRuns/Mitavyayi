@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.rushi.mitavyay.ui.screens.Accounts.AccountsScreen
 import com.rushi.mitavyay.ui.screens.Analysis.AnalysisScreen
+import com.rushi.mitavyay.ui.screens.Budget.BudgetListScreen
 import com.rushi.mitavyay.ui.screens.Categories.CategoriesScreen
 import com.rushi.mitavyay.ui.screens.Debt.DebtListScreen
 import com.rushi.mitavyay.ui.screens.Goals.GoalsListScreen
@@ -57,6 +58,9 @@ fun MitavyayNavHost(
         }
         composable(NavDestination.Goals.route) {
             GoalsListScreen()
+        }
+        composable(NavDestination.Budget.route) {
+            BudgetListScreen()
         }
         composable(NavDestination.TransactionDetail.route) {
             TransactionDetailScreen(

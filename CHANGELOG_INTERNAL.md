@@ -3,6 +3,22 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 6.2: Budget Planning & Alerts complete.
+  - Implemented monthly category budget planning, alert thresholds, and actual vs budget comparison across database, repository, and presentation layers:
+    - Added `Budget` Room entity (`data/db/Budget.kt`) with fields `id`, `category`, `monthYear`, `amount`, and `isActive`, indexed on `monthYear` and unique composite index on `(category, monthYear)`.
+    - Added `BudgetDao` (`data/db/BudgetDao.kt`) with CRUD queries, reactive `Flow<List<Budget>>` observation, and `getBudgetsForMonthOnce`.
+    - Implemented Room database migration `MIGRATION_1_2` upgrading `AppDatabase` from version 1 to version 2 without destructive migration.
+    - Added `DateTimeFormatter` month helpers: `getCurrentMonthYear()`, `formatMonthYear(monthYear)`, `getMonthStartAndEndTimestamps(monthYear)`, and `getAdjacentMonthYear(monthYear, offsetMonths)`.
+    - Created `BudgetRepository` and `BudgetRepositoryImpl` (`data/repository/BudgetRepository.kt`) supporting atomic budget setting, deletion, and cross-month copying via `DatabaseTransactionRunner`.
+    - Bound `BudgetDao` and `BudgetRepository` in `DatabaseModule` and `RepositoryModule`.
+    - Created `BudgetDisplayItem` (`data/model/BudgetDisplayItem.kt`) with alert levels (`SAFE`, `WARNING_80`, `EXCEEDED_100`), % consumed calculation, and formatted currency amounts.
+    - Created `BudgetViewModel` (`ui/screens/Budget/BudgetViewModel.kt`) reactively combining selected month, active category budgets, ledger actual spending (`TransactionRepository.getCategorySpending()`), and category metadata.
+    - Created reusable UI components: `BudgetCard`, `BudgetOverviewCard`, and `BudgetVsActualChart` (`ui/screens/Budget/BudgetCards.kt`), and `SetBudgetDialog` (`ui/screens/Budget/SetBudgetDialog.kt`).
+    - Created `BudgetListScreen` (`ui/screens/Budget/BudgetListScreen.kt`) featuring month navigation (<, >, Today), threshold warning banner (80% / 100%), overall health summary card, comparative spending chart, category budget item list, and copy from previous month action.
+    - Integrated Budget Planning navigation destination in `NavDestinations.kt`, `NavHost.kt`, and top app bar shortcut in `MitavyayApp.kt`.
+    - Added comprehensive unit test suites: `BudgetRepositoryTest` (5 tests) and `BudgetViewModelTest` (6 tests verifying "Test: Set budget", "Test: Actual spending compared to budget", and "Test: Alert logic at thresholds").
+    - Verified all 152 unit tests pass (`testDebugUnitTest`) and clean build (`assembleDebug`).
+    - Updated `SCHEMA.md`, `UTILITIES.md`, and `Finance_App_Project_Phases.md`.
 - Feature 5.6: Multiple Transactions (Batch Add) complete.
   - Implemented multi-transaction batch addition across repository, viewmodel, and UI layers:
     - Added `suspend fun addTransactions(transactions: List<Transaction>)` to `TransactionRepository` and `TransactionRepositoryImpl`.
