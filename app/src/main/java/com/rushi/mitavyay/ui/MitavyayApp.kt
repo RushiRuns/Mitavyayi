@@ -13,9 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.rushi.mitavyay.ui.components.MitavyayBottomBar
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
+import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseSheet
 
 /**
  * Root scaffold Composable for Mitavyay.
@@ -25,8 +30,9 @@ import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
 @Composable
 fun MitavyayApp(
     appState: MitavyayAppState = rememberMitavyayAppState(),
-    onQuickAddClick: () -> Unit = {}
+    onQuickAddClick: (() -> Unit)? = null
 ) {
+    var showQuickAddSheet by remember { mutableStateOf(false) }
     val currentDestination = appState.currentDestination
     val currentRoute = appState.currentRoute
 
@@ -57,7 +63,13 @@ fun MitavyayApp(
         floatingActionButton = {
             if (appState.isTopLevelDestination) {
                 FloatingActionButton(
-                    onClick = onQuickAddClick,
+                    onClick = {
+                        if (onQuickAddClick != null) {
+                            onQuickAddClick()
+                        } else {
+                            showQuickAddSheet = true
+                        }
+                    },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = MaterialTheme.shapes.large
@@ -75,6 +87,12 @@ fun MitavyayApp(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+        )
+    }
+
+    if (showQuickAddSheet) {
+        QuickAddExpenseSheet(
+            onDismiss = { showQuickAddSheet = false }
         )
     }
 }

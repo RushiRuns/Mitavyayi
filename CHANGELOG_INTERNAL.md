@@ -3,6 +3,14 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.2: Quick Add Expense complete.
+  - Implemented atomic balance synchronization in `TransactionRepositoryImpl` (injecting `AccountDao` and `DatabaseTransactionRunner`).
+  - Implemented `QuickAddExpenseViewModel` with auto-selection of active accounts and default categories, transaction validation, and negative/positive sign convention for expenses/incomes.
+  - Created `QuickAddExpenseSheet` Material 3 `ModalBottomSheet` with `CurrencyInput`, Expense/Income toggle, single-tap account/category chips, optional description, and feedback toast.
+  - Wired Floating Action Button in `MitavyayApp` scaffold to launch `QuickAddExpenseSheet`.
+  - Added unit test suite in `QuickAddExpenseTest.kt` verifying expense/income saving, atomic balance updates, input validation, auto-selection, and form reset.
+  - Added repository unit test in `TransactionRepositoryTest.kt` verifying balance updates on transaction additions.
+  - Updated `UTILITIES.md`.
 - Feature 4.1: Account Management complete.
   - Documented conditional account deletion & archiving policy in `docs/decisions/ADR-005-Account-Deletion-Cascade.md`.
   - Updated `AccountDao` and `TransactionDao` with transaction count verification and active status update.

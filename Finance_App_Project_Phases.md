@@ -351,28 +351,28 @@
 ### Feature 4.2: Quick Add Expense
 
 **Planning**
-- [ ] Fastest path to add a transaction from main screen
+- [x] Fastest path to add a transaction from main screen
 
 **Implementation**
-- [ ] Create floating action button on main screen
-- [ ] Create `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`
+- [x] Create floating action button on main screen
+- [x] Create `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`
   - Bottom sheet dialog
   - Amount (with currency formatter)
   - Category dropdown
   - Account dropdown
   - Description (optional)
   - Submit button
-- [ ] Connect to `TransactionRepository.addTransaction()`
-- [ ] On submit: show success toast, clear form
+- [x] Connect to `TransactionRepository.addTransaction()`
+- [x] On submit: show success toast, clear form
 
 **Testing**
-- [ ] Test: Enter amount, select category, submit → transaction saved
-- [ ] Test: Quick add opens from FAB
-- [ ] Test: Amount formatting works correctly
+- [x] Test: Enter amount, select category, submit → transaction saved
+- [x] Test: Quick add opens from FAB
+- [x] Test: Amount formatting works correctly
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: "Feature 4.2: Quick add expense"
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: "Feature 4.2: Quick add expense"
 
 ### Feature 4.3: Transaction List & Display
 

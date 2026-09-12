@@ -46,9 +46,10 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, and direct `Long` paise conversion.
 - `DatePickerField` & `AppDatePickerDialog`: Date selection field launching a Material 3 DatePickerDialog and emitting Unix timestamp ms (`Long`).
 
-### Dialogs (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`)
+### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`)
 - `AppAlertDialog`: Standardized confirmation and alert dialog with theme typography, colors, and confirm/dismiss actions.
 - `AddAccountDialog`: Form dialog for creating and editing accounts with validated name, type selection, and initial balance input.
+- `QuickAddExpenseSheet`: Material 3 ModalBottomSheet for rapid transaction entry with CurrencyInput, Expense/Income toggle, single-tap account/category chips, and atomic balance syncing.
 
 ### Layout & Spacers (`ui/components/Spacing.kt`)
 - `VerticalSpacer(height: Dp)` / `HorizontalSpacer(width: Dp)`

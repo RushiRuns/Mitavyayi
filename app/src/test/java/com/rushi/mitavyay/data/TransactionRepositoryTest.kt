@@ -141,4 +141,59 @@ class TransactionRepositoryTest {
         assertEquals(1, inRange.size)
         assertEquals("2", inRange[0].id)
     }
+
+    private class FakeAccountDao : com.rushi.mitavyay.data.db.AccountDao {
+        val map = mutableMapOf<String, com.rushi.mitavyay.data.db.Account>()
+
+        override suspend fun insert(account: com.rushi.mitavyay.data.db.Account) { map[account.id] = account }
+        override suspend fun insertAll(accounts: List<com.rushi.mitavyay.data.db.Account>) { accounts.forEach { insert(it) } }
+        override suspend fun update(account: com.rushi.mitavyay.data.db.Account) { map[account.id] = account }
+        override suspend fun delete(account: com.rushi.mitavyay.data.db.Account) { map.remove(account.id) }
+        override suspend fun deleteById(id: String) { map.remove(id) }
+        override suspend fun getById(id: String): com.rushi.mitavyay.data.db.Account? = map[id]
+        override fun getByIdFlow(id: String) = flowOf(map[id])
+        override fun getAll() = flowOf(map.values.toList())
+        override fun getActiveAccounts() = flowOf(map.values.filter { it.isActive })
+        override suspend fun updateBalance(id: String, newBalance: Long) {
+            val existing = map[id] ?: return
+            map[id] = existing.copy(balance = newBalance)
+        }
+        override fun getAccountBalance(id: String) = flowOf(map[id]?.balance)
+        override suspend fun updateActiveStatus(id: String, isActive: Boolean) {
+            val existing = map[id] ?: return
+            map[id] = existing.copy(isActive = isActive)
+        }
+    }
+
+    @Test
+    fun transaction_addTransactionUpdatesAccountBalance() = runBlocking {
+        val fakeTxDao = FakeTransactionDao()
+        val fakeAccountDao = FakeAccountDao()
+        val repository = TransactionRepositoryImpl(fakeTxDao, fakeAccountDao)
+
+        val account = com.rushi.mitavyay.data.db.Account(
+            id = "acc_test",
+            name = "Test Account",
+            type = "bank",
+            balance = 10000L, // ₹100.00
+            currency = "INR",
+            createdAt = 1000L,
+            isActive = true
+        )
+        fakeAccountDao.insert(account)
+
+        // Add expense transaction (-₹30.00)
+        repository.addTransaction(
+            Transaction("tx_exp", "acc_test", -3000L, "Coffee", 2000L, "Food")
+        )
+
+        assertEquals(7000L, fakeAccountDao.getById("acc_test")?.balance)
+
+        // Add income transaction (+₹50.00)
+        repository.addTransaction(
+            Transaction("tx_inc", "acc_test", 5000L, "Refund", 3000L, "Other")
+        )
+
+        assertEquals(12000L, fakeAccountDao.getById("acc_test")?.balance)
+    }
 }
