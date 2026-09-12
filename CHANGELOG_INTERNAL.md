@@ -3,6 +3,25 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 5.6: Multiple Transactions (Batch Add) complete.
+  - Implemented multi-transaction batch addition across repository, viewmodel, and UI layers:
+    - Added `suspend fun addTransactions(transactions: List<Transaction>)` to `TransactionRepository` and `TransactionRepositoryImpl`.
+    - Executed batch inserts atomically using `transactionDao.insertAll(transactions)` and grouped net balance updates per account inside Room `transactionRunner`.
+  - Created `BatchAddViewModel` (`ui/screens/BatchAdd/BatchAddViewModel.kt`):
+    - Reactive state combining active accounts, categories, repeatable row list, default account, running expense/income totals, validation, and submission status.
+    - Added row operations: `addRow()`, `removeRow(index)`, `updateRow(index, row)`, `setDefaultAccount(id)`, `reset()`, and `submitBatch()`.
+    - Strict validation enforcing positive amount (`amountPaise > 0`), valid account, valid category, and auto-trimmed descriptions.
+  - Created `BatchAddTransactionsDialog` (`ui/screens/BatchAdd/BatchAddTransactionsDialog.kt`):
+    - Full-screen Material 3 dialog with running summary banner (transaction count, total expenses, total income).
+    - Quick default account selector chip bar applying to current empty rows and future rows.
+    - Dynamic row cards with row index, delete button, Expense/Income toggle, `CurrencyInput`, `AppTextField` description, Account chip selector, Category chip selector with color indicators, and `NotesField`.
+    - "+ Add Another Transaction" CTA button and primary "Save All (X)" action.
+  - Integrated batch add entry points into the app:
+    - Added batch add button next to search bar in `TransactionListScreen`.
+    - Added "Batch Add" header text action inside `QuickAddExpenseSheet` and wired sheet-to-dialog transition in `MitavyayApp`.
+  - Added unit test suite in `BatchAddTransactionsTest.kt` (10 tests covering initial state, row additions/removals, validation, running totals calculation, adding 5 transactions at once, verifying all saved with atomic account balance updates, and error handling) and `TransactionRepositoryTest.kt` (`transaction_addTransactionsBatchUpdatesAccountBalances`).
+  - Verified 100% tests passing (141 tests) in `testDebugUnitTest` and clean build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 5.5: Notes on Transactions complete.
   - Implemented rich note-taking support across transactions:
     - Updated `TransactionDisplayItem` with `notes: String? = null` and mapped in `toDisplayItem()`.

@@ -217,4 +217,52 @@ class TransactionRepositoryTest {
 
         assertEquals(12000L, fakeAccountDao.getById("acc_test")?.balance)
     }
+
+    @Test
+    fun transaction_addTransactionsBatchUpdatesAccountBalances() = runBlocking {
+        val fakeTxDao = FakeTransactionDao()
+        val fakeAccountDao = FakeAccountDao()
+        val repository = TransactionRepositoryImpl(fakeTxDao, fakeAccountDao)
+
+        fakeAccountDao.insert(
+            com.rushi.mitavyay.data.db.Account(
+                id = "acc_1",
+                name = "Bank",
+                type = "bank",
+                balance = 50000L, // ₹500
+                currency = "INR",
+                createdAt = 1000L,
+                isActive = true
+            )
+        )
+        fakeAccountDao.insert(
+            com.rushi.mitavyay.data.db.Account(
+                id = "acc_2",
+                name = "Cash",
+                type = "cash",
+                balance = 20000L, // ₹200
+                currency = "INR",
+                createdAt = 1000L,
+                isActive = true
+            )
+        )
+
+        val batch = listOf(
+            Transaction("tx_1", "acc_1", -5000L, "Groceries", 2000L, "Food"),
+            Transaction("tx_2", "acc_1", -3000L, "Fuel", 2001L, "Transport"),
+            Transaction("tx_3", "acc_1", 10000L, "Salary Bonus", 2002L, "Income"),
+            Transaction("tx_4", "acc_2", -2000L, "Snacks", 2003L, "Food"),
+            Transaction("tx_5", "acc_2", -1000L, "Bus Ticket", 2004L, "Transport")
+        )
+
+        repository.addTransactions(batch)
+
+        // All 5 transactions saved
+        assertEquals(5, fakeTxDao.list.size)
+        // acc_1: 50000 - 5000 - 3000 + 10000 = 52000
+        assertEquals(52000L, fakeAccountDao.getById("acc_1")?.balance)
+        // acc_2: 20000 - 2000 - 1000 = 17000
+        assertEquals(17000L, fakeAccountDao.getById("acc_2")?.balance)
+    }
 }
+

@@ -57,7 +57,7 @@ private val FallbackCategoryPalette = listOf(
     Color(0xFF8D6E63)
 )
 
-fun parseCategoryColor(hex: String?, index: Int): Color {
+fun parseCategoryColor(hex: String?, index: Int = 0): Color {
     if (!hex.isNullOrBlank()) {
         try {
             val clean = hex.removePrefix("#")

@@ -59,7 +59,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `DatePickerField` & `AppDatePickerDialog`: Date selection field launching a Material 3 DatePickerDialog and emitting Unix timestamp ms (`Long`).
 - `NotesField`: Rich multi-line notes editor with character counter, clear button, itemized bullet list helper, date stamp helper, and financial quick tag chips (`#tax`, `#reimbursable`, `#split`, `#warranty`, `#bill`).
 
-### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/Transfer/TransferDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`, `ui/components/AddCategoryDialog.kt`, `ui/screens/Debt/AddDebtDialog.kt`, `ui/screens/RepeatExpense/AddRepeatDialog.kt`, `ui/screens/Goals/AddGoalDialog.kt`, `ui/screens/Goals/AddGoalSavingsDialog.kt`)
+### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/Transfer/TransferDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/BatchAdd/BatchAddTransactionsDialog.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`, `ui/components/AddCategoryDialog.kt`, `ui/screens/Debt/AddDebtDialog.kt`, `ui/screens/RepeatExpense/AddRepeatDialog.kt`, `ui/screens/Goals/AddGoalDialog.kt`, `ui/screens/Goals/AddGoalSavingsDialog.kt`)
 - `AppAlertDialog`: Standardized confirmation and alert dialog with theme typography, colors, and confirm/dismiss actions.
 - `AddAccountDialog`: Form dialog for creating and editing accounts with validated name, type selection, and initial balance input.
 - `TransferDialog`: Dialog allowing fund transfers between two distinct active accounts with currency input, swap button, balance preview, notes, validation, and atomic ledger creation.
@@ -69,6 +69,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `AddGoalDialog`: Form dialog for creating savings goals towards targets and deadlines, supporting dedicated fund or linked account modes, initial deposit, category, and notes.
 - `AddGoalSavingsDialog`: Form dialog for contributing savings deposits to dedicated fund goals with progress preview and CurrencyInput.
 - `QuickAddExpenseSheet`: Material 3 ModalBottomSheet for rapid transaction entry with CurrencyInput, Expense/Income toggle, single-tap account/category chips, and atomic balance syncing.
+- `BatchAddTransactionsDialog`: Full-screen dialog for logging multiple transactions at once with repeatable rows, dynamic add/delete row controls, running expense/income summary banner, single-tap default account setting, notes support, and atomic multi-row commit.
 - `EditTransactionDialog`: Form dialog for editing transaction amount, expense/income type, category, account, description, and notes via NotesField.
 - `EditNoteDialog`: Dedicated lightweight dialog in TransactionDetailScreen for editing transaction notes directly without reopening full transaction form.
 - `ThemeSelectionDialog`: Dialog for selecting app theme (System default, Light mode, Dark mode) with DataStore persistence.

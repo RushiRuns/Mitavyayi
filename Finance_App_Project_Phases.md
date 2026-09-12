@@ -682,19 +682,19 @@
 ### Feature 5.6: Multiple Transactions (Batch Add)
 
 **Planning**
-- [ ] Add multiple transactions at once (not just one at a time)
+- [x] Add multiple transactions at once (not just one at a time)
 
 **Implementation**
-- [ ] Create multi-transaction add dialog
-- [ ] Repeatable form: add row, enter data, submit all at once
-- [ ] All transactions committed atomically
+- [x] Create multi-transaction add dialog
+- [x] Repeatable form: add row, enter data, submit all at once
+- [x] All transactions committed atomically
 
 **Testing**
-- [ ] Test: Add 5 transactions at once
-- [ ] Test: All saved
+- [x] Test: Add 5 transactions at once
+- [x] Test: All saved
 
 **Closure**
-- [ ] Commit: "Feature 5.6: Multiple transactions"
+- [x] Commit: "Feature 5.6: Multiple transactions"
 
 ### Phase 5 Closure
 

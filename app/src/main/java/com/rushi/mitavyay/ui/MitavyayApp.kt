@@ -29,6 +29,7 @@ import com.rushi.mitavyay.ui.components.MitavyayBottomBar
 import com.rushi.mitavyay.ui.components.ThemeSelectionDialog
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
 import com.rushi.mitavyay.ui.navigation.NavDestination
+import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
 import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseSheet
 
 /**
@@ -43,6 +44,7 @@ fun MitavyayApp(
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     var showQuickAddSheet by remember { mutableStateOf(false) }
+    var showBatchAddDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     val currentDestination = appState.currentDestination
     val currentRoute = appState.currentRoute
@@ -154,7 +156,17 @@ fun MitavyayApp(
 
     if (showQuickAddSheet) {
         QuickAddExpenseSheet(
-            onDismiss = { showQuickAddSheet = false }
+            onDismiss = { showQuickAddSheet = false },
+            onBatchAddClick = {
+                showQuickAddSheet = false
+                showBatchAddDialog = true
+            }
+        )
+    }
+
+    if (showBatchAddDialog) {
+        BatchAddTransactionsDialog(
+            onDismiss = { showBatchAddDialog = false }
         )
     }
 

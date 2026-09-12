@@ -90,6 +90,9 @@ interface TransactionRepository {
     fun getAllTransactions(): Flow<List<Transaction>>
     suspend fun getTransactionById(id: String): Transaction?
     suspend fun addTransaction(transaction: Transaction)
+    suspend fun addTransactions(transactions: List<Transaction>) {
+        transactions.forEach { addTransaction(it) }
+    }
     suspend fun updateTransaction(transaction: Transaction)
     suspend fun deleteTransaction(id: String)
     fun getTransactionsByDateRange(start: Long, end: Long): Flow<List<Transaction>>
@@ -132,6 +135,29 @@ class TransactionRepositoryImpl @Inject constructor(
                 val account = dao.getById(transaction.accountId)
                 if (account != null) {
                     dao.updateBalance(account.id, account.balance + transaction.amount)
+                }
+            }
+        }
+
+        if (transactionRunner != null) {
+            transactionRunner { action() }
+        } else {
+            action()
+        }
+    }
+
+    override suspend fun addTransactions(transactions: List<Transaction>) {
+        if (transactions.isEmpty()) return
+        val action: suspend () -> Unit = {
+            transactionDao.insertAll(transactions)
+            if (accountDao != null) {
+                val accountDeltas = transactions.groupBy { it.accountId }
+                    .mapValues { (_, txList) -> txList.sumOf { it.amount } }
+                for ((accId, netDelta) in accountDeltas) {
+                    val account = accountDao.getById(accId)
+                    if (account != null) {
+                        accountDao.updateBalance(accId, account.balance + netDelta)
+                    }
                 }
             }
         }

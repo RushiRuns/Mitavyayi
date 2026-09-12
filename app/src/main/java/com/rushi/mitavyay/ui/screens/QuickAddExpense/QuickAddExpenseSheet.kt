@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,6 +74,7 @@ import com.rushi.mitavyay.ui.theme.spacing
 @Composable
 fun QuickAddExpenseSheet(
     onDismiss: () -> Unit,
+    onBatchAddClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     viewModel: QuickAddExpenseViewModel = hiltViewModel()
 ) {
@@ -108,7 +110,8 @@ fun QuickAddExpenseSheet(
             onAddCategoryClick = { showAddCategoryDialog = true },
             onDescriptionChange = viewModel::onDescriptionChange,
             onNotesChange = viewModel::onNotesChange,
-            onSubmit = { viewModel.saveTransaction() }
+            onSubmit = { viewModel.saveTransaction() },
+            onBatchAddClick = onBatchAddClick
         )
     }
 
@@ -148,6 +151,7 @@ fun QuickAddExpenseContent(
     onDescriptionChange: (String) -> Unit,
     onNotesChange: (String) -> Unit = {},
     onSubmit: () -> Unit,
+    onBatchAddClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -169,12 +173,19 @@ fun QuickAddExpenseContent(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            IconButton(onClick = onDismiss) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (onBatchAddClick != null) {
+                    TextButton(onClick = onBatchAddClick) {
+                        Text("Batch Add")
+                    }
+                }
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
 
