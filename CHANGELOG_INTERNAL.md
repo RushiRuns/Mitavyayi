@@ -3,6 +3,18 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.8: Import/Export (CSV) complete.
+  - Documented strict all-or-nothing import policy in `docs/decisions/ADR-006-Import-All-Or-Nothing.md`: all rows pre-validated prior to writes; any row failure rolls back entirely with zero database mutations.
+  - Implemented `CsvRepository` and `CsvRepositoryImpl` with OpenCSV 5.9:
+    - Export: streaming `CSVWriter` generating standard columns (`Date, Time, Amount, Type, Category, Account, Description, Notes, Id, TransferId`) with decimal format amounts and ISO dates.
+    - Import: streaming `CSVReader` with case-insensitive dynamic column mapping, multi-format date parsing, signed/unsigned amount parsing to paise, and auto-provisioning of missing accounts.
+    - Atomic ledger synchronization inside `DatabaseTransactionRunner` inserting transactions and updating account balances simultaneously.
+  - Configured `FileProvider` (`res/xml/file_paths.xml` and `AndroidManifest.xml`) for secure system-wide CSV file sharing via `Intent.ACTION_SEND`.
+  - Built `ImportExportViewModel` and `ImportExportScreen` supporting "Share CSV", "Save as File" (SAF `CreateDocument`), and "Select CSV File to Import" (SAF `OpenDocument`), with a format guide and informative success/failure modal dialogs.
+  - Integrated into app navigation via `NavDestination.ImportExport`, `MitavyayNavHost`, and a quick access button in `MitavyayApp` `TopAppBar`.
+  - Created unit test suites in `CsvRepositoryTest.kt` (6 tests: export formatting, valid import with balance updates, all-or-nothing invalid row rollback, missing column rejection, missing account auto-creation, and 1,000-row performance benchmark) and `ImportExportViewModelTest.kt` (2 tests).
+  - Verified 90/90 tests passing in `testDebugUnitTest` and clean build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 4.7: Transfers (Between Accounts) complete.
   - Implemented dual paired linked transactions per `ADR-002: Transfers Stored as Dual Linked Transaction Records`: debit record (`amount = -amountPaise`) on source account, credit record (`amount = +amountPaise`) on destination account sharing a unique `transferId`.
   - Upgraded `TransferRepositoryImpl` with atomic ledger synchronization inside `DatabaseTransactionRunner`, updating source and destination account balances simultaneously, and reverting account balances on transfer deletion.

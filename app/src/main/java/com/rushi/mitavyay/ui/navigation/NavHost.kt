@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.rushi.mitavyay.ui.screens.Accounts.AccountsScreen
 import com.rushi.mitavyay.ui.screens.Analysis.AnalysisScreen
 import com.rushi.mitavyay.ui.screens.Categories.CategoriesScreen
+import com.rushi.mitavyay.ui.screens.Settings.ImportExportScreen
 import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailScreen
 import com.rushi.mitavyay.ui.screens.TransactionList.TransactionListScreen
 
@@ -41,6 +42,9 @@ fun MitavyayNavHost(
         }
         composable(NavDestination.Categories.route) {
             CategoriesScreen()
+        }
+        composable(NavDestination.ImportExport.route) {
+            ImportExportScreen()
         }
         composable(NavDestination.TransactionDetail.route) {
             TransactionDetailScreen(

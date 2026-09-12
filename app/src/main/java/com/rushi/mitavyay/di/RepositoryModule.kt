@@ -4,6 +4,8 @@ import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.AccountRepositoryImpl
 import com.rushi.mitavyay.data.repository.CategoryRepository
 import com.rushi.mitavyay.data.repository.CategoryRepositoryImpl
+import com.rushi.mitavyay.data.repository.CsvRepository
+import com.rushi.mitavyay.data.repository.CsvRepositoryImpl
 import com.rushi.mitavyay.data.repository.DebtRepository
 import com.rushi.mitavyay.data.repository.DebtRepositoryImpl
 import com.rushi.mitavyay.data.repository.GoalRepository
@@ -65,4 +67,10 @@ abstract class RepositoryModule {
     abstract fun bindCategoryRepository(
         impl: CategoryRepositoryImpl
     ): CategoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCsvRepository(
+        impl: CsvRepositoryImpl
+    ): CsvRepository
 }

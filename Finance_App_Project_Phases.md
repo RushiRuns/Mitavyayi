@@ -500,27 +500,27 @@
 ### Feature 4.8: Import/Export (CSV)
 
 **Planning**
-- [ ] Export transactions to CSV file
-- [ ] Import transactions from CSV file (all-or-nothing)
+- [x] Export transactions to CSV file
+- [x] Import transactions from CSV file (all-or-nothing)
 
 **Implementation**
-- [ ] Create `ui/screens/Settings/ImportExportScreen.kt`
-- [ ] Export button → writes transactions to CSV in app cache/files directory
-- [ ] Import button → file picker, reads CSV, validates all rows, commits atomically
-- [ ] Use OpenCSV library
-- [ ] Handle errors: show error dialog if import fails
+- [x] Create `ui/screens/Settings/ImportExportScreen.kt`
+- [x] Export button → writes transactions to CSV in app cache/files directory
+- [x] Import button → file picker, reads CSV, validates all rows, commits atomically
+- [x] Use OpenCSV library
+- [x] Handle errors: show error dialog if import fails
   - Rollback: import commits nothing if any row is invalid
-- [ ] Mapping: CSV columns to Transaction fields
+- [x] Mapping: CSV columns to Transaction fields
 
 **Testing**
-- [ ] Test: Export produces valid CSV
-- [ ] Test: Import from valid CSV
-- [ ] Test: Invalid row in import → entire import rejected
-- [ ] Test: Large export/import (performance)
+- [x] Test: Export produces valid CSV
+- [x] Test: Import from valid CSV
+- [x] Test: Invalid row in import → entire import rejected
+- [x] Test: Large export/import (performance)
 
 **Closure**
-- [ ] Create `docs/decisions/ADR-006-Import-All-Or-Nothing.md`
-- [ ] Commit: "Feature 4.8: Import/Export"
+- [x] Create `docs/decisions/ADR-006-Import-All-Or-Nothing.md`
+- [x] Commit: "Feature 4.8: Import/Export"
 
 ### Feature 4.9: Insights (Basic Statistics)
 

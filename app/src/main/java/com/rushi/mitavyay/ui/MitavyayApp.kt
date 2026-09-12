@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -73,6 +74,12 @@ fun MitavyayApp(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "Manage Categories"
+                            )
+                        }
+                        IconButton(onClick = { appState.navController.navigate(NavDestination.ImportExport.route) }) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Backup & Import CSV"
                             )
                         }
                         IconButton(onClick = { showThemeDialog = true }) {

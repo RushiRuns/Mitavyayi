@@ -33,6 +33,10 @@ This file serves as the index for all shared utilities, formatters, extensions, 
   - *Location*: `ui/components/CategoryUtils.kt`
 - **Currency Conversion Utilities**: Helper functions for currency processing (if applicable, entirely offline). *Status: Pending*
 - **Transaction Categorization Logic**: Centralized logic for determining default or custom categories. *Status: Complete via CategoryRepository & DatabaseModule pre-population*
+- **CSV Import & Export Engine** (`com.rushi.mitavyay.data.repository.CsvRepository`):
+  - OpenCSV-powered streaming CSV reader and writer.
+  - Implements ADR-006 strict All-or-Nothing pre-validation, atomic Room transaction commit/rollback, dynamic column mapping, and automatic account reconciliation.
+  - *Location*: `data/repository/CsvRepository.kt`
 
 ## Reusable UI Components (`com.rushi.mitavyay.ui.components`)
 
@@ -78,11 +82,12 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `parseCategoryColor`: Pure Kotlin color hex parser with fallback palette for safe JVM unit testing and Android device rendering.
 
 ### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`)
-- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, `categories`, and `transaction_detail/{transactionId}`), tab labels, and icons.
+- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, `categories`, `import_export`, and `transaction_detail/{transactionId}`), tab labels, and icons.
 - `MitavyayNavHost` (`ui/navigation/NavHost.kt`): Top-level NavHost mapping routes to Compose screens without Fragments.
 - `MitavyayAppState` & `rememberMitavyayAppState` (`ui/AppState.kt`): State holder for navigation controller, backstack resolution, and tab switching.
 - `MitavyayBottomBar` (`ui/components/BottomNavBar.kt`): Material 3 navigation bar utilizing theme tokens.
-- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar (with Categories navigation and theme dialog), BottomNavBar, FAB, and NavHost.
+- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar (with Categories navigation, Backup & CSV Data, and theme dialog), BottomNavBar, FAB, and NavHost.
+- `ImportExportScreen` (`ui/screens/Settings/ImportExportScreen.kt`): Screen managing transaction export, SAF document creation, system sharing, and all-or-nothing CSV import.
 
 
 ## DO NOT CREATE

@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -39,6 +40,12 @@ sealed class NavDestination(
         icon = Icons.Default.Star
     )
 
+    data object ImportExport : NavDestination(
+        route = "import_export",
+        title = "Backup & Data",
+        icon = Icons.Default.Share
+    )
+
     data object TransactionDetail : NavDestination(
         route = "transaction_detail/{transactionId}",
         title = "Transaction Details",
@@ -61,6 +68,7 @@ sealed class NavDestination(
                 Analysis.route -> Analysis
                 Accounts.route -> Accounts
                 Categories.route -> Categories
+                ImportExport.route -> ImportExport
                 "transaction_detail" -> TransactionDetail
                 else -> TransactionList
             }
