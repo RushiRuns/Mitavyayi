@@ -82,6 +82,12 @@ fun MitavyayApp(
                                 contentDescription = "Recurring Expenses"
                             )
                         }
+                        IconButton(onClick = { appState.navController.navigate(NavDestination.Goals.route) }) {
+                            Icon(
+                                imageVector = NavDestination.Goals.icon,
+                                contentDescription = "Savings Goals"
+                            )
+                        }
                         IconButton(onClick = { appState.navController.navigate(NavDestination.Categories.route) }) {
                             Icon(
                                 imageVector = Icons.Default.Star,

@@ -9,6 +9,7 @@ import com.rushi.mitavyay.ui.screens.Accounts.AccountsScreen
 import com.rushi.mitavyay.ui.screens.Analysis.AnalysisScreen
 import com.rushi.mitavyay.ui.screens.Categories.CategoriesScreen
 import com.rushi.mitavyay.ui.screens.Debt.DebtListScreen
+import com.rushi.mitavyay.ui.screens.Goals.GoalsListScreen
 import com.rushi.mitavyay.ui.screens.RepeatExpense.RepeatExpenseListScreen
 import com.rushi.mitavyay.ui.screens.Settings.ImportExportScreen
 import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailScreen
@@ -53,6 +54,9 @@ fun MitavyayNavHost(
         }
         composable(NavDestination.RepeatExpenses.route) {
             RepeatExpenseListScreen()
+        }
+        composable(NavDestination.Goals.route) {
+            GoalsListScreen()
         }
         composable(NavDestination.TransactionDetail.route) {
             TransactionDetailScreen(

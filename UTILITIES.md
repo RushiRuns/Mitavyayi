@@ -49,7 +49,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 ### Cards (`ui/components/Cards.kt`)
 - `TransactionCard`: Card displaying title, category, formatted amount (green for income, red for expenses), formatted date, and "Transfer" badge for paired transfer records.
 - `AccountCard`: Card displaying account name, type chip (Cash/Bank/Credit), formatted balance, and active status.
-- `GoalCard`: Card displaying goal progress bar, saved vs target amount, deadline, and percentage.
+- `GoalCard`: Card displaying goal progress bar, saved vs target amount, deadline, timeline text, status badge, linked account badge vs dedicated fund badge, and deposit/delete actions.
 - `DebtCard`: Card displaying counterparty name, formatted amount (green for lent, red for borrowed), type chip, creation/settlement dates, notes, and "Mark Settled" CTA for active debts (strictly immutable, never exposes delete per ADR-007).
 - `RepeatExpenseCard`: Card displaying description, formatted amount, frequency chip, category, last generated date, active toggle switch, and delete button.
 
@@ -58,13 +58,15 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, and direct `Long` paise conversion.
 - `DatePickerField` & `AppDatePickerDialog`: Date selection field launching a Material 3 DatePickerDialog and emitting Unix timestamp ms (`Long`).
 
-### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/Transfer/TransferDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`, `ui/components/AddCategoryDialog.kt`, `ui/screens/Debt/AddDebtDialog.kt`, `ui/screens/RepeatExpense/AddRepeatDialog.kt`)
+### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/Transfer/TransferDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`, `ui/components/AddCategoryDialog.kt`, `ui/screens/Debt/AddDebtDialog.kt`, `ui/screens/RepeatExpense/AddRepeatDialog.kt`, `ui/screens/Goals/AddGoalDialog.kt`, `ui/screens/Goals/AddGoalSavingsDialog.kt`)
 - `AppAlertDialog`: Standardized confirmation and alert dialog with theme typography, colors, and confirm/dismiss actions.
 - `AddAccountDialog`: Form dialog for creating and editing accounts with validated name, type selection, and initial balance input.
 - `TransferDialog`: Dialog allowing fund transfers between two distinct active accounts with currency input, swap button, balance preview, notes, validation, and atomic ledger creation.
 - `AddCategoryDialog`: Form dialog for creating and editing custom categories with live preview, color swatch picker, and icon grid.
 - `AddDebtDialog`: Form dialog for recording lent and borrowed debts with type selector, counterparty name input, CurrencyInput, notes, and validation.
 - `AddRepeatDialog`: Form dialog for creating recurring expenses with description, CurrencyInput amount, frequency picker, category chips, and active toggle switch.
+- `AddGoalDialog`: Form dialog for creating savings goals towards targets and deadlines, supporting dedicated fund or linked account modes, initial deposit, category, and notes.
+- `AddGoalSavingsDialog`: Form dialog for contributing savings deposits to dedicated fund goals with progress preview and CurrencyInput.
 - `QuickAddExpenseSheet`: Material 3 ModalBottomSheet for rapid transaction entry with CurrencyInput, Expense/Income toggle, single-tap account/category chips, and atomic balance syncing.
 - `EditTransactionDialog`: Form dialog for editing transaction amount, expense/income type, category, account, and description.
 - `ThemeSelectionDialog`: Dialog for selecting app theme (System default, Light mode, Dark mode) with DataStore persistence.
@@ -86,13 +88,14 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `parseCategoryColor`: Pure Kotlin color hex parser with fallback palette for safe JVM unit testing and Android device rendering.
 
 ### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`)
-- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, `categories`, `import_export`, `debts`, `repeat_expenses`, and `transaction_detail/{transactionId}`), tab labels, and icons.
+- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, `categories`, `import_export`, `debts`, `repeat_expenses`, `goals`, and `transaction_detail/{transactionId}`), tab labels, and icons.
 - `MitavyayNavHost` (`ui/navigation/NavHost.kt`): Top-level NavHost mapping routes to Compose screens without Fragments.
 - `MitavyayAppState` & `rememberMitavyayAppState` (`ui/AppState.kt`): State holder for navigation controller, backstack resolution, and tab switching.
 - `MitavyayBottomBar` (`ui/components/BottomNavBar.kt`): Material 3 navigation bar utilizing theme tokens.
-- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar (with Debts & Loans, Recurring Expenses, Categories, Backup & CSV Data, and theme dialog), BottomNavBar, FAB, and NavHost.
+- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar (with Debts & Loans, Recurring Expenses, Savings Goals, Categories, Backup & CSV Data, and theme dialog), BottomNavBar, FAB, and NavHost.
 - `DebtListScreen` (`ui/screens/Debt/DebtListScreen.kt`): Screen managing active and settled debts with summary metrics (Total Lent, Total Borrowed), tab switching, settlement flow, and zero delete capability per ADR-007.
 - `RepeatExpenseListScreen` (`ui/screens/RepeatExpense/RepeatExpenseListScreen.kt`): Screen managing recurring expenses with monthly commitment readout, All/Active/Paused tabs, on-demand due evaluation, and active toggle switch.
+- `GoalsListScreen` (`ui/screens/Goals/GoalsListScreen.kt`): Screen managing savings targets with summary metrics (Total Target, Total Saved, Overall Progress, active/achieved counts), tab switching (All, In Progress, Achieved, Overdue), and savings deposits.
 - `ImportExportScreen` (`ui/screens/Settings/ImportExportScreen.kt`): Screen managing transaction export, SAF document creation, system sharing, and all-or-nothing CSV import.
 
 

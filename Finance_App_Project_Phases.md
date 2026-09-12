@@ -619,29 +619,29 @@
 ### Feature 5.3: Goals Tracking
 
 **Planning**
-- [ ] User sets savings goals (target amount, deadline)
-- [ ] Track progress toward goal
-- [ ] Can link goal to specific account or dedicated fund
+- [x] User sets savings goals (target amount, deadline)
+- [x] Track progress toward goal
+- [x] Can link goal to specific account or dedicated fund
 
 **Implementation**
-- [ ] Create `ui/screens/Goals/GoalsListScreen.kt`
+- [x] Create `ui/screens/Goals/GoalsListScreen.kt`
   - Shows all goals with progress bars
   - Color coded: on track (green), warning (yellow), overdue (red)
-- [ ] Create `ui/screens/Goals/AddGoalDialog.kt`
+- [x] Create `ui/screens/Goals/AddGoalDialog.kt`
   - Form: name, target amount, deadline, optional linked account, category
-- [ ] GoalViewModel calculates progress:
+- [x] GoalViewModel calculates progress:
   - If linked account: progress = account balance / target
   - If dedicated: progress = dedicated balance / target
-- [ ] Show timeline: days/weeks/months until deadline
+- [x] Show timeline: days/weeks/months until deadline
 
 **Testing**
-- [ ] Test: Create goal
-- [ ] Test: Progress calculated correctly
-- [ ] Test: Deadline logic works
-- [ ] Test: Color coding based on progress
+- [x] Test: Create goal
+- [x] Test: Progress calculated correctly
+- [x] Test: Deadline logic works
+- [x] Test: Color coding based on progress
 
 **Closure**
-- [ ] Commit: "Feature 5.3: Goals"
+- [x] Commit: "Feature 5.3: Goals"
 
 ### Feature 5.4: Enhanced Analysis
 

@@ -3,6 +3,21 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 5.3: Goals Tracking complete.
+  - Implemented dual savings goal tracking computation:
+    - If dedicated fund: `progress = dedicated balance (currentAmount) / target`
+    - If linked account: `progress = linked account balance / target` (reflecting live account balance automatically).
+  - Enhanced `GoalDisplayItem` with `GoalStatus` enum (`ACHIEVED`, `ON_TRACK`, `WARNING`, `OVERDUE`), `targetAmountPaise`, `currentAmountPaise`, `progress`, `progressPercentage`, `deadlineFormatted`, and human-readable `timelineText` (e.g., "X months remaining", "Due today", "Overdue by X days", "Goal Achieved!").
+  - Extended `GoalRepository` and `GoalRepositoryImpl` with `addSavings(id: String, amountPaise: Long)`.
+  - Added `GoalCard` in `Cards.kt` supporting `GoalDisplayItem`, color-coded progress bars (`extendedColorScheme.success`, `warning`, `error`), timeline readout, dedicated fund vs linked account badges, "+ Savings" deposit CTA for dedicated goals, and delete action.
+  - Created `AddGoalDialog` supporting goal name, target amount `CurrencyInput`, `DatePickerField` deadline, tracking mode switch ("Dedicated Fund" vs "Linked Account"), initial contribution, category chips, notes, and validation.
+  - Created `AddGoalSavingsDialog` for contributing savings deposits to dedicated goals with progress preview and `CurrencyInput`.
+  - Created `GoalViewModel` combining goals, accounts, categories, and tab filters, computing total targets, total savings, overall progress bar, and active/achieved counts.
+  - Created `GoalsListScreen` with summary metrics header card, `ScrollableTabRow` (All, In Progress, Achieved, Overdue), `LazyColumn` of `GoalCard`s, empty states, FAB, and dialogs.
+  - Registered `NavDestination.Goals` (`goals`, "Savings Goals", `Icons.Default.Favorite`) in `NavDestinations.kt`, `MitavyayNavHost`, and `MitavyayApp` top bar actions.
+  - Added unit test suites in `GoalViewModelTest.kt` (9 tests) and `GoalRepositoryTest.kt` (3 tests), and updated `NavigationTest.kt`.
+  - Verified all 119+ tests passing in `testDebugUnitTest` and clean build in `assembleDebug`.
+  - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 5.2: Repeat Expenses (Lazy Generation) complete.
   - Implemented lazy occurrence evaluation per `ADR-003: Lazy Occurrence Generation for Recurring Expenses`: occurrences generate concrete `Transaction` records strictly on demand when due, preventing database table bloat.
   - Updated `RepeatExpenseDisplayItem` with typed `amountPaise: Long` and `lastGenerated: Long`.

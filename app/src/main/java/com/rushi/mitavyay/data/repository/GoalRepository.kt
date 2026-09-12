@@ -14,6 +14,7 @@ interface GoalRepository {
     suspend fun updateGoal(goal: Goal)
     suspend fun deleteGoal(id: String)
     suspend fun updateCurrentAmount(id: String, amount: Long)
+    suspend fun addSavings(id: String, amountPaise: Long)
 }
 
 @Singleton
@@ -35,4 +36,9 @@ class GoalRepositoryImpl @Inject constructor(
 
     override suspend fun updateCurrentAmount(id: String, amount: Long) =
         goalDao.updateCurrentAmount(id, amount)
+
+    override suspend fun addSavings(id: String, amountPaise: Long) {
+        val existing = goalDao.getById(id) ?: return
+        goalDao.updateCurrentAmount(id, existing.currentAmount + amountPaise)
+    }
 }

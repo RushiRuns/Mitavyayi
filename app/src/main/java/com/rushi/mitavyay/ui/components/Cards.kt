@@ -31,6 +31,8 @@ import com.rushi.mitavyay.ui.theme.extendedColorScheme
 import com.rushi.mitavyay.ui.theme.spacing
 import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.model.DebtDisplayItem
+import com.rushi.mitavyay.data.model.GoalDisplayItem
+import com.rushi.mitavyay.data.model.GoalStatus
 import com.rushi.mitavyay.data.model.RepeatExpenseDisplayItem
 import com.rushi.mitavyay.data.model.TransactionDisplayItem
 import com.rushi.mitavyay.util.CurrencyFormatter
@@ -502,6 +504,184 @@ fun GoalCard(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Overload for [GoalCard] accepting a rich [GoalDisplayItem].
+ * Features color coding (on track = green, warning = yellow, overdue = red, achieved = success),
+ * timeline status, account link badge, and savings deposit CTA for dedicated funds.
+ */
+@Composable
+fun GoalCard(
+    item: GoalDisplayItem,
+    modifier: Modifier = Modifier,
+    onAddSavingsClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null,
+    onClick: () -> Unit = {}
+) {
+    val statusColor = when (item.status) {
+        GoalStatus.ACHIEVED -> MaterialTheme.extendedColorScheme.success
+        GoalStatus.ON_TRACK -> MaterialTheme.extendedColorScheme.success
+        GoalStatus.WARNING -> MaterialTheme.extendedColorScheme.warning
+        GoalStatus.OVERDUE -> MaterialTheme.colorScheme.error
+    }
+
+    val statusLabel = when (item.status) {
+        GoalStatus.ACHIEVED -> "Achieved"
+        GoalStatus.ON_TRACK -> "On Track"
+        GoalStatus.WARNING -> "Warning"
+        GoalStatus.OVERDUE -> "Overdue"
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.appShapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = MaterialTheme.spacing.xs
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.cardContent)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = item.name,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    SpacerXs()
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)
+                    ) {
+                        Surface(
+                            shape = MaterialTheme.appShapes.small,
+                            color = statusColor.copy(alpha = 0.15f)
+                        ) {
+                            Text(
+                                text = statusLabel,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = statusColor,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+
+                        Surface(
+                            shape = MaterialTheme.appShapes.small,
+                            color = MaterialTheme.colorScheme.secondaryContainer
+                        ) {
+                            Text(
+                                text = item.linkedAccountName?.let { "Linked: $it" } ?: "Dedicated Fund",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+
+                        Surface(
+                            shape = MaterialTheme.appShapes.small,
+                            color = MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            Text(
+                                text = item.category,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = "${item.progressPercentage}%",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = statusColor
+                )
+            }
+
+            SpacerSm()
+
+            LinearProgressIndicator(
+                progress = { item.progress },
+                modifier = Modifier.fillMaxWidth(),
+                color = statusColor,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+
+            SpacerSm()
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Saved: ${item.currentAmountFormatted}",
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Target: ${item.targetAmountFormatted}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+
+            SpacerXs()
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = item.timelineText,
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                        color = statusColor
+                    )
+                    Text(
+                        text = "Target Date: ${item.deadlineFormatted}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)
+                ) {
+                    if (item.linkedAccountId == null && item.progress < 1.0f && onAddSavingsClick != null) {
+                        SecondaryButton(
+                            text = "+ Savings",
+                            onClick = onAddSavingsClick
+                        )
+                    }
+
+                    if (onDeleteClick != null) {
+                        IconButton(onClick = onDeleteClick) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete Goal",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
             }
         }
     }
