@@ -320,33 +320,33 @@
 ### Feature 4.1: Account Management
 
 **Planning**
-- [ ] Create `docs/decisions/ADR-005-Account-Deletion-Cascade.md`
+- [x] Create `docs/decisions/ADR-005-Account-Deletion-Cascade.md`
   - Decision: Deleting an account cascades delete all transactions (or block if transfers exist)
   - Specify clearly before implementing
 
 **Implementation**
-- [ ] Create `ui/screens/Accounts/AccountsViewModel.kt`
+- [x] Create `ui/screens/Accounts/AccountsViewModel.kt`
   - `data class AccountsUiState(val accounts: List<AccountDisplayItem> = emptyList())`
   - Functions: addAccount, editAccount, deleteAccount
-- [ ] Create `ui/screens/Accounts/AccountsScreen.kt`
+- [x] Create `ui/screens/Accounts/AccountsScreen.kt`
   - List of accounts with balance
   - Button to add new account
   - Edit/delete account buttons
-- [ ] Create `ui/screens/Accounts/AddAccountDialog.kt`
+- [x] Create `ui/screens/Accounts/AddAccountDialog.kt`
   - Form: name, type (cash/bank/credit), initial balance
   - Uses theme tokens
-- [ ] Update `UTILITIES.md` with AccountDisplayItem and account formatter
+- [x] Update `UTILITIES.md` with AccountDisplayItem and account formatter
 
 **Testing**
-- [ ] Test: Add account and verify it appears in list
-- [ ] Test: Edit account name and verify update
-- [ ] Test: Delete account behavior (cascade/block)
-- [ ] Test: Account balance calculated correctly
+- [x] Test: Add account and verify it appears in list
+- [x] Test: Edit account name and verify update
+- [x] Test: Delete account behavior (cascade/block)
+- [x] Test: Account balance calculated correctly
 
 **Closure**
-- [ ] Answer comprehension questions: What files changed? What does each own? What depends on it now?
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: "Feature 4.1: Account management"
+- [x] Answer comprehension questions: What files changed? What does each own? What depends on it now?
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: "Feature 4.1: Account management"
 
 ### Feature 4.2: Quick Add Expense
 

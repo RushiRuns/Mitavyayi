@@ -115,8 +115,15 @@ class ViewModelsTest {
             override suspend fun getAccount(id: String): Account? = null
             override fun getAccountBalance(id: String): Flow<Long?> = flowOf(0L)
             override suspend fun addAccount(account: Account) {}
+            override suspend fun createAccount(name: String, type: String, initialBalancePaise: Long): Account {
+                return Account(id = "acc_new", name = name, type = type, balance = initialBalancePaise, currency = "INR", createdAt = 0L, isActive = true)
+            }
+            override suspend fun editAccount(id: String, name: String, type: String) {}
             override suspend fun updateAccount(account: Account) {}
-            override suspend fun deleteAccount(id: String) {}
+            override suspend fun deleteAccount(id: String): Boolean = true
+            override suspend fun canDeleteAccount(id: String): Boolean = true
+            override suspend fun archiveAccount(id: String) {}
+            override suspend fun unarchiveAccount(id: String) {}
             override suspend fun updateBalance(id: String, newBalance: Long) {}
         }
 

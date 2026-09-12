@@ -69,6 +69,9 @@ class TransactionRepositoryTest {
             flowOf(list.filter { it.timestamp in start..end && it.amount > 0 }.map { it.amount }.sum())
 
         override fun getTransactionCount() = flowOf(list.size)
+
+        override suspend fun getTransactionCountForAccount(accountId: String) =
+            list.count { it.accountId == accountId }
     }
 
     @Test

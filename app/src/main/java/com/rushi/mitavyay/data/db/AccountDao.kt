@@ -43,4 +43,7 @@ interface AccountDao {
 
     @Query("SELECT balance FROM accounts WHERE id = :id")
     fun getAccountBalance(id: String): Flow<Long?>
+
+    @Query("UPDATE accounts SET isActive = :isActive WHERE id = :id")
+    suspend fun updateActiveStatus(id: String, isActive: Boolean)
 }

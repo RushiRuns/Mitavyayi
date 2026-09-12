@@ -47,6 +47,8 @@ class TransferRepositoryTest {
         override fun getTotalExpensesByDateRange(start: Long, end: Long) = flowOf(null)
         override fun getTotalIncomeByDateRange(start: Long, end: Long) = flowOf(null)
         override fun getTransactionCount() = flowOf(0)
+        override suspend fun getTransactionCountForAccount(accountId: String) =
+            list.count { it.accountId == accountId }
     }
 
     @Test

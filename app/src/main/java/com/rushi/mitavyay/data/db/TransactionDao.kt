@@ -58,4 +58,7 @@ interface TransactionDao {
 
     @Query("SELECT COUNT(*) FROM transactions")
     fun getTransactionCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE accountId = :accountId")
+    suspend fun getTransactionCountForAccount(accountId: String): Int
 }

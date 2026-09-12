@@ -3,6 +3,15 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.1: Account Management complete.
+  - Documented conditional account deletion & archiving policy in `docs/decisions/ADR-005-Account-Deletion-Cascade.md`.
+  - Updated `AccountDao` and `TransactionDao` with transaction count verification and active status update.
+  - Implemented `createAccount`, `editAccount`, `deleteAccount`, `archiveAccount`, `canDeleteAccount` in `AccountRepository`.
+  - Created `AddAccountDialog` with theme tokens, validated name, type selection (`bank`, `cash`, `credit`), and `CurrencyInput` for initial balance.
+  - Enhanced `AccountsViewModel` with full CRUD, dialog states, and deletion blocking with archive prompt.
+  - Enhanced `AccountsScreen` with interactive cards, FAB, edit/delete actions, and confirmation dialogs.
+  - Created unit tests in `AccountManagementTest.kt` verifying all account operations, initial balance transaction creation, deletion constraints, and ViewModel flows.
+  - Updated `UTILITIES.md`.
 - Phase 3: Navigation structure and screen templates.
   - Implemented sealed navigation routing in `ui/navigation/NavDestinations.kt` (`TransactionList`, `Analysis`, `Accounts`).
   - Implemented single `MitavyayNavHost` in `ui/navigation/NavHost.kt` without Fragments.
