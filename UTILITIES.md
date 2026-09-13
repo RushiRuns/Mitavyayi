@@ -84,6 +84,9 @@ This file serves as the index for all shared utilities, formatters, extensions, 
     - `EmptyGoalsIllustration`: Flag platform milestone with stars.
   - *Location*: `ui/components/IllustrationAssets.kt`
 
+### Pull-to-Refresh & Containers (`ui/components/PullToRefresh.kt`)
+- `PullToRefreshBox`: Standard Material 3 pull-to-refresh container wrapper managing `PullToRefreshState`, nested scrolling, and haptic feedback with accent green primary spinner on neutral container surface.
+
 ### Cards (`ui/components/Cards.kt`)
 - `TransactionCard`: Card displaying title, category, formatted amount (green for income, red for expenses), formatted date, and "Transfer" badge for paired transfer records.
 - `AccountCard`: Card displaying account name, type chip (Cash/Bank/Credit), formatted balance, and active status.

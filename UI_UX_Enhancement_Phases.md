@@ -383,8 +383,8 @@
 
 ### Tasks
 
-- [ ] Locate the `PullToRefreshBox` (or `pullRefresh` modifier) in `TransactionListScreen.kt`
-- [ ] Ensure the refresh container wraps ONLY the `LazyColumn`, not the search bar:
+- [x] Locate the `PullToRefreshBox` (or `pullRefresh` modifier) in `TransactionListScreen.kt`
+- [x] Ensure the refresh container wraps ONLY the `LazyColumn`, not the search bar:
   ```
   Column {
     SearchBar  ← outside pull-to-refresh
@@ -393,20 +393,20 @@
     }
   }
   ```
-- [ ] Use the official Compose `PullToRefreshBox` (Material3 stable API)
-- [ ] In `TransactionListViewModel.kt`, add `isRefreshing: Boolean` state
+- [x] Use the official Compose `PullToRefreshBox` (Material3 stable API)
+- [x] In `TransactionListViewModel.kt`, add `isRefreshing: Boolean` state
   - `onRefresh`: set `isRefreshing = true`, re-fetch, set `isRefreshing = false`
-- [ ] Refresh indicator uses accent green color (per new theme)
+- [x] Refresh indicator uses accent green color (per new theme)
 
 **Testing**
-- [ ] Test: Pull down on the list → indicator appears below search bar (not stuck at search bar)
-- [ ] Test: Data reloads on pull-to-refresh
-- [ ] Test: Indicator disappears after refresh completes
-- [ ] Test: Search bar remains fixed during pull
+- [x] Test: Pull down on the list → indicator appears below search bar (not stuck at search bar)
+- [x] Test: Data reloads on pull-to-refresh
+- [x] Test: Indicator disappears after refresh completes
+- [x] Test: Search bar remains fixed during pull
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 9: Fixed pull-to-refresh positioning in Transactions tab"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 9: Fixed pull-to-refresh positioning in Transactions tab"`
 
 ---
 

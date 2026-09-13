@@ -45,14 +45,11 @@ import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -63,6 +60,9 @@ import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.AppDateRangePickerDialog
 import com.rushi.mitavyay.ui.components.EmptySearchIllustration
 import com.rushi.mitavyay.ui.components.EmptyTransactionsIllustration
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import com.rushi.mitavyay.ui.components.PullToRefreshBox
 import com.rushi.mitavyay.ui.components.SkeletonTransactionList
 import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
 import com.rushi.mitavyay.util.DateTimeFormatter
@@ -108,20 +108,6 @@ fun TransactionListContent(
     var showCustomDateRangePicker by remember { mutableStateOf(false) }
     val isFilterActive = uiState.dateFilter !is DateFilter.AllTime
 
-    val pullToRefreshState = rememberPullToRefreshState()
-    if (pullToRefreshState.isRefreshing) {
-        androidx.compose.runtime.LaunchedEffect(true) {
-            context.hapticLight()
-            onRefresh()
-        }
-    }
-    androidx.compose.runtime.LaunchedEffect(uiState.isRefreshing) {
-        if (uiState.isRefreshing) {
-            pullToRefreshState.startRefresh()
-        } else {
-            pullToRefreshState.endRefresh()
-        }
-    }
 
     if (transactionPendingDelete != null) {
         AppAlertDialog(
@@ -290,7 +276,11 @@ fun TransactionListContent(
             )
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        PullToRefreshBox(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.fillMaxSize()
+        ) {
             when {
                 uiState.isLoading -> {
                     SkeletonTransactionList(count = 6)
@@ -320,48 +310,43 @@ fun TransactionListContent(
                                 if (uiState.searchQuery.isNotBlank()) onSearchQueryChange("")
                                 if (isFilterActive) onDateFilterChange(DateFilter.AllTime)
                             },
-                            illustration = { EmptySearchIllustration() }
+                            illustration = { EmptySearchIllustration() },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
                         )
                     } else {
                         EmptyState(
                             title = "No transactions yet",
                             description = "Tap + to add your first expense or income.",
-                            illustration = { EmptyTransactionsIllustration() }
+                            illustration = { EmptyTransactionsIllustration() },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
                         )
                     }
                 }
                 else -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(MaterialTheme.spacing.md),
+                        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
                     ) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(MaterialTheme.spacing.md),
-                            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
-                        ) {
-                            items(
-                                items = uiState.transactions,
-                                key = { it.id }
-                            ) { item ->
-                                @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-                                SwipeableTransactionCard(
-                                    item = item,
-                                    onClick = { onTransactionClick(item.id) },
-                                    onSwipeDelete = {
-                                        context.hapticLight()
-                                        transactionPendingDelete = item
-                                    },
-                                    modifier = Modifier.animateItemPlacement()
-                                )
-                            }
+                        items(
+                            items = uiState.transactions,
+                            key = { it.id }
+                        ) { item ->
+                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+                            SwipeableTransactionCard(
+                                item = item,
+                                onClick = { onTransactionClick(item.id) },
+                                onSwipeDelete = {
+                                    context.hapticLight()
+                                    transactionPendingDelete = item
+                                },
+                                modifier = Modifier.animateItemPlacement()
+                            )
                         }
-
-                        PullToRefreshContainer(
-                            state = pullToRefreshState,
-                            modifier = Modifier.align(Alignment.TopCenter)
-                        )
                     }
                 }
             }

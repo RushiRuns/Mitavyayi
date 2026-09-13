@@ -3,6 +3,12 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 9: Fixed pull-to-refresh positioning in Transactions tab.
+  - Resolved pull-to-refresh indicator positioning so it triggers and animates cleanly below the search bar and date filter chips rather than stuck at the top of the screen.
+  - Implemented `PullToRefreshBox` (`ui/components/PullToRefresh.kt`) adhering to Material 3 semantics with accent green spinner (`MaterialTheme.colorScheme.primary`) on neutral container surface.
+  - Encapsulated only the transaction list / content area inside `PullToRefreshBox`, ensuring SearchBar, DateFilter folder button, and active filter chips remain completely fixed during pull gestures.
+  - Added vertical scrolling behavior to empty state composables inside the refresh container so pull-to-refresh functions smoothly on both populated lists and empty search/transaction views.
+  - Updated `UI_UX_Enhancement_Phases.md` and verified all unit tests pass cleanly.
 - Change 8: Remove all feature icons from Top Bar.
   - Verified and finalized the complete removal of all 8 legacy feature shortcut icons (Debts, Recurring Expenses, Goals, Budget, Insights, Categories, Backup/CSV Export, and Settings) from `TopAppBar` in `MitavyayApp.kt`.
   - Feature access is now cleanly and exclusively hosted within the card-based `More` hub screen (`HubScreen.kt`) and full-page `SettingsScreen.kt`.
