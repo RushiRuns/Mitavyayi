@@ -1,5 +1,10 @@
 package com.rushi.mitavyay.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,6 +31,7 @@ import com.rushi.mitavyay.ui.components.MitavyayBottomBar
 import androidx.compose.ui.platform.LocalContext
 import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
+import com.rushi.mitavyay.ui.navigation.NavDestination
 import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
 import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseSheet
 import com.rushi.mitavyay.util.hapticLight
@@ -46,6 +52,10 @@ fun MitavyayApp(
     var showBatchAddDialog by remember { mutableStateOf(false) }
     val currentDestination = appState.currentDestination
     val currentRoute = appState.currentRoute
+    val showFab = currentRoute in listOf(
+        NavDestination.TransactionList.route,
+        NavDestination.Analysis.route
+    )
     val currentThemeMode by mainViewModel.themeMode.collectAsState()
     val hapticFeedbackEnabled by mainViewModel.hapticFeedbackEnabled.collectAsState()
 
@@ -87,7 +97,11 @@ fun MitavyayApp(
             }
         },
         floatingActionButton = {
-            if (appState.isTopLevelDestination) {
+            AnimatedVisibility(
+                visible = showFab,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
                 FloatingActionButton(
                     onClick = {
                         context.hapticLight(hapticFeedbackEnabled)

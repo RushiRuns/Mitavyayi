@@ -1,6 +1,7 @@
 package com.rushi.mitavyay.ui.navigation
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -49,5 +50,27 @@ class NavigationTest {
         assertEquals(NavDestination.TransactionList, NavDestination.fromRoute("transactions/item_123"))
         assertEquals(NavDestination.TransactionList, NavDestination.fromRoute("unknown_route"))
         assertEquals(NavDestination.TransactionList, NavDestination.fromRoute(null))
+    }
+
+    @Test
+    fun testQuickAddFabVisibility() {
+        // Quick Add FAB should only be visible on Transactions and Analysis
+        assertTrue(NavDestination.shouldShowQuickAddFab("transactions"))
+        assertTrue(NavDestination.shouldShowQuickAddFab("analysis"))
+
+        // FAB must be hidden on More (Hub) and all sub-screens
+        assertFalse(NavDestination.shouldShowQuickAddFab("more"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("accounts"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("settings"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("categories"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("debts"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("repeat_expenses"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("goals"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("budgets"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("insights"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("import_export"))
+        assertFalse(NavDestination.shouldShowQuickAddFab("transaction_detail/tx_123"))
+        assertFalse(NavDestination.shouldShowQuickAddFab(null))
+        assertFalse(NavDestination.shouldShowQuickAddFab("unknown_route"))
     }
 }

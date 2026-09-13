@@ -114,6 +114,14 @@ sealed class NavDestination(
         fun isTopLevel(route: String?): Boolean =
             topLevelDestinations.any { it.route == route }
 
+        val quickAddFabDestinations = listOf(
+            TransactionList.route,
+            Analysis.route
+        )
+
+        fun shouldShowQuickAddFab(route: String?): Boolean =
+            route in quickAddFabDestinations
+
         fun fromRoute(route: String?): NavDestination {
             return when (route?.substringBefore("/")) {
                 TransactionList.route -> TransactionList

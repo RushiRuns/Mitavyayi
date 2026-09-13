@@ -3,6 +3,12 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 14: Quick Add FAB only shown on Transactions and Analysis screens.
+  - Made Quick Add FAB conditional based on navigation route, limiting visibility strictly to `NavDestination.TransactionList.route` ("transactions") and `NavDestination.Analysis.route` ("analysis").
+  - Wrapped `FloatingActionButton` inside `AnimatedVisibility` with `enter = scaleIn() + fadeIn()` and `exit = scaleOut() + fadeOut()`, providing smooth micro-animations when switching tabs.
+  - Hidden on More (Hub) screen and all sub-destinations (Accounts, Settings, Categories, Debts, Budgets, Goals, Recurring Expenses, Insights, Detail), preventing UI overlap and maintaining clean screen-specific actions.
+  - Added route helper and unit test coverage in `NavigationTest.kt` verifying conditional FAB visibility across all destinations.
+  - Updated `UI_UX_Enhancement_Phases.md`.
 - Change 13: FAB for adding new accounts on AccountsScreen.
   - Added `FloatingActionButton` to `Scaffold` in `AccountsScreen.kt` for creating new accounts.
   - Wired FAB click handler to `viewModel.onAddClick()`, launching `AddAccountDialog.kt`.

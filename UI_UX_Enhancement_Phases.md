@@ -568,7 +568,7 @@
 
 ### Tasks
 
-- [ ] Make the FAB conditional based on current nav route:
+- [x] Make the FAB conditional based on current nav route:
   ```kotlin
   val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
   val showFab = currentRoute in listOf(
@@ -576,7 +576,7 @@
     NavDestination.Analysis.route
   )
   ```
-- [ ] Wrap the FAB in `AnimatedVisibility`:
+- [x] Wrap the FAB in `AnimatedVisibility`:
   ```kotlin
   AnimatedVisibility(
     visible = showFab,
@@ -588,13 +588,13 @@
   ```
 
 **Testing**
-- [ ] Test: FAB visible on Transactions and Analysis
-- [ ] Test: FAB hidden on More/Hub and all sub-screens
-- [ ] Test: FAB animates in/out smoothly
+- [x] Test: FAB visible on Transactions and Analysis
+- [x] Test: FAB hidden on More/Hub and all sub-screens
+- [x] Test: FAB animates in/out smoothly
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 14: Quick Add FAB only shown on Transactions and Analysis screens"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 14: Quick Add FAB only shown on Transactions and Analysis screens"`
 
 ---
 
