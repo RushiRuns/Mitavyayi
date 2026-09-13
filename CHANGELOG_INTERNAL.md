@@ -3,6 +3,12 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 15: Income mode auto-focuses amount and hides category.
+  - Added auto-focus to CurrencyInput amount field when switching between Expense and Income modes in `QuickAddExpenseSheet.kt` using `LaunchedEffect(uiState.isExpense)`.
+  - Wrapped Category selector section in `AnimatedVisibility(visible = uiState.isExpense)` so it smoothly hides in Income mode and reveals in Expense mode.
+  - Automatically defaulted transaction category to an Income category ("Salary & Income") when logging an income transaction in `QuickAddExpenseViewModel.kt`.
+  - Added comprehensive unit tests in `QuickAddExpenseTest.kt` verifying automatic category assignment for income and seamless category restoration when switching modes.
+  - Updated `UI_UX_Enhancement_Phases.md`.
 - Change 14: Quick Add FAB only shown on Transactions and Analysis screens.
   - Made Quick Add FAB conditional based on navigation route, limiting visibility strictly to `NavDestination.TransactionList.route` ("transactions") and `NavDestination.Analysis.route` ("analysis").
   - Wrapped `FloatingActionButton` inside `AnimatedVisibility` with `enter = scaleIn() + fadeIn()` and `exit = scaleOut() + fadeOut()`, providing smooth micro-animations when switching tabs.

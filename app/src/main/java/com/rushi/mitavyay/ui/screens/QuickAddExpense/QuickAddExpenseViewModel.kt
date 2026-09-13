@@ -79,8 +79,18 @@ class QuickAddExpenseViewModel @Inject constructor(
         val effectiveAccountId = form.selectedAccountId?.takeIf { id -> accountItems.any { it.id == id } }
             ?: accountItems.firstOrNull()?.id
 
-        val effectiveCategory = form.selectedCategory?.takeIf { name -> categoryItems.any { it.name == name } }
-            ?: categoryItems.firstOrNull()?.name
+        val effectiveCategory = if (!form.isExpense) {
+            // For Income mode, automatically default to an Income category
+            form.selectedCategory?.takeIf { name ->
+                categoryItems.any { it.name == name && (it.name.contains("Income", ignoreCase = true) || it.name.contains("Salary", ignoreCase = true)) }
+            } ?: categoryItems.find {
+                it.name.contains("Income", ignoreCase = true) || it.name.contains("Salary", ignoreCase = true)
+            }?.name ?: categoryItems.firstOrNull()?.name ?: "Salary & Income"
+        } else {
+            form.selectedCategory?.takeIf { name -> categoryItems.any { it.name == name } }
+                ?: categoryItems.firstOrNull { !it.name.contains("Income", ignoreCase = true) && !it.name.contains("Salary", ignoreCase = true) }?.name
+                ?: categoryItems.firstOrNull()?.name
+        }
 
         QuickAddExpenseUiState(
             isLoading = false,
@@ -111,7 +121,10 @@ class QuickAddExpenseViewModel @Inject constructor(
     }
 
     fun onTypeToggle(isExpense: Boolean) {
-        _formState.value = _formState.value.copy(isExpense = isExpense)
+        _formState.value = _formState.value.copy(
+            isExpense = isExpense,
+            selectedCategory = null
+        )
     }
 
     fun onAccountSelect(accountId: String) {

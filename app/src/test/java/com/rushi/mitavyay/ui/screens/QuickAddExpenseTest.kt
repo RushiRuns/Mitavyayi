@@ -469,4 +469,38 @@ class QuickAddExpenseTest {
         assertTrue(state.selectedDate > pastDate)
         assertTrue(kotlin.math.abs(System.currentTimeMillis() - state.selectedDate) < 5000L)
     }
+
+    @Test
+    fun income_defaultsToIncomeCategoryWithoutManualSelection() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        viewModel.onTypeToggle(isExpense = false)
+        viewModel.onAmountChange(300000L) // ₹3,000.00
+        viewModel.onAccountSelect("acc_bank")
+
+        val state = viewModel.uiState.first { !it.isExpense }
+        assertEquals("Salary & Income", state.selectedCategory)
+
+        var callbackTriggered = false
+        viewModel.saveTransaction { callbackTriggered = true }
+
+        assertTrue(callbackTriggered)
+        val tx = fakeTransactionRepository.transactions.first()
+        assertEquals(300000L, tx.amount)
+        assertEquals("Salary & Income", tx.category)
+        assertEquals("Salary & Income", tx.description)
+    }
+
+    @Test
+    fun switchingBetweenExpenseAndIncome_updatesDefaultCategory() = runBlocking {
+        val initialState = viewModel.uiState.first { !it.isLoading }
+        assertEquals("Food & Dining", initialState.selectedCategory)
+
+        viewModel.onTypeToggle(isExpense = false)
+        val incomeState = viewModel.uiState.first { !it.isExpense }
+        assertEquals("Salary & Income", incomeState.selectedCategory)
+
+        viewModel.onTypeToggle(isExpense = true)
+        val expenseState = viewModel.uiState.first { it.isExpense }
+        assertEquals("Food & Dining", expenseState.selectedCategory)
+    }
 }

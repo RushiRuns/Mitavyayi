@@ -609,30 +609,30 @@
 
 ### Tasks
 
-- [ ] When user taps "Income" button:
+- [x] When user taps "Income" button:
   ```kotlin
   LaunchedEffect(isIncomeMode) {
     if (isIncomeMode) { delay(100); focusRequester.requestFocus() }
   }
   ```
-- [ ] Wrap Category section in conditional:
+- [x] Wrap Category section in conditional:
   ```kotlin
   AnimatedVisibility(visible = !isIncomeMode) {
     CategorySection(...)
   }
   ```
-- [ ] For Income, default `category` to an "Income" category automatically
-- [ ] Same focus behavior on switching back to Expense
+- [x] For Income, default `category` to an "Income" category automatically
+- [x] Same focus behavior on switching back to Expense
 
 **Testing**
-- [ ] Test: Tap "Income" → amount field focused, category hidden
-- [ ] Test: Tap "Expense" → amount field focused, category visible
-- [ ] Test: Income transaction saves with correct default category
-- [ ] Test: Transition is smooth (AnimatedVisibility)
+- [x] Test: Tap "Income" → amount field focused, category hidden
+- [x] Test: Tap "Expense" → amount field focused, category visible
+- [x] Test: Income transaction saves with correct default category
+- [x] Test: Transition is smooth (AnimatedVisibility)
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 15: Income mode auto-focuses amount and hides category"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 15: Income mode auto-focuses amount and hides category"`
 
 ---
 

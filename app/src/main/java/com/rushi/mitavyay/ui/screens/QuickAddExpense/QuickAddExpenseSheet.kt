@@ -1,6 +1,7 @@
 package com.rushi.mitavyay.ui.screens.QuickAddExpense
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -182,8 +183,15 @@ fun QuickAddExpenseContent(
 ) {
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        delay(200) // Wait for sheet animation to complete
+    var isFirstLaunch by remember { mutableStateOf(true) }
+
+    LaunchedEffect(uiState.isExpense) {
+        if (isFirstLaunch) {
+            isFirstLaunch = false
+            delay(200) // Wait for sheet animation to complete on initial open
+        } else {
+            delay(100) // Quick switch focus when toggling between Expense and Income
+        }
         try {
             focusRequester.requestFocus()
         } catch (_: Exception) {
@@ -383,56 +391,59 @@ fun QuickAddExpenseContent(
             )
         }
 
-        SpacerMd()
+        // Category Selector (visible in Expense mode only)
+        AnimatedVisibility(visible = uiState.isExpense) {
+            Column {
+                SpacerMd()
+                Text(
+                    text = "Category",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
 
-        // Category Selector
-        Text(
-            text = "Category",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(uiState.categories, key = { it.id }) { category ->
-                CategoryChip(
-                    category = category,
-                    isSelected = uiState.selectedCategory == category.name,
-                    onClick = {
-                        context.hapticLight(hapticFeedbackEnabled)
-                        onCategorySelect(category.name)
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(uiState.categories, key = { it.id }) { category ->
+                        CategoryChip(
+                            category = category,
+                            isSelected = uiState.selectedCategory == category.name,
+                            onClick = {
+                                context.hapticLight(hapticFeedbackEnabled)
+                                onCategorySelect(category.name)
+                            }
+                        )
                     }
-                )
-            }
-            item {
-                AssistChip(
-                    onClick = {
-                        context.hapticLight(hapticFeedbackEnabled)
-                        onAddCategoryClick()
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Custom Category",
-                            modifier = Modifier.size(16.dp)
+                    item {
+                        AssistChip(
+                            onClick = {
+                                context.hapticLight(hapticFeedbackEnabled)
+                                onAddCategoryClick()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add Custom Category",
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = "New",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
+                            shape = MaterialTheme.appShapes.small,
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                labelColor = MaterialTheme.colorScheme.primary,
+                                leadingIconContentColor = MaterialTheme.colorScheme.primary
+                            )
                         )
-                    },
-                    label = {
-                        Text(
-                            text = "New",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    },
-                    shape = MaterialTheme.appShapes.small,
-                    colors = AssistChipDefaults.assistChipColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        labelColor = MaterialTheme.colorScheme.primary,
-                        leadingIconContentColor = MaterialTheme.colorScheme.primary
-                    )
-                )
+                    }
+                }
             }
         }
 
