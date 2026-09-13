@@ -26,7 +26,6 @@ import com.rushi.mitavyay.ui.components.MitavyayBottomBar
 import androidx.compose.ui.platform.LocalContext
 import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
-import com.rushi.mitavyay.ui.navigation.NavDestination
 import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
 import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseSheet
 import com.rushi.mitavyay.util.hapticLight

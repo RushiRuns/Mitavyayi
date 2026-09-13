@@ -3,6 +3,12 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 8: Remove all feature icons from Top Bar.
+  - Verified and finalized the complete removal of all 8 legacy feature shortcut icons (Debts, Recurring Expenses, Goals, Budget, Insights, Categories, Backup/CSV Export, and Settings) from `TopAppBar` in `MitavyayApp.kt`.
+  - Feature access is now cleanly and exclusively hosted within the card-based `More` hub screen (`HubScreen.kt`) and full-page `SettingsScreen.kt`.
+  - Ensured top bar displays only clean screen titles on top-level destinations (Transactions, Analysis, More), and standard back arrow navigation on sub-destinations.
+  - Removed orphaned imports (such as unused `NavDestination` in `MitavyayApp.kt`) and confirmed zero orphaned click handlers or unused state variables remain.
+  - Updated `UI_UX_Enhancement_Phases.md` and verified all unit tests pass cleanly.
 - Change 7: Transaction date filter added; Batch Add button replaced with folder icon.
   - Replaced the `+` button beside the search bar in `TransactionListScreen` with a date filter folder icon button (`R.drawable.ic_folder_open`).
   - Implemented `DateFilterMenu` dropdown offering: "All Time" (clears filter), "Today", "This Week (Mon–Sun)", "This Month", and "Custom Date...".

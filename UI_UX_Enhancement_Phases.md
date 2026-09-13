@@ -364,9 +364,9 @@
 
 > **What this is:** This is completed as part of Change 1. Tracked here for cross-reference.
 
-- [ ] Confirm all top bar feature icons are removed after Change 1 is complete
-- [ ] Verify: only App title + Refresh icon remain in the top bar
-- [ ] Verify: no orphaned click handlers for removed icons
+- [x] Confirm all top bar feature icons are removed after Change 1 is complete
+- [x] Verify: only App title + Refresh icon remain in the top bar
+- [x] Verify: no orphaned click handlers for removed icons
 
 **Closure:** Included in Change 1 commit.
 
