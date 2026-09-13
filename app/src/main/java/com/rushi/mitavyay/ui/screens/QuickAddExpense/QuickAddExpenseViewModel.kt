@@ -28,6 +28,7 @@ data class QuickAddExpenseUiState(
     val selectedCategory: String? = null,
     val amountPaise: Long = 0L,
     val isExpense: Boolean = true,
+    val selectedDate: Long = System.currentTimeMillis(),
     val description: String = "",
     val notes: String = "",
     val errorMessage: String? = null,
@@ -47,6 +48,7 @@ class QuickAddExpenseViewModel @Inject constructor(
     private data class FormState(
         val amountPaise: Long = 0L,
         val isExpense: Boolean = true,
+        val selectedDate: Long = System.currentTimeMillis(),
         val selectedAccountId: String? = null,
         val selectedCategory: String? = null,
         val description: String = "",
@@ -88,6 +90,7 @@ class QuickAddExpenseViewModel @Inject constructor(
             selectedCategory = effectiveCategory,
             amountPaise = form.amountPaise,
             isExpense = form.isExpense,
+            selectedDate = form.selectedDate,
             description = form.description,
             notes = form.notes,
             errorMessage = form.errorMessage,
@@ -125,6 +128,10 @@ class QuickAddExpenseViewModel @Inject constructor(
         )
     }
 
+    fun onDateSelected(newDate: Long) {
+        _formState.value = _formState.value.copy(selectedDate = newDate)
+    }
+
     fun onDescriptionChange(newDescription: String) {
         _formState.value = _formState.value.copy(description = newDescription)
     }
@@ -158,7 +165,7 @@ class QuickAddExpenseViewModel @Inject constructor(
                 accountId = accountId,
                 amount = amount,
                 description = current.description.trim().ifBlank { category },
-                timestamp = System.currentTimeMillis(),
+                timestamp = current.selectedDate,
                 category = category,
                 tags = "[]",
                 transferId = null,

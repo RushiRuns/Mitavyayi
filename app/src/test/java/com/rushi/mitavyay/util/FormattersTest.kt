@@ -46,4 +46,22 @@ class FormattersTest {
 
         assertEquals("", DateTimeFormatter.formatDate(0L))
     }
+
+    @Test
+    fun dateTimeFormatter_formatRelativeDate() {
+        val now = System.currentTimeMillis()
+        val formattedToday = DateTimeFormatter.formatRelativeDate(now)
+        assert(formattedToday.startsWith("Today, "))
+
+        val calYesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+        val formattedYesterday = DateTimeFormatter.formatRelativeDate(calYesterday.timeInMillis)
+        assert(formattedYesterday.startsWith("Yesterday, "))
+
+        val calPast = Calendar.getInstance().apply {
+            set(2025, Calendar.JANUARY, 15, 10, 0, 0)
+        }
+        val formattedPast = DateTimeFormatter.formatRelativeDate(calPast.timeInMillis)
+        assert(!formattedPast.startsWith("Today") && !formattedPast.startsWith("Yesterday"))
+        assert(formattedPast.contains("15 Jan 2025"))
+    }
 }

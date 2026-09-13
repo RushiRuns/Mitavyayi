@@ -428,4 +428,45 @@ class QuickAddExpenseTest {
         assertEquals("Subscriptions", state.selectedCategory)
         assertTrue(state.categories.any { it.name == "Subscriptions" })
     }
+
+    @Test
+    fun dateSelection_updatesSelectedDate() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        val customDate = 1700000000000L
+        viewModel.onDateSelected(customDate)
+
+        val state = viewModel.uiState.first { it.selectedDate == customDate }
+        assertEquals(customDate, state.selectedDate)
+    }
+
+    @Test
+    fun expense_savedWithCustomSelectedDate() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        val customDate = 1700000000000L // specific past date
+        viewModel.onAmountChange(12000L)
+        viewModel.onDescriptionChange("Past lunch")
+        viewModel.onCategorySelect("Food & Dining")
+        viewModel.onAccountSelect("acc_bank")
+        viewModel.onDateSelected(customDate)
+
+        var callbackTriggered = false
+        viewModel.saveTransaction { callbackTriggered = true }
+
+        assertTrue(callbackTriggered)
+        val tx = fakeTransactionRepository.transactions.first()
+        assertEquals(customDate, tx.timestamp)
+        assertEquals(-12000L, tx.amount)
+    }
+
+    @Test
+    fun formReset_resetsSelectedDate() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        val pastDate = 1700000000000L
+        viewModel.onDateSelected(pastDate)
+        viewModel.resetForm()
+
+        val state = viewModel.uiState.first { !it.isLoading }
+        assertTrue(state.selectedDate > pastDate)
+        assertTrue(kotlin.math.abs(System.currentTimeMillis() - state.selectedDate) < 5000L)
+    }
 }

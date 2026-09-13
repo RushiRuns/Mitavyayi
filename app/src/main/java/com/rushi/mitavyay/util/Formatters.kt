@@ -100,6 +100,27 @@ object DateTimeFormatter {
     }
 
     /**
+     * Formats timestamp into relative date description (e.g. "Today, 13 Sep 2026", "Yesterday, 12 Sep 2026", or "11 Sep 2026").
+     */
+    fun formatRelativeDate(timestampMs: Long): String {
+        if (timestampMs <= 0) return ""
+        val calSelected = Calendar.getInstance().apply { timeInMillis = timestampMs }
+        val calToday = Calendar.getInstance()
+        val isToday = calSelected.get(Calendar.YEAR) == calToday.get(Calendar.YEAR) &&
+                calSelected.get(Calendar.DAY_OF_YEAR) == calToday.get(Calendar.DAY_OF_YEAR)
+        if (isToday) {
+            return "Today, ${formatDate(timestampMs)}"
+        }
+        val calYesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+        val isYesterday = calSelected.get(Calendar.YEAR) == calYesterday.get(Calendar.YEAR) &&
+                calSelected.get(Calendar.DAY_OF_YEAR) == calYesterday.get(Calendar.DAY_OF_YEAR)
+        if (isYesterday) {
+            return "Yesterday, ${formatDate(timestampMs)}"
+        }
+        return formatDate(timestampMs)
+    }
+
+    /**
      * Returns current month in "yyyy-MM" format (e.g. "2026-09").
      */
     fun getCurrentMonthYear(): String {

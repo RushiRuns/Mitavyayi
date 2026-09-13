@@ -3,6 +3,14 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 5: Date picker added to Quick Add Expense.
+  - Added interactive Date row in `QuickAddExpenseSheet` positioned cleanly between Account and Category selectors.
+  - Displays calendar icon (`Icons.Outlined.DateRange`) with human-friendly relative formatting: `"Today, dd MMM yyyy"`, `"Yesterday, dd MMM yyyy"`, or `"dd MMM yyyy"` via `DateTimeFormatter.formatRelativeDate`.
+  - Tapping opens the Material 3 `AppDatePickerDialog` (from `ui/components/DatePicker.kt`), defaulting to today and allowing fast backdating or future date logging.
+  - Added `selectedDate: Long` state and `onDateSelected(newDate: Long)` in `QuickAddExpenseViewModel`.
+  - Stored `selectedDate` as transaction `timestamp` upon persistence in `TransactionRepository.addTransaction()`, automatically resetting to current date on form reset.
+  - Verified `TransactionCard` renders selected transaction dates using `DateTimeFormatter.formatDate(timestamp)`.
+  - Added unit test coverage in `QuickAddExpenseTest` (date updates, custom date persistence, reset behavior) and `FormattersTest` (relative date formatting). All 184 unit tests pass cleanly.
 - Change 4: Notes feature removed from UI (data column preserved).
   - Completely removed the "Notes" field and quick-insert helper chips from `QuickAddExpenseSheet` and `EditTransactionDialog`.
   - Removed Notes detail row, dedicated Notes card, and `EditNoteDialog` from `TransactionDetailScreen`.

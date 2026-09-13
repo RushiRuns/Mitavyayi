@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -49,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.model.CategoryDisplayItem
 import com.rushi.mitavyay.ui.components.AddCategoryDialog
+import com.rushi.mitavyay.ui.components.AppDatePickerDialog
 import com.rushi.mitavyay.ui.components.AppTextField
 import com.rushi.mitavyay.ui.components.CurrencyInput
 import com.rushi.mitavyay.ui.components.PrimaryButton
@@ -59,6 +62,7 @@ import com.rushi.mitavyay.ui.components.parseCategoryColor
 import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.extendedColorScheme
 import com.rushi.mitavyay.ui.theme.spacing
+import com.rushi.mitavyay.util.DateTimeFormatter
 
 import com.rushi.mitavyay.util.hapticError
 import com.rushi.mitavyay.util.hapticLight
@@ -118,6 +122,7 @@ fun QuickAddExpenseSheet(
             onTypeToggle = viewModel::onTypeToggle,
             onAccountSelect = viewModel::onAccountSelect,
             onCategorySelect = viewModel::onCategorySelect,
+            onDateSelected = viewModel::onDateSelected,
             onAddCategoryClick = { showAddCategoryDialog = true },
             onDescriptionChange = viewModel::onDescriptionChange,
             onSubmit = { viewModel.saveTransaction() },
@@ -160,6 +165,7 @@ fun QuickAddExpenseContent(
     onTypeToggle: (Boolean) -> Unit,
     onAccountSelect: (String) -> Unit,
     onCategorySelect: (String) -> Unit,
+    onDateSelected: (Long) -> Unit = {},
     onAddCategoryClick: () -> Unit,
     onDescriptionChange: (String) -> Unit,
     onSubmit: () -> Unit,
@@ -304,6 +310,60 @@ fun QuickAddExpenseContent(
                     )
                 }
             }
+        }
+
+        SpacerMd()
+
+        // Date Field Row
+        var showDatePicker by remember { mutableStateOf(false) }
+
+        Text(
+            text = "Date",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+
+        Surface(
+            onClick = {
+                context.hapticLight(hapticFeedbackEnabled)
+                showDatePicker = true
+            },
+            shape = MaterialTheme.appShapes.small,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MaterialTheme.spacing.md, vertical = MaterialTheme.spacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.DateRange,
+                    contentDescription = "Select Date",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = DateTimeFormatter.formatRelativeDate(uiState.selectedDate),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+
+        if (showDatePicker) {
+            AppDatePickerDialog(
+                initialSelectedDateMs = uiState.selectedDate,
+                onDateSelected = { timestamp ->
+                    onDateSelected(timestamp)
+                    showDatePicker = false
+                },
+                onDismissRequest = { showDatePicker = false }
+            )
         }
 
         SpacerMd()

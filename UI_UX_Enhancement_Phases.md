@@ -267,24 +267,24 @@
 
 ### Tasks
 
-- [ ] Add a date field row in the form (between Account and Category sections)
+- [x] Add a date field row in the form (between Account and Category sections)
   - Display: calendar icon + formatted date (e.g., "Today, 13 Sept 2026")
   - Tapping opens the date picker dialog
-- [ ] Reuse the existing `DatePicker.kt` component (`ui/components/DatePicker.kt`)
-- [ ] Default value: current date (today)
-- [ ] In ViewModel, add `selectedDate: Long` state (unix timestamp, defaults to `System.currentTimeMillis()`)
-- [ ] Pass `selectedDate` as the `timestamp` field when calling `TransactionRepository.addTransaction()`
-- [ ] Confirm `TransactionCard` already displays the formatted date from `transaction.timestamp` — if not, add it
+- [x] Reuse the existing `DatePicker.kt` component (`ui/components/DatePicker.kt`)
+- [x] Default value: current date (today)
+- [x] In ViewModel, add `selectedDate: Long` state (unix timestamp, defaults to `System.currentTimeMillis()`)
+- [x] Pass `selectedDate` as the `timestamp` field when calling `TransactionRepository.addTransaction()`
+- [x] Confirm `TransactionCard` already displays the formatted date from `transaction.timestamp` — if not, add it
 
 **Testing**
-- [ ] Test: Open Quick Add → date defaults to today
-- [ ] Test: Change date to yesterday → transaction saved with yesterday's timestamp
-- [ ] Test: Transaction appears in list with the chosen date
-- [ ] Test: DatePicker opens and closes correctly
+- [x] Test: Open Quick Add → date defaults to today
+- [x] Test: Change date to yesterday → transaction saved with yesterday's timestamp
+- [x] Test: Transaction appears in list with the chosen date
+- [x] Test: DatePicker opens and closes correctly
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 5: Date picker added to Quick Add Expense"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 5: Date picker added to Quick Add Expense"`
 
 ---
 
