@@ -64,4 +64,38 @@ class FormattersTest {
         assert(!formattedPast.startsWith("Today") && !formattedPast.startsWith("Yesterday"))
         assert(formattedPast.contains("15 Jan 2025"))
     }
+
+    @Test
+    fun dateTimeFormatter_formatSectionDateHeader() {
+        val now = System.currentTimeMillis()
+        assertEquals("Today", DateTimeFormatter.formatSectionDateHeader(now))
+
+        val calYesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+        assertEquals("Yesterday", DateTimeFormatter.formatSectionDateHeader(calYesterday.timeInMillis))
+
+        val calPast = Calendar.getInstance().apply {
+            set(2025, Calendar.JANUARY, 15, 10, 0, 0)
+        }
+        val header = DateTimeFormatter.formatSectionDateHeader(calPast.timeInMillis)
+        assertEquals("15 Jan 2025", header)
+
+        assertEquals("", DateTimeFormatter.formatSectionDateHeader(0L))
+    }
+
+    @Test
+    fun dateTimeFormatter_getStartOfDay() {
+        val cal = Calendar.getInstance().apply {
+            set(2026, Calendar.SEPTEMBER, 13, 15, 45, 30)
+            set(Calendar.MILLISECOND, 500)
+        }
+        val startOfDay = DateTimeFormatter.getStartOfDay(cal.timeInMillis)
+        val verifyCal = Calendar.getInstance().apply { timeInMillis = startOfDay }
+        assertEquals(2026, verifyCal.get(Calendar.YEAR))
+        assertEquals(Calendar.SEPTEMBER, verifyCal.get(Calendar.MONTH))
+        assertEquals(13, verifyCal.get(Calendar.DAY_OF_MONTH))
+        assertEquals(0, verifyCal.get(Calendar.HOUR_OF_DAY))
+        assertEquals(0, verifyCal.get(Calendar.MINUTE))
+        assertEquals(0, verifyCal.get(Calendar.SECOND))
+        assertEquals(0, verifyCal.get(Calendar.MILLISECOND))
+    }
 }

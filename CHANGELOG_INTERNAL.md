@@ -3,6 +3,15 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 11: Transactions grouped by date with sticky section headers.
+  - Added `TransactionGroup(dateLabel, transactions)` model and date normalization in `TransactionListViewModel.kt` and `DateTimeFormatter.kt`.
+  - Implemented smart date labeling logic: current date labeled as `"Today"`, previous day labeled as `"Yesterday"`, and other dates formatted as `"dd MMM yyyy"` (e.g. `"15 Jan 2025"`).
+  - Exposed `groupedTransactions: StateFlow<List<TransactionGroup>>` from `TransactionListViewModel` as well as inside `TransactionListUiState`.
+  - Fully integrated grouping with reactive search query matching and date filtering (only displaying date groups containing matching transactions).
+  - Created `DateSectionHeader` composable (`ui/components/DateSectionHeader.kt`) displaying subtle `onSurfaceVariant` date typography and a clean thin horizontal divider on top of the app background.
+  - Replaced flat `LazyColumn` in `TransactionListScreen.kt` with `stickyHeader` per date section, pinning headers seamlessly during scrolling while maintaining item placement animations and swipe-to-delete gestures.
+  - Added unit test coverage for date section formatting, start of day calculations, and ViewModel chronological grouping.
+  - Updated `UTILITIES.md` and `UI_UX_Enhancement_Phases.md`.
 - Change 10: Auto-focus amount input on Quick Add Expense open.
   - Added `FocusRequester` parameter support to `CurrencyInput` (`ui/components/CurrencyInput.kt`), directly attaching it to the internal `OutlinedTextField`.
   - Integrated `LaunchedEffect(Unit)` with a 200ms delay in `QuickAddExpenseContent` (`ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`) to wait for sheet expansion animations before requesting input focus.

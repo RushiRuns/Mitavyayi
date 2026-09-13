@@ -18,11 +18,20 @@ data class TransactionDisplayItem(
     val isCredit: Boolean,
     val accountName: String? = null,
     val transferId: String? = null,
-    val notes: String? = null
+    val notes: String? = null,
+    val timestamp: Long = 0L
 ) {
     val isIncome: Boolean get() = isCredit
     val isTransfer: Boolean get() = !transferId.isNullOrBlank()
 }
+
+/**
+ * Group of transactions for a specific date section header.
+ */
+data class TransactionGroup(
+    val dateLabel: String,
+    val transactions: List<TransactionDisplayItem>
+)
 
 fun Transaction.toDisplayItem(accountName: String? = null): TransactionDisplayItem {
     return TransactionDisplayItem(
@@ -40,6 +49,7 @@ fun Transaction.toDisplayItem(accountName: String? = null): TransactionDisplayIt
         isCredit = amount >= 0,
         accountName = accountName,
         transferId = transferId,
-        notes = notes?.trim()?.ifBlank { null }
+        notes = notes?.trim()?.ifBlank { null },
+        timestamp = timestamp
     )
 }

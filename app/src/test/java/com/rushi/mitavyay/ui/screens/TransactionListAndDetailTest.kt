@@ -554,4 +554,85 @@ class TransactionListAndDetailTest {
         assertTrue(transferItem!!.isTransfer)
         assertFalse(normalItem!!.isTransfer)
     }
+
+    @Test
+    fun transactionList_groupsTransactionsByDate() = runBlocking {
+        val now = System.currentTimeMillis()
+        val calYesterday = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_YEAR, -1) }
+        val calPast = java.util.Calendar.getInstance().apply { set(2025, java.util.Calendar.JANUARY, 15, 12, 0, 0) }
+
+        val txToday1 = Transaction(
+            id = "tx_today_1",
+            accountId = "acc_cash",
+            amount = -1000L,
+            description = "Coffee",
+            timestamp = now,
+            category = "Food & Dining"
+        )
+        val txToday2 = Transaction(
+            id = "tx_today_2",
+            accountId = "acc_cash",
+            amount = -2000L,
+            description = "Snacks",
+            timestamp = now - 1000L,
+            category = "Food & Dining"
+        )
+        val txYesterday = Transaction(
+            id = "tx_yesterday",
+            accountId = "acc_cash",
+            amount = -5000L,
+            description = "Groceries",
+            timestamp = calYesterday.timeInMillis,
+            category = "Groceries"
+        )
+        val txPast = Transaction(
+            id = "tx_past",
+            accountId = "acc_cash",
+            amount = 100000L,
+            description = "Old Income",
+            timestamp = calPast.timeInMillis,
+            category = "Salary"
+        )
+
+        fakeTxRepo.addTransaction(txToday1)
+        fakeTxRepo.addTransaction(txToday2)
+        fakeTxRepo.addTransaction(txYesterday)
+        fakeTxRepo.addTransaction(txPast)
+
+        val viewModel = TransactionListViewModel(fakeTxRepo, fakeAccountRepo)
+        val state = viewModel.uiState.first { it.transactions.size == 4 }
+
+        assertEquals(3, state.groupedTransactions.size)
+
+        // Group 1: Today (2 transactions)
+        val todayGroup = state.groupedTransactions[0]
+        assertEquals("Today", todayGroup.dateLabel)
+        assertEquals(2, todayGroup.transactions.size)
+        assertEquals("tx_today_1", todayGroup.transactions[0].id)
+        assertEquals("tx_today_2", todayGroup.transactions[1].id)
+
+        // Group 2: Yesterday (1 transaction)
+        val yesterdayGroup = state.groupedTransactions[1]
+        assertEquals("Yesterday", yesterdayGroup.dateLabel)
+        assertEquals(1, yesterdayGroup.transactions.size)
+        assertEquals("tx_yesterday", yesterdayGroup.transactions[0].id)
+
+        // Group 3: Past date (1 transaction)
+        val pastGroup = state.groupedTransactions[2]
+        assertEquals("15 Jan 2025", pastGroup.dateLabel)
+        assertEquals(1, pastGroup.transactions.size)
+        assertEquals("tx_past", pastGroup.transactions[0].id)
+
+        // Test search filter preserves grouping
+        viewModel.onSearchQueryChange("Coffee")
+        val filteredState = viewModel.uiState.first { it.searchQuery == "Coffee" && it.transactions.size == 1 }
+        assertEquals(1, filteredState.groupedTransactions.size)
+        assertEquals("Today", filteredState.groupedTransactions[0].dateLabel)
+        assertEquals("tx_today_1", filteredState.groupedTransactions[0].transactions[0].id)
+
+        // Verify exposed groupedTransactions StateFlow
+        val exposedGroups = viewModel.groupedTransactions.first { it.size == 1 }
+        assertEquals(1, exposedGroups.size)
+        assertEquals("Today", exposedGroups[0].dateLabel)
+    }
 }

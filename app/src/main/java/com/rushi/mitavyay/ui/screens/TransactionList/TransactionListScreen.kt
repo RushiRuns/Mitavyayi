@@ -62,6 +62,7 @@ import com.rushi.mitavyay.ui.components.EmptySearchIllustration
 import com.rushi.mitavyay.ui.components.EmptyTransactionsIllustration
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import com.rushi.mitavyay.ui.components.DateSectionHeader
 import com.rushi.mitavyay.ui.components.PullToRefreshBox
 import com.rushi.mitavyay.ui.components.SkeletonTransactionList
 import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
@@ -327,25 +328,34 @@ fun TransactionListContent(
                     }
                 }
                 else -> {
+                    @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(MaterialTheme.spacing.md),
+                        contentPadding = PaddingValues(
+                            start = MaterialTheme.spacing.md,
+                            end = MaterialTheme.spacing.md,
+                            bottom = MaterialTheme.spacing.md
+                        ),
                         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
                     ) {
-                        items(
-                            items = uiState.transactions,
-                            key = { it.id }
-                        ) { item ->
-                            @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-                            SwipeableTransactionCard(
-                                item = item,
-                                onClick = { onTransactionClick(item.id) },
-                                onSwipeDelete = {
-                                    context.hapticLight()
-                                    transactionPendingDelete = item
-                                },
-                                modifier = Modifier.animateItemPlacement()
-                            )
+                        for (group in uiState.groupedTransactions) {
+                            stickyHeader(key = "header_${group.dateLabel}") {
+                                DateSectionHeader(label = group.dateLabel)
+                            }
+                            items(
+                                items = group.transactions,
+                                key = { it.id }
+                            ) { item ->
+                                SwipeableTransactionCard(
+                                    item = item,
+                                    onClick = { onTransactionClick(item.id) },
+                                    onSwipeDelete = {
+                                        context.hapticLight()
+                                        transactionPendingDelete = item
+                                    },
+                                    modifier = Modifier.animateItemPlacement()
+                                )
+                            }
                         }
                     }
                 }

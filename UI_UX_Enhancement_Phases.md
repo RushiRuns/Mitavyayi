@@ -453,22 +453,22 @@
 ### Tasks
 
 **ViewModel**
-- [ ] Transform flat `List<Transaction>` into grouped structure:
+- [x] Transform flat `List<Transaction>` into grouped structure:
   ```kotlin
   data class TransactionGroup(
     val dateLabel: String,      // "Today", "Yesterday", "12 Sept 2026"
     val transactions: List<TransactionDisplayItem>
   )
   ```
-- [ ] Date label logic:
+- [x] Date label logic:
   - today → "Today"
   - yesterday → "Yesterday"
   - otherwise → formatted date (e.g., "12 Sept 2026")
-- [ ] Expose `groupedTransactions: StateFlow<List<TransactionGroup>>`
-- [ ] Grouping must work with date filter (Change 7) and search filter
+- [x] Expose `groupedTransactions: StateFlow<List<TransactionGroup>>`
+- [x] Grouping must work with date filter (Change 7) and search filter
 
 **UI**
-- [ ] Replace flat `LazyColumn` with grouped version using `stickyHeader`:
+- [x] Replace flat `LazyColumn` with grouped version using `stickyHeader`:
   ```kotlin
   LazyColumn {
     for (group in groupedTransactions) {
@@ -477,21 +477,21 @@
     }
   }
   ```
-- [ ] Create `DateSectionHeader` composable:
+- [x] Create `DateSectionHeader` composable:
   - Date label in `onSurfaceVariant` color (subtle)
   - Thin `HorizontalDivider` below
-- [ ] When filtered by search/date: only show groups with matching transactions
+- [x] When filtered by search/date: only show groups with matching transactions
 
 **Testing**
-- [ ] Test: Transactions appear grouped by date
-- [ ] Test: "Today" and "Yesterday" labels correct
-- [ ] Test: Transaction for past date appears in correct group
-- [ ] Test: Search and date filter work with grouped layout
+- [x] Test: Transactions appear grouped by date
+- [x] Test: "Today" and "Yesterday" labels correct
+- [x] Test: Transaction for past date appears in correct group
+- [x] Test: Search and date filter work with grouped layout
 
 **Closure**
-- [ ] Update `UTILITIES.md` with `TransactionGroup` and `DateSectionHeader`
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 11: Transactions grouped by date with section headers"`
+- [x] Update `UTILITIES.md` with `TransactionGroup` and `DateSectionHeader`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 11: Transactions grouped by date with section headers"`
 
 ---
 

@@ -27,6 +27,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
   - *Location*: `data/datastore/PreferencesRepository.kt` & `PreferenceKeys.kt`
 - **UI Display Model Mappers** (`com.rushi.mitavyay.data.model.*`):
   - `toDisplayItem()` extension functions for `Transaction`, `Account`, `Goal`, `Debt`, `RepeatExpense`, and `Category`.
+  - `TransactionGroup(dateLabel, transactions)`: Model representing transactions grouped chronologically under a date section header.
   - Ensures entities are never exposed directly to UI components.
   - Includes transfer flags (`transferId`, `isTransfer`) on `TransactionDisplayItem`.
   - *Location*: `data/model/*DisplayItem.kt`
@@ -86,6 +87,9 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 
 ### Pull-to-Refresh & Containers (`ui/components/PullToRefresh.kt`)
 - `PullToRefreshBox`: Standard Material 3 pull-to-refresh container wrapper managing `PullToRefreshState`, nested scrolling, and haptic feedback with accent green primary spinner on neutral container surface.
+
+### Section Headers & Dividers (`ui/components/DateSectionHeader.kt`)
+- `DateSectionHeader`: Sticky date section header displaying date label in subtle `onSurfaceVariant` with an underlying thin divider for grouped transaction lists.
 
 ### Cards (`ui/components/Cards.kt`)
 - `TransactionCard`: Card displaying title, category, formatted amount (green for income, red for expenses), formatted date, and "Transfer" badge for paired transfer records.

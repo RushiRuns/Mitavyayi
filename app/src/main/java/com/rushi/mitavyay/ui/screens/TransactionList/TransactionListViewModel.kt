@@ -4,16 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rushi.mitavyay.data.model.DateFilter
 import com.rushi.mitavyay.data.model.TransactionDisplayItem
+import com.rushi.mitavyay.data.model.TransactionGroup
 import com.rushi.mitavyay.data.model.matches
 import com.rushi.mitavyay.data.model.toDisplayItem
 import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
+import com.rushi.mitavyay.util.DateTimeFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -23,6 +26,7 @@ data class TransactionListUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val transactions: List<TransactionDisplayItem> = emptyList(),
+    val groupedTransactions: List<TransactionGroup> = emptyList(),
     val searchQuery: String = "",
     val dateFilter: DateFilter = DateFilter.AllTime,
     val errorMessage: String? = null
@@ -66,10 +70,27 @@ class TransactionListViewModel @Inject constructor(
             }
         }
 
+        val grouped = if (filtered.isEmpty()) {
+            emptyList()
+        } else {
+            val groupMap = LinkedHashMap<Long, MutableList<TransactionDisplayItem>>()
+            for (item in filtered) {
+                val startOfDay = DateTimeFormatter.getStartOfDay(item.timestamp)
+                groupMap.getOrPut(startOfDay) { mutableListOf() }.add(item)
+            }
+            groupMap.map { (startOfDay, items) ->
+                TransactionGroup(
+                    dateLabel = DateTimeFormatter.formatSectionDateHeader(startOfDay),
+                    transactions = items
+                )
+            }
+        }
+
         TransactionListUiState(
             isLoading = false,
             isRefreshing = isRefreshing,
             transactions = filtered,
+            groupedTransactions = grouped,
             searchQuery = query,
             dateFilter = dateFilter
         )
@@ -78,6 +99,14 @@ class TransactionListViewModel @Inject constructor(
         started = SharingStarted.Eagerly,
         initialValue = TransactionListUiState(isLoading = true)
     )
+
+    val groupedTransactions: StateFlow<List<TransactionGroup>> = uiState
+        .map { it.groupedTransactions }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList()
+        )
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query

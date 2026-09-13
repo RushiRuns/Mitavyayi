@@ -100,6 +100,42 @@ object DateTimeFormatter {
     }
 
     /**
+     * Returns the timestamp for the start of day (00:00:00.000) for a given timestamp.
+     */
+    fun getStartOfDay(timestampMs: Long): Long {
+        if (timestampMs <= 0) return 0L
+        val cal = Calendar.getInstance().apply {
+            timeInMillis = timestampMs
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        return cal.timeInMillis
+    }
+
+    /**
+     * Formats timestamp into section header date label ("Today", "Yesterday", or formatted date e.g. "12 Sept 2026").
+     */
+    fun formatSectionDateHeader(timestampMs: Long): String {
+        if (timestampMs <= 0) return ""
+        val calSelected = Calendar.getInstance().apply { timeInMillis = timestampMs }
+        val calToday = Calendar.getInstance()
+        val isToday = calSelected.get(Calendar.YEAR) == calToday.get(Calendar.YEAR) &&
+                calSelected.get(Calendar.DAY_OF_YEAR) == calToday.get(Calendar.DAY_OF_YEAR)
+        if (isToday) {
+            return "Today"
+        }
+        val calYesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+        val isYesterday = calSelected.get(Calendar.YEAR) == calYesterday.get(Calendar.YEAR) &&
+                calSelected.get(Calendar.DAY_OF_YEAR) == calYesterday.get(Calendar.DAY_OF_YEAR)
+        if (isYesterday) {
+            return "Yesterday"
+        }
+        return formatDate(timestampMs, "dd MMM yyyy")
+    }
+
+    /**
      * Formats timestamp into relative date description (e.g. "Today, 13 Sep 2026", "Yesterday, 12 Sep 2026", or "11 Sep 2026").
      */
     fun formatRelativeDate(timestampMs: Long): String {
