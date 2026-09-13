@@ -6,6 +6,7 @@ import com.rushi.mitavyay.data.db.Transaction
 import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.CategoryRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
+import com.rushi.mitavyay.data.repository.TransferRepository
 import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,6 +35,7 @@ class QuickAddExpenseTest {
     private lateinit var fakeTransactionRepository: FakeTransactionRepository
     private lateinit var fakeAccountRepository: FakeAccountRepository
     private lateinit var fakeCategoryRepository: FakeCategoryRepository
+    private lateinit var fakeTransferRepository: FakeTransferRepository
     private lateinit var viewModel: QuickAddExpenseViewModel
 
     private class FakeTransactionRepository(
@@ -268,12 +270,76 @@ class QuickAddExpenseTest {
             categoriesMap[id]?.isCustom == true
     }
 
+    private class FakeTransferRepository(
+        private val accountRepository: FakeAccountRepository,
+        private val transactionRepository: FakeTransactionRepository
+    ) : TransferRepository {
+        data class TransferCall(
+            val fromAccountId: String,
+            val toAccountId: String,
+            val amountPaise: Long,
+            val notes: String?
+        )
+
+        val transferCalls = mutableListOf<TransferCall>()
+        var shouldThrow = false
+
+        override suspend fun createTransfer(
+            fromAccountId: String,
+            toAccountId: String,
+            amountPaise: Long,
+            timestamp: Long,
+            notes: String?
+        ): String {
+            if (shouldThrow) throw IllegalStateException("Transfer failed")
+            if (fromAccountId == toAccountId) throw IllegalArgumentException("Cannot transfer to same account")
+            if (amountPaise <= 0L) throw IllegalArgumentException("Amount must be greater than zero")
+
+            val transferId = UUID.randomUUID().toString()
+            transferCalls.add(TransferCall(fromAccountId, toAccountId, amountPaise, notes))
+
+            val fromAcc = accountRepository.accountsMap[fromAccountId]
+            val toAcc = accountRepository.accountsMap[toAccountId]
+
+            val debitTx = Transaction(
+                id = UUID.randomUUID().toString(),
+                accountId = fromAccountId,
+                amount = -amountPaise,
+                description = notes ?: "Transfer to ${toAcc?.name ?: "Account"}",
+                timestamp = timestamp,
+                category = "Transfer",
+                transferId = transferId,
+                notes = notes
+            )
+            val creditTx = Transaction(
+                id = UUID.randomUUID().toString(),
+                accountId = toAccountId,
+                amount = amountPaise,
+                description = notes ?: "Transfer from ${fromAcc?.name ?: "Account"}",
+                timestamp = timestamp,
+                category = "Transfer",
+                transferId = transferId,
+                notes = notes
+            )
+
+            transactionRepository.addTransaction(debitTx)
+            transactionRepository.addTransaction(creditTx)
+
+            return transferId
+        }
+
+        override suspend fun deleteTransfer(transferId: String) {}
+        override suspend fun getTransferTransactions(transferId: String): List<Transaction> =
+            transactionRepository.transactions.filter { it.transferId == transferId }
+    }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeAccountRepository = FakeAccountRepository()
         fakeTransactionRepository = FakeTransactionRepository(fakeAccountRepository)
         fakeCategoryRepository = FakeCategoryRepository()
+        fakeTransferRepository = FakeTransferRepository(fakeAccountRepository, fakeTransactionRepository)
 
         runBlocking {
             fakeAccountRepository.addAccount(
@@ -304,7 +370,8 @@ class QuickAddExpenseTest {
         viewModel = QuickAddExpenseViewModel(
             transactionRepository = fakeTransactionRepository,
             accountRepository = fakeAccountRepository,
-            categoryRepository = fakeCategoryRepository
+            categoryRepository = fakeCategoryRepository,
+            transferRepository = fakeTransferRepository
         )
     }
 
@@ -502,5 +569,87 @@ class QuickAddExpenseTest {
         viewModel.onTypeToggle(isExpense = true)
         val expenseState = viewModel.uiState.first { it.isExpense }
         assertEquals("Food & Dining", expenseState.selectedCategory)
+    }
+
+    @Test
+    fun transferMode_switchesUIStateAndHidesCategory() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        viewModel.onTransferSelect()
+
+        val state = viewModel.uiState.first { it.isTransfer }
+        assertTrue(state.isTransfer)
+        assertEquals("Transfer", state.selectedCategory)
+        assertNotNull(state.selectedAccountId)
+        assertNotNull(state.selectedToAccountId)
+        assertTrue(state.selectedAccountId != state.selectedToAccountId)
+    }
+
+    @Test
+    fun transfer_createsTwoLinkedTransactionsAndUpdatesBalances() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        viewModel.onTransferSelect()
+        viewModel.onAmountChange(50000L) // ₹500.00
+        viewModel.onAccountSelect("acc_bank")
+        viewModel.onToAccountSelect("acc_cash")
+        viewModel.onDescriptionChange("Transfer for savings")
+
+        var callbackTriggered = false
+        viewModel.saveTransaction { callbackTriggered = true }
+
+        assertTrue(callbackTriggered)
+        assertEquals(2, fakeTransactionRepository.transactions.size)
+
+        val debitTx = fakeTransactionRepository.transactions.find { it.accountId == "acc_bank" }
+        val creditTx = fakeTransactionRepository.transactions.find { it.accountId == "acc_cash" }
+
+        assertNotNull(debitTx)
+        assertNotNull(creditTx)
+        assertEquals(-50000L, debitTx?.amount)
+        assertEquals(50000L, creditTx?.amount)
+        assertEquals("Transfer", debitTx?.category)
+        assertEquals("Transfer", creditTx?.category)
+        assertNotNull(debitTx?.transferId)
+        assertEquals(debitTx?.transferId, creditTx?.transferId)
+
+        // Verify account balances updated: bank 100000 - 50000 = 50000; cash 50000 + 50000 = 100000
+        val bankAcc = fakeAccountRepository.getAccount("acc_bank")
+        val cashAcc = fakeAccountRepository.getAccount("acc_cash")
+        assertEquals(50000L, bankAcc?.balance)
+        assertEquals(100000L, cashAcc?.balance)
+    }
+
+    @Test
+    fun transfer_preventsTransferToSameAccount() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        viewModel.onTransferSelect()
+        viewModel.onAmountChange(20000L)
+        viewModel.onAccountSelect("acc_bank")
+        viewModel.onToAccountSelect("acc_bank") // force same account
+
+        var callbackTriggered = false
+        viewModel.saveTransaction { callbackTriggered = true }
+
+        assertFalse(callbackTriggered)
+        assertEquals(0, fakeTransactionRepository.transactions.size)
+        val state = viewModel.uiState.first { it.errorMessage != null }
+        assertEquals("From and To accounts cannot be the same", state.errorMessage)
+    }
+
+    @Test
+    fun transfer_swapAccountsSwapsFromAndTo() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        viewModel.onTransferSelect()
+        viewModel.onAccountSelect("acc_bank")
+        viewModel.onToAccountSelect("acc_cash")
+
+        val beforeSwap = viewModel.uiState.first { it.selectedAccountId == "acc_bank" }
+        assertEquals("acc_bank", beforeSwap.selectedAccountId)
+        assertEquals("acc_cash", beforeSwap.selectedToAccountId)
+
+        viewModel.onSwapAccounts()
+
+        val afterSwap = viewModel.uiState.first { it.selectedAccountId == "acc_cash" }
+        assertEquals("acc_cash", afterSwap.selectedAccountId)
+        assertEquals("acc_bank", afterSwap.selectedToAccountId)
     }
 }

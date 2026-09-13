@@ -8,6 +8,7 @@ import com.rushi.mitavyay.data.model.toDisplayItem
 import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.CategoryRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
+import com.rushi.mitavyay.data.repository.TransferRepository
 import com.rushi.mitavyay.ui.navigation.NavDestination
 import com.rushi.mitavyay.ui.screens.QuickAddExpense.QuickAddExpenseViewModel
 import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailViewModel
@@ -38,6 +39,7 @@ class TransactionNotesTest {
     private lateinit var fakeTxRepo: FakeTransactionRepository
     private lateinit var fakeAccountRepo: FakeAccountRepository
     private lateinit var fakeCategoryRepo: FakeCategoryRepository
+    private lateinit var fakeTransferRepo: FakeTransferRepository
 
     private class FakeAccountRepository : AccountRepository {
         val accountsMap = mutableMapOf(
@@ -179,12 +181,26 @@ class TransactionNotesTest {
         override fun getTotalIncomeByDateRange(start: Long, end: Long): Flow<Long?> = flowOf(0L)
     }
 
+    private class FakeTransferRepository : TransferRepository {
+        override suspend fun createTransfer(
+            fromAccountId: String,
+            toAccountId: String,
+            amountPaise: Long,
+            timestamp: Long,
+            notes: String?
+        ): String = UUID.randomUUID().toString()
+
+        override suspend fun deleteTransfer(transferId: String) {}
+        override suspend fun getTransferTransactions(transferId: String): List<Transaction> = emptyList()
+    }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeAccountRepo = FakeAccountRepository()
         fakeCategoryRepo = FakeCategoryRepository()
         fakeTxRepo = FakeTransactionRepository()
+        fakeTransferRepo = FakeTransferRepository()
     }
 
     @After
@@ -365,7 +381,8 @@ class TransactionNotesTest {
         val viewModel = QuickAddExpenseViewModel(
             transactionRepository = fakeTxRepo,
             accountRepository = fakeAccountRepo,
-            categoryRepository = fakeCategoryRepo
+            categoryRepository = fakeCategoryRepo,
+            transferRepository = fakeTransferRepo
         )
 
         viewModel.onAmountChange(25000L) // 250.00

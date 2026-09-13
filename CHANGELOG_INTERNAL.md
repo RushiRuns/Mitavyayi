@@ -3,6 +3,13 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 16: Transfer button added to Quick Add Expense.
+  - Added third "Transfer" mode button alongside "Expense" and "Income" in `QuickAddExpenseSheet.kt` styled with neutral `secondaryContainer` and `onSecondaryContainer`.
+  - Built Transfer UI with "From Account" and "To Account" dropdowns, account swap action, and category selector hidden via `AnimatedVisibility`.
+  - Auto-focuses amount field when switching to Transfer mode via `LaunchedEffect(uiState.isTransfer)`.
+  - Injected `TransferRepository` into `QuickAddExpenseViewModel.kt` and wired transaction submission to `createTransfer(...)` with validation ensuring distinct source and destination accounts.
+  - Added comprehensive unit tests in `QuickAddExpenseTest.kt` verifying transfer UI state, dual linked transaction generation, balance adjustments, validation against identical accounts, and swap behavior.
+  - Updated `UI_UX_Enhancement_Phases.md`.
 - Change 15: Income mode auto-focuses amount and hides category.
   - Added auto-focus to CurrencyInput amount field when switching between Expense and Income modes in `QuickAddExpenseSheet.kt` using `LaunchedEffect(uiState.isExpense)`.
   - Wrapped Category selector section in `AnimatedVisibility(visible = uiState.isExpense)` so it smoothly hides in Income mode and reveals in Expense mode.

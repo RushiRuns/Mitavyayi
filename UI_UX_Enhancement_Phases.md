@@ -647,27 +647,27 @@
 
 ### Tasks
 
-- [ ] Expand the Expense/Income toggle to a three-option row: `[Expense]` `[Income]` `[Transfer]`
+- [x] Expand the Expense/Income toggle to a three-option row: `[Expense]` `[Income]` `[Transfer]`
   - "Transfer" uses neutral color (`secondaryContainer` or similar grey)
-- [ ] Transfer mode UI:
+- [x] Transfer mode UI:
   - Amount input (same as expense/income)
   - "From Account" dropdown
   - "To Account" dropdown (cannot equal From Account)
   - Category hidden
   - Submit button: "Transfer"
-- [ ] Auto-focus amount field on Transfer mode switch
-- [ ] In ViewModel: on submit in Transfer mode, call `TransferRepository.createTransfer(fromId, toId, amount)`
-- [ ] Validate: From ≠ To
+- [x] Auto-focus amount field on Transfer mode switch
+- [x] In ViewModel: on submit in Transfer mode, call `TransferRepository.createTransfer(fromId, toId, amount)`
+- [x] Validate: From ≠ To
 
 **Testing**
-- [ ] Test: Tap "Transfer" → transfer UI shown
-- [ ] Test: Transfer creates two linked transactions
-- [ ] Test: Cannot select same account for From and To
-- [ ] Test: Transfer appears in transaction list
+- [x] Test: Tap "Transfer" → transfer UI shown
+- [x] Test: Transfer creates two linked transactions
+- [x] Test: Cannot select same account for From and To
+- [x] Test: Transfer appears in transaction list
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 16: Transfer button added to Quick Add Expense"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 16: Transfer button added to Quick Add Expense"`
 
 ---
 

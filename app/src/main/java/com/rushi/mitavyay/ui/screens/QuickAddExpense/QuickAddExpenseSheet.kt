@@ -19,11 +19,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -100,8 +104,8 @@ fun QuickAddExpenseSheet(
     LaunchedEffect(uiState.isSavedSuccessfully) {
         if (uiState.isSavedSuccessfully) {
             context.hapticSuccess(hapticFeedbackEnabled)
-            val typeStr = if (uiState.isExpense) "Expense" else "Income"
-            Toast.makeText(context, "$typeStr added successfully!", Toast.LENGTH_SHORT).show()
+            val typeStr = if (uiState.isTransfer) "Transfer completed successfully!" else if (uiState.isExpense) "Expense added successfully!" else "Income added successfully!"
+            Toast.makeText(context, typeStr, Toast.LENGTH_SHORT).show()
             viewModel.resetForm()
             onDismiss()
         }
@@ -127,7 +131,10 @@ fun QuickAddExpenseSheet(
             onDismiss = onDismiss,
             onAmountChange = viewModel::onAmountChange,
             onTypeToggle = viewModel::onTypeToggle,
+            onTransferSelect = viewModel::onTransferSelect,
             onAccountSelect = viewModel::onAccountSelect,
+            onToAccountSelect = viewModel::onToAccountSelect,
+            onSwapAccounts = viewModel::onSwapAccounts,
             onCategorySelect = viewModel::onCategorySelect,
             onDateSelected = viewModel::onDateSelected,
             onAddCategoryClick = { showAddCategoryDialog = true },
@@ -170,7 +177,10 @@ fun QuickAddExpenseContent(
     onDismiss: () -> Unit,
     onAmountChange: (Long) -> Unit,
     onTypeToggle: (Boolean) -> Unit,
+    onTransferSelect: () -> Unit = {},
     onAccountSelect: (String) -> Unit,
+    onToAccountSelect: (String) -> Unit = {},
+    onSwapAccounts: () -> Unit = {},
     onCategorySelect: (String) -> Unit,
     onDateSelected: (Long) -> Unit = {},
     onAddCategoryClick: () -> Unit,
@@ -185,12 +195,12 @@ fun QuickAddExpenseContent(
 
     var isFirstLaunch by remember { mutableStateOf(true) }
 
-    LaunchedEffect(uiState.isExpense) {
+    LaunchedEffect(uiState.isTransfer, uiState.isExpense) {
         if (isFirstLaunch) {
             isFirstLaunch = false
             delay(200) // Wait for sheet animation to complete on initial open
         } else {
-            delay(100) // Quick switch focus when toggling between Expense and Income
+            delay(100) // Quick switch focus when toggling between Expense, Income, Transfer
         }
         try {
             focusRequester.requestFocus()
@@ -213,7 +223,7 @@ fun QuickAddExpenseContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (uiState.isExpense) "Quick Add Expense" else "Quick Add Income",
+                text = if (uiState.isTransfer) "Transfer Funds" else if (uiState.isExpense) "Quick Add Expense" else "Quick Add Income",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -242,13 +252,13 @@ fun QuickAddExpenseContent(
 
         SpacerSm()
 
-        // Expense / Income Segmented Toggle
+        // Expense / Income / Transfer Segmented Toggle
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
         ) {
             FilterChip(
-                selected = uiState.isExpense,
+                selected = !uiState.isTransfer && uiState.isExpense,
                 onClick = {
                     context.hapticLight(hapticFeedbackEnabled)
                     onTypeToggle(true)
@@ -256,7 +266,7 @@ fun QuickAddExpenseContent(
                 label = {
                     Text(
                         text = "Expense",
-                        fontWeight = if (uiState.isExpense) FontWeight.Bold else FontWeight.Normal,
+                        fontWeight = if (!uiState.isTransfer && uiState.isExpense) FontWeight.Bold else FontWeight.Normal,
                         modifier = Modifier.padding(vertical = MaterialTheme.spacing.xs)
                     )
                 },
@@ -269,7 +279,7 @@ fun QuickAddExpenseContent(
             )
 
             FilterChip(
-                selected = !uiState.isExpense,
+                selected = !uiState.isTransfer && !uiState.isExpense,
                 onClick = {
                     context.hapticLight(hapticFeedbackEnabled)
                     onTypeToggle(false)
@@ -277,13 +287,34 @@ fun QuickAddExpenseContent(
                 label = {
                     Text(
                         text = "Income",
-                        fontWeight = if (!uiState.isExpense) FontWeight.Bold else FontWeight.Normal,
+                        fontWeight = if (!uiState.isTransfer && !uiState.isExpense) FontWeight.Bold else FontWeight.Normal,
                         modifier = Modifier.padding(vertical = MaterialTheme.spacing.xs)
                     )
                 },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = MaterialTheme.extendedColorScheme.success.copy(alpha = 0.2f),
                     selectedLabelColor = MaterialTheme.extendedColorScheme.success
+                ),
+                shape = MaterialTheme.appShapes.small,
+                modifier = Modifier.weight(1f)
+            )
+
+            FilterChip(
+                selected = uiState.isTransfer,
+                onClick = {
+                    context.hapticLight(hapticFeedbackEnabled)
+                    onTransferSelect()
+                },
+                label = {
+                    Text(
+                        text = "Transfer",
+                        fontWeight = if (uiState.isTransfer) FontWeight.Bold else FontWeight.Normal,
+                        modifier = Modifier.padding(vertical = MaterialTheme.spacing.xs)
+                    )
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
                 ),
                 shape = MaterialTheme.appShapes.small,
                 modifier = Modifier.weight(1f)
@@ -296,7 +327,7 @@ fun QuickAddExpenseContent(
         CurrencyInput(
             amountPaise = uiState.amountPaise,
             onAmountChange = onAmountChange,
-            label = if (uiState.isExpense) "Expense Amount" else "Income Amount",
+            label = if (uiState.isTransfer) "Transfer Amount" else if (uiState.isExpense) "Expense Amount" else "Income Amount",
             isError = uiState.errorMessage != null && uiState.amountPaise <= 0L,
             errorMessage = if (uiState.amountPaise <= 0L) uiState.errorMessage else null,
             modifier = Modifier.fillMaxWidth(),
@@ -306,33 +337,86 @@ fun QuickAddExpenseContent(
         SpacerMd()
 
         // Account Selector
-        Text(
-            text = "Account",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+        if (uiState.isTransfer) {
+            val fromAccount = uiState.accounts.find { it.id == uiState.selectedAccountId }
+            val toAccount = uiState.accounts.find { it.id == uiState.selectedToAccountId }
 
-        if (uiState.accounts.isEmpty()) {
-            Text(
-                text = "No active accounts found. Please add an account first.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error
-            )
-        } else {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(uiState.accounts, key = { it.id }) { account ->
-                    AccountChip(
-                        account = account,
-                        isSelected = uiState.selectedAccountId == account.id,
+            if (uiState.accounts.size < 2) {
+                Text(
+                    text = "At least two active accounts are needed to perform a transfer.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            } else {
+                AccountDropdown(
+                    label = "From Account",
+                    selectedAccount = fromAccount,
+                    accounts = uiState.accounts,
+                    onAccountSelected = onAccountSelect,
+                    excludeAccountId = uiState.selectedToAccountId,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    IconButton(
                         onClick = {
                             context.hapticLight(hapticFeedbackEnabled)
-                            onAccountSelect(account.id)
+                            onSwapAccounts()
                         }
-                    )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Swap Accounts",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+
+                AccountDropdown(
+                    label = "To Account",
+                    selectedAccount = toAccount,
+                    accounts = uiState.accounts,
+                    onAccountSelected = onToAccountSelect,
+                    excludeAccountId = uiState.selectedAccountId,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        } else {
+            Text(
+                text = "Account",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+
+            if (uiState.accounts.isEmpty()) {
+                Text(
+                    text = "No active accounts found. Please add an account first.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            } else {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(uiState.accounts, key = { it.id }) { account ->
+                        AccountChip(
+                            account = account,
+                            isSelected = uiState.selectedAccountId == account.id,
+                            onClick = {
+                                context.hapticLight(hapticFeedbackEnabled)
+                                onAccountSelect(account.id)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -392,7 +476,7 @@ fun QuickAddExpenseContent(
         }
 
         // Category Selector (visible in Expense mode only)
-        AnimatedVisibility(visible = uiState.isExpense) {
+        AnimatedVisibility(visible = !uiState.isTransfer && uiState.isExpense) {
             Column {
                 SpacerMd()
                 Text(
@@ -453,8 +537,8 @@ fun QuickAddExpenseContent(
         AppTextField(
             value = uiState.description,
             onValueChange = onDescriptionChange,
-            label = "Description (Optional)",
-            placeholder = "e.g. Grocery shopping, Lunch, Salary",
+            label = if (uiState.isTransfer) "Notes (Optional)" else "Description (Optional)",
+            placeholder = if (uiState.isTransfer) "e.g. Rent share, savings, pocket money" else "e.g. Grocery shopping, Lunch, Salary",
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -472,13 +556,21 @@ fun QuickAddExpenseContent(
         SpacerLg()
 
         // Submit Button
-        val canSubmit = uiState.amountPaise > 0L &&
-                !uiState.selectedAccountId.isNullOrBlank() &&
-                !uiState.selectedCategory.isNullOrBlank() &&
-                !uiState.isSaving
+        val canSubmit = if (uiState.isTransfer) {
+            uiState.amountPaise > 0L &&
+                    !uiState.selectedAccountId.isNullOrBlank() &&
+                    !uiState.selectedToAccountId.isNullOrBlank() &&
+                    uiState.selectedAccountId != uiState.selectedToAccountId &&
+                    !uiState.isSaving
+        } else {
+            uiState.amountPaise > 0L &&
+                    !uiState.selectedAccountId.isNullOrBlank() &&
+                    !uiState.selectedCategory.isNullOrBlank() &&
+                    !uiState.isSaving
+        }
 
         PrimaryButton(
-            text = if (uiState.isExpense) "Add Expense" else "Add Income",
+            text = if (uiState.isTransfer) "Transfer" else if (uiState.isExpense) "Add Expense" else "Add Income",
             onClick = {
                 context.hapticLight(hapticFeedbackEnabled)
                 onSubmit()
@@ -487,6 +579,92 @@ fun QuickAddExpenseContent(
             loading = uiState.isSaving,
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@Composable
+private fun AccountDropdown(
+    label: String,
+    selectedAccount: AccountDisplayItem?,
+    accounts: List<AccountDisplayItem>,
+    onAccountSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    excludeAccountId: String? = null
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val eligibleAccounts = remember(accounts, excludeAccountId) {
+        if (excludeAccountId != null) accounts.filter { it.id != excludeAccountId } else accounts
+    }
+
+    Box(modifier = modifier) {
+        Surface(
+            onClick = { expanded = true },
+            shape = MaterialTheme.appShapes.small,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MaterialTheme.spacing.md, vertical = MaterialTheme.spacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f, fill = false)) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = selectedAccount?.name ?: "Select Account",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (selectedAccount != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline
+                    )
+                    if (selectedAccount != null) {
+                        Text(
+                            text = selectedAccount.balanceFormatted,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Select $label",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            eligibleAccounts.forEach { acc ->
+                DropdownMenuItem(
+                    text = {
+                        Column {
+                            Text(
+                                text = acc.name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (acc.id == selectedAccount?.id) FontWeight.Bold else FontWeight.Normal
+                            )
+                            Text(
+                                text = acc.balanceFormatted,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                    },
+                    onClick = {
+                        onAccountSelected(acc.id)
+                        expanded = false
+                    }
+                )
+            }
+        }
     }
 }
 
