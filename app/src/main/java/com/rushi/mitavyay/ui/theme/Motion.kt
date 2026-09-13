@@ -76,10 +76,10 @@ data class AppMotion(
 
     // Tab crossfade transitions for top-level navigation
     fun tabCrossfadeEnter(): EnterTransition =
-        fadeIn(animationSpec = tween(durationMillis = durationNormal, easing = standard))
+        fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing))
 
     fun tabCrossfadeExit(): ExitTransition =
-        fadeOut(animationSpec = tween(durationMillis = durationFast, easing = standard))
+        fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing))
 }
 
 val LocalAppMotion = staticCompositionLocalOf { AppMotion() }

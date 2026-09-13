@@ -3,6 +3,12 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 12: Smooth animated transitions for bottom tab switching.
+  - Added explicit `enterTransition` and `exitTransition` to the three bottom navigation tab composables in `NavHost.kt` (`NavDestination.TransactionList`, `NavDestination.Analysis`, `NavDestination.More`).
+  - Configured 250ms fade transitions (`fadeIn` / `fadeOut` with `FastOutSlowInEasing`) for seamless crossfading between top-level screens without jarring visual jumps or content pop.
+  - Preserved standard slide transitions for sub-screens (Accounts, Settings, Categories, Debts, Budgets, Goals, Recurring Expenses, Insights, Detail) and dialogs.
+  - Standardized `tabCrossfadeEnter()` and `tabCrossfadeExit()` motion tokens in `AppMotion` (`ui/theme/Motion.kt`) to 250ms with `FastOutSlowInEasing`.
+  - Updated `UI_UX_Enhancement_Phases.md`.
 - Change 11: Transactions grouped by date with sticky section headers.
   - Added `TransactionGroup(dateLabel, transactions)` model and date normalization in `TransactionListViewModel.kt` and `DateTimeFormatter.kt`.
   - Implemented smart date labeling logic: current date labeled as `"Today"`, previous day labeled as `"Yesterday"`, and other dates formatted as `"dd MMM yyyy"` (e.g. `"15 Jan 2025"`).

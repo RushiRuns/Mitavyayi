@@ -505,7 +505,7 @@
 
 ### Tasks
 
-- [ ] In `NavHost.kt`, add `enterTransition` and `exitTransition` for the three bottom-nav destinations:
+- [x] In `NavHost.kt`, add `enterTransition` and `exitTransition` for the three bottom-nav destinations:
   ```kotlin
   composable(
     route = NavDestination.Transactions.route,
@@ -513,17 +513,17 @@
     exitTransition = { fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) }
   ) { TransactionListScreen() }
   ```
-- [ ] Apply same transitions to Analysis and More/Hub composables
-- [ ] Do NOT add transitions to sub-screens (detail screens, dialogs)
+- [x] Apply same transitions to Analysis and More/Hub composables
+- [x] Do NOT add transitions to sub-screens (detail screens, dialogs)
 
 **Testing**
-- [ ] Test: Each tab switch has smooth fade
-- [ ] Test: Fast switching doesn't crash
-- [ ] Test: No white flash or content pop
+- [x] Test: Each tab switch has smooth fade
+- [x] Test: Fast switching doesn't crash
+- [x] Test: No white flash or content pop
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 12: Smooth animated transitions for bottom tab switching"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 12: Smooth animated transitions for bottom tab switching"`
 
 ---
 
