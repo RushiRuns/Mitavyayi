@@ -525,27 +525,27 @@
 ### Feature 4.9: Insights (Basic Statistics)
 
 **Planning**
-- [ ] Simple dashboard with key stats:
+- [x] Simple dashboard with key stats:
   - Total spent this month
   - Average daily spend
   - Largest transaction
   - Most used category
 
 **Implementation**
-- [ ] Create `ui/screens/Insights/InsightsViewModel.kt`
+- [x] Create `ui/screens/Insights/InsightsViewModel.kt`
   - Calculate statistics from transactions
   - All calculation in repository
-- [ ] Create `ui/screens/Insights/InsightsScreen.kt`
+- [x] Create `ui/screens/Insights/InsightsScreen.kt`
   - Display stats in card format
   - Use theme tokens
   - Show previous month for comparison
 
 **Testing**
-- [ ] Test: Stats calculate correctly
-- [ ] Test: Empty state when no data
+- [x] Test: Stats calculate correctly
+- [x] Test: Empty state when no data
 
 **Closure**
-- [ ] Commit: "Feature 4.9: Insights"
+- [x] Commit: "Feature 4.9: Insights"
 
 ### Phase 4 Closure
 

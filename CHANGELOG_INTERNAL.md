@@ -3,6 +3,32 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Feature 4.9: Insights (Basic Statistics) complete.
+  - Implemented simple, high-value financial dashboard providing key statistics for any selected month:
+    - Repository Calculations (`TransactionRepository.kt` & `BasicInsightsCalculator`):
+      - Created `BasicInsightsData` model capturing: `totalSpentThisMonthPaise`, `totalSpentPreviousMonthPaise`, `spendingDeltaPaise`, `spendingPercentageChange`, `isSpendingIncreasing`, `averageDailySpendPaise`, `previousAverageDailySpendPaise`, `daysElapsed`, `totalDaysInMonth`, `largestTransaction`, `mostUsedCategory`, `mostUsedCategoryCount`, `mostUsedCategoryTotalPaise`, `mostUsedCategoryColorHex`, `totalExpenseTransactionsCount`, `totalIncomeThisMonthPaise`, `netSavingsPaise`, and `hasData`.
+      - Strict ADR-000 (offline-only) and ADR-001/ADR-002 (amounts exclusively handled as `Long` paise) compliance.
+      - Implemented `getBasicInsights(monthYear)` on `TransactionRepositoryImpl` by combining `getByDateRange` flows for current and previous months, `CategoryDao` color metadata, and calendar day calculations.
+      - Built `BasicInsightsCalculator.compute` pure calculation engine with customizable date provider for deterministic testing.
+    - View Model & UI (`InsightsViewModel.kt` & `InsightsScreen.kt`):
+      - `InsightsViewModel`: Hilt ViewModel exposing reactive `uiState: StateFlow<InsightsUiState>` with month switching (`previousMonth`, `nextMonth`, `resetToCurrentMonth`, `selectMonth`).
+      - `InsightsScreen`: Material 3 dashboard layout utilizing theme tokens:
+        - Month switcher header with `<` / `>` arrow buttons, formatted month title, and "Back to Current Month" shortcut chip with tactile haptic feedback.
+        - **Total Spent Card**: Total spent headline, previous month comparison pill (`↑ X% vs last month` or `↓ X% vs last month` with delta amount), and total expense transaction count.
+        - **Average Daily Spend Card**: Daily burn rate (`₹/day`) computed across elapsed days in the month, with previous month daily average comparison.
+        - **Largest Transaction Card**: Details of the highest expense of the month (description, formatted amount, category badge, timestamp) with `pressScale` bouncy click navigation to transaction details.
+        - **Most Used Category Card**: Category name, color swatch, frequency count (% of total expenses), and total spent in category.
+        - **Monthly Cash Flow Overview**: Income, Expenses, and Net Savings breakdown.
+        - **Loading & Empty States**: Shimmer skeleton cards during load; `EmptyState` with `EmptyTransactionsIllustration` when no data exists.
+    - Navigation:
+      - Added `NavDestination.Insights` (`route = "insights"`, `title = "Insights"`).
+      - Added top app bar icon button in `MitavyayApp.kt`.
+      - Added quick shortcut card in `AnalysisScreen.kt`.
+      - Wired `InsightsScreen` in `MitavyayNavHost.kt`.
+    - Automated Unit Tests:
+      - Created `InsightsCalculationTest.kt`: 7 tests verifying empty state, total spent and average daily spend calculation, largest transaction identification, most used category frequency and volume, previous month increase/decrease percentage and delta, and days elapsed logic for past/current/future months.
+      - Created `InsightsViewModelTest.kt`: 3 tests verifying initial state loading, month navigation, and explicit month selection.
+    - Updated `UTILITIES.md` and `Finance_App_Project_Phases.md`.
 - Feature 7.5: Micro-Interactions complete.
   - Implemented subtle, delightful micro-interactions across Mitavyay:
     - Loading Skeleton Screens (`SkeletonLoader.kt`):

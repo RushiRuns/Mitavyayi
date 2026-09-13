@@ -1,5 +1,6 @@
 package com.rushi.mitavyay.ui.screens.Analysis
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,7 +69,8 @@ import java.util.Locale
 @Composable
 fun AnalysisScreen(
     modifier: Modifier = Modifier,
-    viewModel: AnalysisViewModel = hiltViewModel()
+    viewModel: AnalysisViewModel = hiltViewModel(),
+    onNavigateToInsights: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -79,6 +81,7 @@ fun AnalysisScreen(
         onNextPeriod = { viewModel.nextPeriod() },
         onAccountSelected = { viewModel.selectAccount(it) },
         onChartTypeSelected = { viewModel.setChartType(it) },
+        onNavigateToInsights = onNavigateToInsights,
         modifier = modifier
     )
 }
@@ -91,6 +94,7 @@ fun AnalysisContent(
     onNextPeriod: () -> Unit,
     onAccountSelected: (String?) -> Unit,
     onChartTypeSelected: (TrendChartType) -> Unit,
+    onNavigateToInsights: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -107,6 +111,57 @@ fun AnalysisContent(
                 ),
                 verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)
             ) {
+                // Quick Shortcut: Insights (Basic Statistics Dashboard)
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onNavigateToInsights),
+                        shape = MaterialTheme.appShapes.medium,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = MaterialTheme.spacing.md, vertical = MaterialTheme.spacing.sm),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Column {
+                                    Text(
+                                        text = "Monthly Insights & Key Stats",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = "Burn rate, largest expense & top categories",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = "Open Insights",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+
                 // 1. Period Selector (Week / Month / Year)
                 item {
                     PeriodSelectorBar(

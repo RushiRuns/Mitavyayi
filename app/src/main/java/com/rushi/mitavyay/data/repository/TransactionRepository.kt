@@ -1,10 +1,12 @@
 package com.rushi.mitavyay.data.repository
 
 import com.rushi.mitavyay.data.db.AccountDao
+import com.rushi.mitavyay.data.db.Category
 import com.rushi.mitavyay.data.db.CategoryDao
 import com.rushi.mitavyay.data.db.DatabaseTransactionRunner
 import com.rushi.mitavyay.data.db.Transaction
 import com.rushi.mitavyay.data.db.TransactionDao
+import com.rushi.mitavyay.util.DateTimeFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
@@ -86,6 +88,30 @@ data class SpendingTrendInsight(
     val hasComparisonData: Boolean = false
 )
 
+data class BasicInsightsData(
+    val monthYear: String = "",
+    val monthYearFormatted: String = "",
+    val previousMonthYearFormatted: String = "",
+    val totalSpentThisMonthPaise: Long = 0L,
+    val totalSpentPreviousMonthPaise: Long = 0L,
+    val spendingDeltaPaise: Long = 0L,
+    val spendingPercentageChange: Float = 0f,
+    val isSpendingIncreasing: Boolean = false,
+    val averageDailySpendPaise: Long = 0L,
+    val previousAverageDailySpendPaise: Long = 0L,
+    val daysElapsed: Int = 1,
+    val totalDaysInMonth: Int = 30,
+    val largestTransaction: Transaction? = null,
+    val mostUsedCategory: String? = null,
+    val mostUsedCategoryCount: Int = 0,
+    val mostUsedCategoryTotalPaise: Long = 0L,
+    val mostUsedCategoryColorHex: String? = null,
+    val totalExpenseTransactionsCount: Int = 0,
+    val totalIncomeThisMonthPaise: Long = 0L,
+    val netSavingsPaise: Long = 0L,
+    val hasData: Boolean = false
+)
+
 interface TransactionRepository {
     fun getAllTransactions(): Flow<List<Transaction>>
     suspend fun getTransactionById(id: String): Transaction?
@@ -114,6 +140,9 @@ interface TransactionRepository {
 
     fun getAccountSpending(start: Long, end: Long): Flow<List<AccountSpending>> = flowOf(emptyList())
     fun getPeriodComparison(currentStart: Long, currentEnd: Long, previousStart: Long, previousEnd: Long, accountId: String? = null): Flow<PeriodComparisonData> = flowOf(PeriodComparisonData())
+
+    // Feature 4.9: Insights
+    fun getBasicInsights(monthYear: String = ""): Flow<BasicInsightsData> = flowOf(BasicInsightsData())
 }
 
 @Singleton
@@ -500,5 +529,137 @@ class TransactionRepositoryImpl @Inject constructor(
         }
 
         return points
+    }
+
+    override fun getBasicInsights(monthYear: String): Flow<BasicInsightsData> {
+        val targetMonthYear = if (monthYear.isBlank()) DateTimeFormatter.getCurrentMonthYear() else monthYear
+        val (curStart, curEnd) = DateTimeFormatter.getMonthStartAndEndTimestamps(targetMonthYear)
+        val prevMonthYear = DateTimeFormatter.getAdjacentMonthYear(targetMonthYear, -1)
+        val (prevStart, prevEnd) = DateTimeFormatter.getMonthStartAndEndTimestamps(prevMonthYear)
+
+        val categoriesFlow = categoryDao?.getAll() ?: flowOf(emptyList())
+
+        return combine(
+            transactionDao.getByDateRange(curStart, curEnd),
+            transactionDao.getByDateRange(prevStart, prevEnd),
+            categoriesFlow
+        ) { currentTxs, prevTxs, categories ->
+            BasicInsightsCalculator.compute(
+                monthYear = targetMonthYear,
+                currentTxs = currentTxs,
+                prevTxs = prevTxs,
+                categories = categories
+            )
+        }
+    }
+}
+
+object BasicInsightsCalculator {
+    fun compute(
+        monthYear: String,
+        currentTxs: List<Transaction>,
+        prevTxs: List<Transaction>,
+        categories: List<Category> = emptyList(),
+        currentDateProvider: () -> Pair<String, Int> = {
+            val cal = Calendar.getInstance()
+            Pair(
+                DateTimeFormatter.getCurrentMonthYear(),
+                cal.get(Calendar.DAY_OF_MONTH)
+            )
+        }
+    ): BasicInsightsData {
+        val parts = monthYear.split("-")
+        val year = parts.getOrNull(0)?.toIntOrNull() ?: 2026
+        val month = parts.getOrNull(1)?.toIntOrNull() ?: 1
+        val cal = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month - 1)
+            set(Calendar.DAY_OF_MONTH, 1)
+        }
+        val totalDaysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+        val prevMonthYear = DateTimeFormatter.getAdjacentMonthYear(monthYear, -1)
+        val prevParts = prevMonthYear.split("-")
+        val prevYear = prevParts.getOrNull(0)?.toIntOrNull() ?: year
+        val prevMonth = prevParts.getOrNull(1)?.toIntOrNull() ?: (if (month == 1) 12 else month - 1)
+        val prevCal = Calendar.getInstance().apply {
+            set(Calendar.YEAR, prevYear)
+            set(Calendar.MONTH, prevMonth - 1)
+            set(Calendar.DAY_OF_MONTH, 1)
+        }
+        val prevTotalDaysInMonth = prevCal.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+        val (nowMonthYear, nowDayOfMonth) = currentDateProvider()
+        val daysElapsed = when {
+            monthYear == nowMonthYear -> nowDayOfMonth.coerceIn(1, totalDaysInMonth)
+            monthYear < nowMonthYear -> totalDaysInMonth
+            else -> 1 // Future month
+        }
+
+        val prevDaysElapsed = when {
+            prevMonthYear == nowMonthYear -> nowDayOfMonth.coerceIn(1, prevTotalDaysInMonth)
+            prevMonthYear < nowMonthYear -> prevTotalDaysInMonth
+            else -> 1
+        }
+
+        val currentExpenses = currentTxs.filter { it.amount < 0 }
+        val currentIncomes = currentTxs.filter { it.amount > 0 }
+        val totalSpentThisMonthPaise = currentExpenses.sumOf { abs(it.amount) }
+        val totalIncomeThisMonthPaise = currentIncomes.sumOf { it.amount }
+        val netSavingsPaise = totalIncomeThisMonthPaise - totalSpentThisMonthPaise
+        val totalExpenseTransactionsCount = currentExpenses.size
+        val hasData = currentTxs.isNotEmpty()
+
+        val prevExpenses = prevTxs.filter { it.amount < 0 }
+        val totalSpentPreviousMonthPaise = prevExpenses.sumOf { abs(it.amount) }
+
+        val spendingDeltaPaise = totalSpentThisMonthPaise - totalSpentPreviousMonthPaise
+        val spendingPercentageChange = if (totalSpentPreviousMonthPaise > 0L) {
+            ((spendingDeltaPaise.toFloat() / totalSpentPreviousMonthPaise.toFloat()) * 100f)
+        } else if (totalSpentThisMonthPaise > 0L) {
+            100f
+        } else {
+            0f
+        }
+        val isSpendingIncreasing = spendingDeltaPaise > 0L
+
+        val averageDailySpendPaise = if (daysElapsed > 0) totalSpentThisMonthPaise / daysElapsed else 0L
+        val previousAverageDailySpendPaise = if (prevDaysElapsed > 0) totalSpentPreviousMonthPaise / prevDaysElapsed else 0L
+
+        val largestTransaction = currentExpenses.maxByOrNull { abs(it.amount) }
+
+        val categoryColorMap = categories.associate { it.name.lowercase(Locale.ROOT) to it.color }
+        val categoryGroups = currentExpenses.groupBy { it.category }
+        val mostUsedEntry = categoryGroups.maxWithOrNull(
+            compareBy({ it.value.size }, { it.value.sumOf { tx -> abs(tx.amount) } })
+        )
+        val mostUsedCategory = mostUsedEntry?.key
+        val mostUsedCategoryCount = mostUsedEntry?.value?.size ?: 0
+        val mostUsedCategoryTotalPaise = mostUsedEntry?.value?.sumOf { abs(it.amount) } ?: 0L
+        val mostUsedCategoryColorHex = mostUsedCategory?.let { categoryColorMap[it.lowercase(Locale.ROOT)] }
+
+        return BasicInsightsData(
+            monthYear = monthYear,
+            monthYearFormatted = DateTimeFormatter.formatMonthYear(monthYear),
+            previousMonthYearFormatted = DateTimeFormatter.formatMonthYear(prevMonthYear),
+            totalSpentThisMonthPaise = totalSpentThisMonthPaise,
+            totalSpentPreviousMonthPaise = totalSpentPreviousMonthPaise,
+            spendingDeltaPaise = spendingDeltaPaise,
+            spendingPercentageChange = spendingPercentageChange,
+            isSpendingIncreasing = isSpendingIncreasing,
+            averageDailySpendPaise = averageDailySpendPaise,
+            previousAverageDailySpendPaise = previousAverageDailySpendPaise,
+            daysElapsed = daysElapsed,
+            totalDaysInMonth = totalDaysInMonth,
+            largestTransaction = largestTransaction,
+            mostUsedCategory = mostUsedCategory,
+            mostUsedCategoryCount = mostUsedCategoryCount,
+            mostUsedCategoryTotalPaise = mostUsedCategoryTotalPaise,
+            mostUsedCategoryColorHex = mostUsedCategoryColorHex,
+            totalExpenseTransactionsCount = totalExpenseTransactionsCount,
+            totalIncomeThisMonthPaise = totalIncomeThisMonthPaise,
+            netSavingsPaise = netSavingsPaise,
+            hasData = hasData
+        )
     }
 }

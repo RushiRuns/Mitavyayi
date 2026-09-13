@@ -11,6 +11,7 @@ import com.rushi.mitavyay.ui.screens.Budget.BudgetListScreen
 import com.rushi.mitavyay.ui.screens.Categories.CategoriesScreen
 import com.rushi.mitavyay.ui.screens.Debt.DebtListScreen
 import com.rushi.mitavyay.ui.screens.Goals.GoalsListScreen
+import com.rushi.mitavyay.ui.screens.Insights.InsightsScreen
 import com.rushi.mitavyay.ui.screens.RepeatExpense.RepeatExpenseListScreen
 import com.rushi.mitavyay.ui.screens.Settings.ImportExportScreen
 import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailScreen
@@ -68,7 +69,11 @@ fun MitavyayNavHost(
             )
         }
         composable(NavDestination.Analysis.route) {
-            AnalysisScreen()
+            AnalysisScreen(
+                onNavigateToInsights = {
+                    navController.navigate(NavDestination.Insights.route)
+                }
+            )
         }
         composable(NavDestination.Accounts.route) {
             AccountsScreen()
@@ -90,6 +95,13 @@ fun MitavyayNavHost(
         }
         composable(NavDestination.Budget.route) {
             BudgetListScreen()
+        }
+        composable(NavDestination.Insights.route) {
+            InsightsScreen(
+                onTransactionClick = { transactionId ->
+                    navController.navigate(NavDestination.TransactionDetail.createRoute(transactionId))
+                }
+            )
         }
         composable(NavDestination.TransactionDetail.route) {
             TransactionDetailScreen(

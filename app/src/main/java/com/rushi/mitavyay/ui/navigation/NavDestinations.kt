@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
@@ -74,6 +75,12 @@ sealed class NavDestination(
         icon = Icons.Default.ShoppingCart
     )
 
+    data object Insights : NavDestination(
+        route = "insights",
+        title = "Insights",
+        icon = Icons.Default.Info
+    )
+
     data object TransactionDetail : NavDestination(
         route = "transaction_detail/{transactionId}",
         title = "Transaction Details",
@@ -104,6 +111,7 @@ sealed class NavDestination(
                 RepeatExpenses.route -> RepeatExpenses
                 Goals.route -> Goals
                 Budget.route -> Budget
+                Insights.route -> Insights
                 "transaction_detail" -> TransactionDetail
                 else -> TransactionList
             }
