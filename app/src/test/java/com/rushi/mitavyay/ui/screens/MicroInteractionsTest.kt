@@ -197,15 +197,6 @@ class MicroInteractionsTest {
     }
 
     @Test
-    fun pullToRefresh_updatesRefreshingState() = runTest {
-        assertFalse(viewModel.uiState.value.isRefreshing)
-
-        viewModel.refresh()
-        advanceTimeBy(500)
-        assertFalse("Should return to false after refresh completes", viewModel.uiState.value.isRefreshing)
-    }
-
-    @Test
     fun swipeToDelete_deletesTransactionAndUpdatesBalance() = runBlocking {
         val txId = UUID.randomUUID().toString()
         val tx = Transaction(

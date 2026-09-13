@@ -1,9 +1,5 @@
 package com.rushi.mitavyay.ui.navigation
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -61,39 +57,39 @@ fun MitavyayNavHost(
             }
         },
         popEnterTransition = {
-            motion.screenPopEnterTransition()
+            val targetRoute = targetState.destination.route
+            val initialRoute = initialState.destination.route
+            if (NavDestination.isTopLevel(targetRoute) && NavDestination.isTopLevel(initialRoute)) {
+                motion.tabCrossfadeEnter()
+            } else {
+                motion.screenPopEnterTransition()
+            }
         },
         popExitTransition = {
-            motion.screenPopExitTransition()
+            val targetRoute = targetState.destination.route
+            val initialRoute = initialState.destination.route
+            if (NavDestination.isTopLevel(targetRoute) && NavDestination.isTopLevel(initialRoute)) {
+                motion.tabCrossfadeExit()
+            } else {
+                motion.screenPopExitTransition()
+            }
         }
     ) {
-        composable(
-            route = NavDestination.TransactionList.route,
-            enterTransition = { fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) },
-            exitTransition = { fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) }
-        ) {
+        composable(route = NavDestination.TransactionList.route) {
             TransactionListScreen(
                 onTransactionClick = { transactionId ->
                     navController.navigate(NavDestination.TransactionDetail.createRoute(transactionId))
                 }
             )
         }
-        composable(
-            route = NavDestination.Analysis.route,
-            enterTransition = { fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) },
-            exitTransition = { fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) }
-        ) {
+        composable(route = NavDestination.Analysis.route) {
             AnalysisScreen(
                 onNavigateToInsights = {
                     navController.navigate(NavDestination.Insights.route)
                 }
             )
         }
-        composable(
-            route = NavDestination.More.route,
-            enterTransition = { fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) },
-            exitTransition = { fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) }
-        ) {
+        composable(route = NavDestination.More.route) {
             HubScreen(
                 onNavigateToAccounts = { navController.navigate(NavDestination.Accounts.route) },
                 onNavigateToDebt = { navController.navigate(NavDestination.Debt.route) },

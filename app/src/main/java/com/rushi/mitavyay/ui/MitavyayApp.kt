@@ -1,10 +1,14 @@
 package com.rushi.mitavyay.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -64,10 +68,19 @@ fun MitavyayApp(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = currentDestination.title,
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    AnimatedContent(
+                        targetState = currentDestination.title,
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) togetherWith
+                                fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing))
+                        },
+                        label = "TopAppBarTitleCrossfade"
+                    ) { title ->
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
                 },
                 navigationIcon = {
                     if (!appState.isTopLevelDestination) {
@@ -99,8 +112,10 @@ fun MitavyayApp(
         floatingActionButton = {
             AnimatedVisibility(
                 visible = showFab,
-                enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut()
+                enter = scaleIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) +
+                    fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)),
+                exit = scaleOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) +
+                    fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing))
             ) {
                 FloatingActionButton(
                     onClick = {

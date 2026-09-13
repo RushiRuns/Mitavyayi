@@ -207,7 +207,7 @@ class AnalysisViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = AnalysisUiState(isLoading = true)
+        initialValue = AnalysisUiState(isLoading = false)
     )
 
     fun selectPeriod(period: AnalysisPeriod) {

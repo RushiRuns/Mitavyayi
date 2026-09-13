@@ -17,14 +17,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TransactionListUiState(
     val isLoading: Boolean = false,
-    val isRefreshing: Boolean = false,
     val transactions: List<TransactionDisplayItem> = emptyList(),
     val groupedTransactions: List<TransactionGroup> = emptyList(),
     val searchQuery: String = "",
@@ -40,16 +38,14 @@ class TransactionListViewModel @Inject constructor(
 
     private val accountsFlow = accountRepository?.getAllAccounts() ?: flowOf(emptyList())
     private val _searchQuery = MutableStateFlow("")
-    private val _isRefreshing = MutableStateFlow(false)
     private val _dateFilter = MutableStateFlow<DateFilter>(DateFilter.AllTime)
 
     val uiState: StateFlow<TransactionListUiState> = combine(
         transactionRepository.getAllTransactions(),
         accountsFlow,
         _searchQuery,
-        _isRefreshing,
         _dateFilter
-    ) { transactions, accounts, query, isRefreshing, dateFilter ->
+    ) { transactions, accounts, query, dateFilter ->
         val accountMap = accounts.associateBy { it.id }
         val allDisplayItems = transactions
             .filter { dateFilter.matches(it.timestamp) }
@@ -88,7 +84,6 @@ class TransactionListViewModel @Inject constructor(
 
         TransactionListUiState(
             isLoading = false,
-            isRefreshing = isRefreshing,
             transactions = filtered,
             groupedTransactions = grouped,
             searchQuery = query,
@@ -97,7 +92,7 @@ class TransactionListViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = TransactionListUiState(isLoading = true)
+        initialValue = TransactionListUiState(isLoading = false)
     )
 
     val groupedTransactions: StateFlow<List<TransactionGroup>> = uiState
@@ -114,14 +109,6 @@ class TransactionListViewModel @Inject constructor(
 
     fun onDateFilterChange(filter: DateFilter) {
         _dateFilter.value = filter
-    }
-
-    fun refresh() {
-        viewModelScope.launch {
-            _isRefreshing.value = true
-            delay(400)
-            _isRefreshing.value = false
-        }
     }
 
     fun deleteTransaction(transactionId: String) {

@@ -63,7 +63,6 @@ import com.rushi.mitavyay.ui.components.EmptyTransactionsIllustration
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.rushi.mitavyay.ui.components.DateSectionHeader
-import com.rushi.mitavyay.ui.components.PullToRefreshBox
 import com.rushi.mitavyay.ui.components.SkeletonTransactionList
 import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
 import com.rushi.mitavyay.util.DateTimeFormatter
@@ -85,7 +84,6 @@ fun TransactionListScreen(
         onSearchQueryChange = viewModel::onSearchQueryChange,
         onDateFilterChange = viewModel::onDateFilterChange,
         onTransactionClick = onTransactionClick,
-        onRefresh = viewModel::refresh,
         onDeleteTransaction = viewModel::deleteTransaction,
         modifier = modifier
     )
@@ -99,7 +97,6 @@ fun TransactionListContent(
     onDateFilterChange: (DateFilter) -> Unit = {},
     onTransactionClick: (String) -> Unit = {},
     onBatchAddClick: (() -> Unit)? = null,
-    onRefresh: () -> Unit = {},
     onDeleteTransaction: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -277,13 +274,11 @@ fun TransactionListContent(
             )
         }
 
-        PullToRefreshBox(
-            isRefreshing = uiState.isRefreshing,
-            onRefresh = onRefresh,
+        Box(
             modifier = Modifier.fillMaxSize()
         ) {
             when {
-                uiState.isLoading -> {
+                uiState.isLoading && uiState.transactions.isEmpty() -> {
                     SkeletonTransactionList(count = 6)
                 }
                 uiState.transactions.isEmpty() -> {

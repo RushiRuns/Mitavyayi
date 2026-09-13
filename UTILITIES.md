@@ -91,9 +91,6 @@ This file serves as the index for all shared utilities, formatters, extensions, 
     - `EmptyGoalsIllustration`: Flag platform milestone with stars.
   - *Location*: `ui/components/IllustrationAssets.kt`
 
-### Pull-to-Refresh & Containers (`ui/components/PullToRefresh.kt`)
-- `PullToRefreshBox`: Standard Material 3 pull-to-refresh container wrapper managing `PullToRefreshState`, nested scrolling, and haptic feedback with accent green primary spinner on neutral container surface.
-
 ### Section Headers & Dividers (`ui/components/DateSectionHeader.kt`)
 - `DateSectionHeader`: Sticky date section header displaying date label in subtle `onSurfaceVariant` with an underlying thin divider for grouped transaction lists.
 

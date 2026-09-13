@@ -99,7 +99,7 @@ fun AnalysisContent(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        if (uiState.isLoading) {
+        if (uiState.isLoading && uiState.isEmpty) {
             LoadingState(message = "Analyzing your spending...")
         } else {
             LazyColumn(
