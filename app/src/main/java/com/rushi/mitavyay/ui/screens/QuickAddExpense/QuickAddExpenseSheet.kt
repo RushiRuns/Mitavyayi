@@ -138,6 +138,7 @@ fun QuickAddExpenseSheet(
             onCategorySelect = viewModel::onCategorySelect,
             onDateSelected = viewModel::onDateSelected,
             onAddCategoryClick = { showAddCategoryDialog = true },
+            onNeedWantToggle = viewModel::onNeedWantToggle,
             onDescriptionChange = viewModel::onDescriptionChange,
             onSubmit = { viewModel.saveTransaction() },
             onBatchAddClick = onBatchAddClick,
@@ -184,6 +185,7 @@ fun QuickAddExpenseContent(
     onCategorySelect: (String) -> Unit,
     onDateSelected: (Long) -> Unit = {},
     onAddCategoryClick: () -> Unit,
+    onNeedWantToggle: (Boolean) -> Unit = {},
     onDescriptionChange: (String) -> Unit,
     onSubmit: () -> Unit,
     onBatchAddClick: (() -> Unit)? = null,
@@ -527,6 +529,60 @@ fun QuickAddExpenseContent(
                             )
                         )
                     }
+                }
+            }
+        }
+
+        // Need / Want Toggle (visible in Expense mode only)
+        AnimatedVisibility(visible = !uiState.isTransfer && uiState.isExpense) {
+            Column {
+                SpacerMd()
+                Text(
+                    text = "Need or Want",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
+                ) {
+                    FilterChip(
+                        selected = uiState.isNeed,
+                        onClick = {
+                            context.hapticLight(hapticFeedbackEnabled)
+                            onNeedWantToggle(true)
+                        },
+                        label = {
+                            Text(
+                                text = "Need",
+                                fontWeight = if (uiState.isNeed) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilterChip(
+                        selected = !uiState.isNeed,
+                        onClick = {
+                            context.hapticLight(hapticFeedbackEnabled)
+                            onNeedWantToggle(false)
+                        },
+                        label = {
+                            Text(
+                                text = "Want",
+                                fontWeight = if (!uiState.isNeed) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }

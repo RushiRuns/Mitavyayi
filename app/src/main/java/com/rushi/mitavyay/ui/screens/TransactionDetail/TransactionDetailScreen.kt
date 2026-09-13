@@ -147,6 +147,25 @@ fun TransactionDetailScreen(
                                     shape = MaterialTheme.appShapes.small
                                 )
                             }
+                            if (!isCredit && !isTransfer) {
+                                SuggestionChip(
+                                    onClick = {},
+                                    label = { Text(if (tx.isNeed) "Need" else "Want") },
+                                    colors = SuggestionChipDefaults.suggestionChipColors(
+                                        containerColor = if (tx.isNeed) {
+                                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                                        } else {
+                                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                                        },
+                                        labelColor = if (tx.isNeed) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.secondary
+                                        }
+                                    ),
+                                    shape = MaterialTheme.appShapes.small
+                                )
+                            }
                         }
 
                         SpacerSm()
@@ -283,14 +302,15 @@ fun TransactionDetailScreen(
                     accounts = uiState.availableAccounts,
                     categories = uiState.availableCategories,
                     onDismiss = { showEditDialog = false },
-                    onSave = { amountPaise, isExpense, description, category, accountId, notes ->
+                    onSave = { amountPaise, isExpense, description, category, accountId, notes, isNeed ->
                         viewModel.updateTransaction(
                             amountPaise = amountPaise,
                             isExpense = isExpense,
                             description = description,
                             category = category,
                             accountId = accountId,
-                            notes = notes
+                            notes = notes,
+                            isNeed = isNeed
                         ) {
                             showEditDialog = false
                             Toast.makeText(context, "Transaction updated", Toast.LENGTH_SHORT).show()

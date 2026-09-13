@@ -11,6 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * Invariant Rule:
  * fallbackToDestructiveMigration() is strictly banned by ARCHITECTURE.md.
  * Version 2: Added budgets entity and MIGRATION_1_2.
+ * Version 3: Added isNeed column to transactions and MIGRATION_2_3.
  */
 @Database(
     entities = [
@@ -23,7 +24,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         Category::class,
         Budget::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -54,6 +55,12 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_budgets_monthYear` ON `budgets` (`monthYear`)")
                 db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_budgets_category_monthYear` ON `budgets` (`category`, `monthYear`)")
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE transactions ADD COLUMN isNeed INTEGER NOT NULL DEFAULT 1")
             }
         }
     }

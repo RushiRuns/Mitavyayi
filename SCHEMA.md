@@ -8,10 +8,11 @@ This document details the complete data model, Room database specifications, con
 
 - **Database Class**: `com.rushi.mitavyay.data.db.AppDatabase`
 - **Database File**: `mitavyay.db`
-- **Schema Version**: 2 (Feature 6.2: Budget Planning & Alerts)
+- **Schema Version**: 3 (Change 17: Need/Want Classification & Donut Chart)
 - **Destructive Migrations**: **BANNED** (`fallbackToDestructiveMigration()` is forbidden by `ARCHITECTURE.md`).
 - **Migrations**:
   - `MIGRATION_1_2`: Creates table `budgets` with indexes `index_budgets_monthYear` and unique composite index `index_budgets_category_monthYear`.
+  - `MIGRATION_2_3`: Adds `isNeed` column (`INTEGER NOT NULL DEFAULT 1`) to `transactions` table.
 
 ---
 
@@ -28,6 +29,7 @@ Represents single ledger transactions (both regular expenses/incomes and transfe
 - `tags`: `String` (JSON array string format, e.g. `["food", "dining"]`)
 - `transferId`: `String?` (Indexed, non-null if this transaction is part of an inter-account transfer)
 - `notes`: `String?`
+- `isNeed`: `Boolean` (Indexed/ColumnInfo default `1`, true = Need, false = Want)
 
 ### 2. `accounts` (`Account.kt`)
 Represents user financial accounts (cash, bank accounts, credit cards).

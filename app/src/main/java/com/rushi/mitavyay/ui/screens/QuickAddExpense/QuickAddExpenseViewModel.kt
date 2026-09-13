@@ -31,6 +31,7 @@ data class QuickAddExpenseUiState(
     val amountPaise: Long = 0L,
     val isExpense: Boolean = true,
     val isTransfer: Boolean = false,
+    val isNeed: Boolean = true,
     val selectedDate: Long = System.currentTimeMillis(),
     val description: String = "",
     val notes: String = "",
@@ -53,6 +54,7 @@ class QuickAddExpenseViewModel @Inject constructor(
         val amountPaise: Long = 0L,
         val isExpense: Boolean = true,
         val isTransfer: Boolean = false,
+        val isNeed: Boolean = true,
         val selectedDate: Long = System.currentTimeMillis(),
         val selectedAccountId: String? = null,
         val selectedToAccountId: String? = null,
@@ -113,6 +115,7 @@ class QuickAddExpenseViewModel @Inject constructor(
             amountPaise = form.amountPaise,
             isExpense = form.isExpense,
             isTransfer = form.isTransfer,
+            isNeed = form.isNeed,
             selectedDate = form.selectedDate,
             description = form.description,
             notes = form.notes,
@@ -148,6 +151,10 @@ class QuickAddExpenseViewModel @Inject constructor(
             selectedCategory = null,
             errorMessage = null
         )
+    }
+
+    fun onNeedWantToggle(isNeed: Boolean) {
+        _formState.value = _formState.value.copy(isNeed = isNeed)
     }
 
     fun onAccountSelect(accountId: String) {
@@ -261,7 +268,8 @@ class QuickAddExpenseViewModel @Inject constructor(
                     category = category,
                     tags = "[]",
                     transferId = null,
-                    notes = current.notes.trim().ifBlank { null }
+                    notes = current.notes.trim().ifBlank { null },
+                    isNeed = if (current.isExpense) current.isNeed else true
                 )
                 transactionRepository.addTransaction(transaction)
                 _formState.value = FormState(isSavedSuccessfully = true)

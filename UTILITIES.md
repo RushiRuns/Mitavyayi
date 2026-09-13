@@ -30,7 +30,13 @@ This file serves as the index for all shared utilities, formatters, extensions, 
   - `TransactionGroup(dateLabel, transactions)`: Model representing transactions grouped chronologically under a date section header.
   - Ensures entities are never exposed directly to UI components.
   - Includes transfer flags (`transferId`, `isTransfer`) on `TransactionDisplayItem`.
+  - Includes `isNeed: Boolean` field on `TransactionDisplayItem` mapped from `Transaction.isNeed`.
   - *Location*: `data/model/*DisplayItem.kt`
+- **Need vs Want Spending Model** (`com.rushi.mitavyay.data.model.NeedWantData`):
+  - Model representing aggregated spending metrics classified into essential Needs vs. discretionary Wants:
+    - `needTotalPaise: Long`, `wantTotalPaise: Long`, `needPercentage: Float`, `wantPercentage: Float`, `needCount: Int`, `wantCount: Int`, `totalExpensePaise: Long`.
+  - Used by `AnalysisViewModel` and `NeedWantBreakdownSection` in `AnalysisScreen`.
+  - *Location*: `data/model/NeedWantData.kt`
 - **Category Icon & Color Utilities** (`com.rushi.mitavyay.ui.components`):
   - `getCategoryIcon(iconName: String): ImageVector`: Maps icon identifiers to safe `material-icons-core` vectors.
   - `CategoryColorOptions`: Curated palette of 16 theme-harmonized hex colors for custom category creation.

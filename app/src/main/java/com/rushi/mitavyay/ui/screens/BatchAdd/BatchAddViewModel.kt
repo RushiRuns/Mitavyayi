@@ -23,6 +23,7 @@ data class BatchTransactionRow(
     val id: String = UUID.randomUUID().toString(),
     val amountPaise: Long = 0L,
     val isExpense: Boolean = true,
+    val isNeed: Boolean = true,
     val description: String = "",
     val category: String = "",
     val accountId: String = "",
@@ -186,7 +187,8 @@ class BatchAddViewModel @Inject constructor(
                         category = row.category,
                         tags = "[]",
                         transferId = null,
-                        notes = row.notes.trim().ifBlank { null }
+                        notes = row.notes.trim().ifBlank { null },
+                        isNeed = if (row.isExpense) row.isNeed else true
                     )
                 }
                 transactionRepository.addTransactions(transactions)

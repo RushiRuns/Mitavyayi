@@ -6,6 +6,7 @@ import com.rushi.mitavyay.data.db.CategoryDao
 import com.rushi.mitavyay.data.db.DatabaseTransactionRunner
 import com.rushi.mitavyay.data.db.Transaction
 import com.rushi.mitavyay.data.db.TransactionDao
+import com.rushi.mitavyay.data.model.NeedWantData
 import com.rushi.mitavyay.util.DateTimeFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -140,6 +141,7 @@ interface TransactionRepository {
 
     fun getAccountSpending(start: Long, end: Long): Flow<List<AccountSpending>> = flowOf(emptyList())
     fun getPeriodComparison(currentStart: Long, currentEnd: Long, previousStart: Long, previousEnd: Long, accountId: String? = null): Flow<PeriodComparisonData> = flowOf(PeriodComparisonData())
+    fun getNeedWantSpending(start: Long, end: Long, accountId: String? = null): Flow<NeedWantData> = flowOf(NeedWantData())
 
     // Feature 4.9: Insights
     fun getBasicInsights(monthYear: String = ""): Flow<BasicInsightsData> = flowOf(BasicInsightsData())
@@ -375,6 +377,35 @@ class TransactionRepositoryImpl @Inject constructor(
                     savingsRate = savingsRate
                 )
             }
+        }
+
+    override fun getNeedWantSpending(
+        start: Long,
+        end: Long,
+        accountId: String?
+    ): Flow<NeedWantData> =
+        transactionDao.getByDateRange(start, end).map { transactions ->
+            val expenses = transactions.filter {
+                it.amount < 0 && it.transferId == null && (accountId == null || it.accountId == accountId)
+            }
+            val needExpenses = expenses.filter { it.isNeed }
+            val wantExpenses = expenses.filter { !it.isNeed }
+
+            val needTotal = needExpenses.sumOf { abs(it.amount) }
+            val wantTotal = wantExpenses.sumOf { abs(it.amount) }
+            val total = needTotal + wantTotal
+
+            val needPct = if (total > 0L) (needTotal.toFloat() / total.toFloat()) * 100f else 0f
+            val wantPct = if (total > 0L) (wantTotal.toFloat() / total.toFloat()) * 100f else 0f
+
+            NeedWantData(
+                needTotalPaise = needTotal,
+                wantTotalPaise = wantTotal,
+                needPercentage = needPct,
+                wantPercentage = wantPct,
+                needCount = needExpenses.size,
+                wantCount = wantExpenses.size
+            )
         }
 
     override fun getAccountSpending(start: Long, end: Long): Flow<List<AccountSpending>> =

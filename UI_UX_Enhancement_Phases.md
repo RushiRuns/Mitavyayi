@@ -695,13 +695,13 @@
 ### Tasks
 
 **Schema Migration (do this first)**
-- [ ] Add `isNeed: Boolean` to `Transaction` entity:
+- [x] Add `isNeed: Boolean` to `Transaction` entity:
   ```kotlin
   @ColumnInfo(defaultValue = "1")
   val isNeed: Boolean = true
   ```
-- [ ] Bump `AppDatabase` version (N → N+1)
-- [ ] Write Room migration:
+- [x] Bump `AppDatabase` version (N → N+1)
+- [x] Write Room migration:
   ```kotlin
   val MIGRATION_N_N1 = object : Migration(N, N+1) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -709,46 +709,46 @@
     }
   }
   ```
-- [ ] Add migration to `AppDatabase.kt` builder
-- [ ] Update `SCHEMA.md`
-- [ ] Create `docs/decisions/ADR-012-NeedWant-Field.md`
+- [x] Add migration to `AppDatabase.kt` builder
+- [x] Update `SCHEMA.md`
+- [x] Create `docs/decisions/ADR-012-NeedWant-Field.md`
 
 **Quick Add Expense Sheet**
-- [ ] Add "Need / Want" `SegmentedButton` or two-option toggle row:
+- [x] Add "Need / Want" `SegmentedButton` or two-option toggle row:
   - Placement: between Category and Description
   - Default: "Need"
   - Hide when Income or Transfer mode is active
-- [ ] Wire to ViewModel: `isNeed: Boolean` state
-- [ ] Pass `isNeed` when calling `addTransaction()`
+- [x] Wire to ViewModel: `isNeed: Boolean` state
+- [x] Pass `isNeed` when calling `addTransaction()`
 
 **Transaction Detail / Edit**
-- [ ] `TransactionDetailScreen.kt`: show "Need" or "Want" chip/badge
-- [ ] `EditTransactionDialog.kt`: add Need/Want toggle for editing
+- [x] `TransactionDetailScreen.kt`: show "Need" or "Want" chip/badge
+- [x] `EditTransactionDialog.kt`: add Need/Want toggle for editing
 
 **Batch Add**
-- [ ] `BatchAddTransactionsDialog.kt`: add Need/Want column per row
+- [x] `BatchAddTransactionsDialog.kt`: add Need/Want column per row
 
 **Analysis Screen**
-- [ ] In `AnalysisViewModel.kt`: aggregate `needTotal` and `wantTotal` for selected date range
-- [ ] In `AnalysisScreen.kt`, add chart section ABOVE "Spending by Category":
+- [x] In `AnalysisViewModel.kt`: aggregate `needTotal` and `wantTotal` for selected date range
+- [x] In `AnalysisScreen.kt`, add chart section ABOVE "Spending by Category":
   - **Title:** "Spending: Need vs. Want"
   - **Chart:** Use existing `PieChart.kt` — two segments
   - Show amounts and percentages below chart
   - Date range selector consistent with rest of Analysis screen
-- [ ] Reuse `PieChart.kt` — do NOT create a new chart component
+- [x] Reuse `PieChart.kt` — do NOT create a new chart component
 
 **Testing**
-- [ ] Test: App launches after migration — no crash
-- [ ] Test: Existing transactions default to "Need" (isNeed = true)
-- [ ] Test: Need/Want toggle in Quick Add saves correctly
-- [ ] Test: Analysis shows correct Need vs. Want split
-- [ ] Test: Chart renders with only Needs, only Wants, or empty state
+- [x] Test: App launches after migration — no crash
+- [x] Test: Existing transactions default to "Need" (isNeed = true)
+- [x] Test: Need/Want toggle in Quick Add saves correctly
+- [x] Test: Analysis shows correct Need vs. Want split
+- [x] Test: Chart renders with only Needs, only Wants, or empty state
 
 **Closure**
-- [ ] Update `SCHEMA.md`
-- [ ] Update `UTILITIES.md` with `NeedWantData`
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 17: Need/Want toggle in Quick Add + Need vs. Want chart in Analysis (with DB migration)"`
+- [x] Update `SCHEMA.md`
+- [x] Update `UTILITIES.md` with `NeedWantData`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 17: Need/Want toggle in Quick Add + Need vs. Want chart in Analysis (with DB migration)"`
 
 ---
 

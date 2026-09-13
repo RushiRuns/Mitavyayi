@@ -296,4 +296,71 @@ class EnhancedAnalysisTest {
         viewModel.setChartType(TrendChartType.LINE)
         assertEquals(TrendChartType.LINE, viewModel.uiState.value.chartType)
     }
+
+    @Test
+    fun needWantSpending_computesSplitAndPercentagesCorrectly() = runBlocking {
+        val now = System.currentTimeMillis()
+        // Needs: ₹600 + ₹400 = ₹1,000 (100,000 paise)
+        transactionDao.insert(Transaction("t1", "acc_1", -60000L, "Rent", now, "Bills", isNeed = true))
+        transactionDao.insert(Transaction("t2", "acc_1", -40000L, "Groceries", now, "Groceries", isNeed = true))
+        // Wants: ₹1,000 (100,000 paise)
+        transactionDao.insert(Transaction("t3", "acc_1", -100000L, "Luxury Watch", now, "Shopping", isNeed = false))
+
+        viewModel = AnalysisViewModel(transactionRepository, categoryRepository, accountRepository)
+        val state = viewModel.uiState.value
+        val needWant = state.needWantData
+
+        assertEquals(100000L, needWant.needTotalPaise)
+        assertEquals(100000L, needWant.wantTotalPaise)
+        assertEquals(200000L, needWant.totalExpensePaise)
+        assertEquals(2, needWant.needCount)
+        assertEquals(1, needWant.wantCount)
+        assertEquals(50.0f, needWant.needPercentage, 0.01f)
+        assertEquals(50.0f, needWant.wantPercentage, 0.01f)
+    }
+
+    @Test
+    fun needWantSpending_withOnlyNeeds_computes100PercentNeed() = runBlocking {
+        val now = System.currentTimeMillis()
+        transactionDao.insert(Transaction("t1", "acc_1", -50000L, "Groceries", now, "Groceries", isNeed = true))
+
+        viewModel = AnalysisViewModel(transactionRepository, categoryRepository, accountRepository)
+        val state = viewModel.uiState.value
+        val needWant = state.needWantData
+
+        assertEquals(50000L, needWant.needTotalPaise)
+        assertEquals(0L, needWant.wantTotalPaise)
+        assertEquals(50000L, needWant.totalExpensePaise)
+        assertEquals(100.0f, needWant.needPercentage, 0.01f)
+        assertEquals(0.0f, needWant.wantPercentage, 0.01f)
+    }
+
+    @Test
+    fun needWantSpending_withOnlyWants_computes100PercentWant() = runBlocking {
+        val now = System.currentTimeMillis()
+        transactionDao.insert(Transaction("t1", "acc_1", -30000L, "Concert", now, "Entertainment", isNeed = false))
+
+        viewModel = AnalysisViewModel(transactionRepository, categoryRepository, accountRepository)
+        val state = viewModel.uiState.value
+        val needWant = state.needWantData
+
+        assertEquals(0L, needWant.needTotalPaise)
+        assertEquals(30000L, needWant.wantTotalPaise)
+        assertEquals(30000L, needWant.totalExpensePaise)
+        assertEquals(0.0f, needWant.needPercentage, 0.01f)
+        assertEquals(100.0f, needWant.wantPercentage, 0.01f)
+    }
+
+    @Test
+    fun needWantSpending_withNoExpenses_computesZeroEmptyState() = runBlocking {
+        viewModel = AnalysisViewModel(transactionRepository, categoryRepository, accountRepository)
+        val state = viewModel.uiState.value
+        val needWant = state.needWantData
+
+        assertEquals(0L, needWant.needTotalPaise)
+        assertEquals(0L, needWant.wantTotalPaise)
+        assertEquals(0L, needWant.totalExpensePaise)
+        assertEquals(0.0f, needWant.needPercentage, 0.01f)
+        assertEquals(0.0f, needWant.wantPercentage, 0.01f)
+    }
 }

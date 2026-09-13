@@ -1,5 +1,6 @@
 package com.rushi.mitavyay.data.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -31,5 +32,7 @@ data class Transaction(
     val category: String,
     val tags: String = "[]",
     val transferId: String? = null,
-    val notes: String? = null
+    val notes: String? = null,
+    @ColumnInfo(defaultValue = "1")
+    val isNeed: Boolean = true
 )

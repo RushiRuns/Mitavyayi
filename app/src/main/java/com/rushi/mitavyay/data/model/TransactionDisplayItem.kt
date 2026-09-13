@@ -19,7 +19,8 @@ data class TransactionDisplayItem(
     val accountName: String? = null,
     val transferId: String? = null,
     val notes: String? = null,
-    val timestamp: Long = 0L
+    val timestamp: Long = 0L,
+    val isNeed: Boolean = true
 ) {
     val isIncome: Boolean get() = isCredit
     val isTransfer: Boolean get() = !transferId.isNullOrBlank()
@@ -50,6 +51,7 @@ fun Transaction.toDisplayItem(accountName: String? = null): TransactionDisplayIt
         accountName = accountName,
         transferId = transferId,
         notes = notes?.trim()?.ifBlank { null },
-        timestamp = timestamp
+        timestamp = timestamp,
+        isNeed = isNeed
     )
 }

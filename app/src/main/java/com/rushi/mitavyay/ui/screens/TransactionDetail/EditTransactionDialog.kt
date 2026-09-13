@@ -54,13 +54,16 @@ fun EditTransactionDialog(
     accounts: List<AccountDisplayItem>,
     categories: List<CategoryDisplayItem>,
     onDismiss: () -> Unit,
-    onSave: (amountPaise: Long, isExpense: Boolean, description: String, category: String, accountId: String, notes: String?) -> Unit
+    onSave: (amountPaise: Long, isExpense: Boolean, description: String, category: String, accountId: String, notes: String?, isNeed: Boolean) -> Unit
 ) {
     var amountPaise by remember(transaction) {
         mutableLongStateOf(abs(transaction.amount))
     }
     var isExpense by remember(transaction) {
         mutableStateOf(transaction.amount < 0)
+    }
+    var isNeed by remember(transaction) {
+        mutableStateOf(transaction.isNeed)
     }
     var description by remember(transaction) {
         mutableStateOf(transaction.description)
@@ -203,6 +206,51 @@ fun EditTransactionDialog(
                     }
                 }
 
+                if (isExpense) {
+                    SpacerMd()
+                    Text(
+                        text = "Need or Want",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
+                    ) {
+                        FilterChip(
+                            selected = isNeed,
+                            onClick = { isNeed = true },
+                            label = {
+                                Text(
+                                    text = "Need",
+                                    fontWeight = if (isNeed) FontWeight.Bold else FontWeight.Normal
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                        FilterChip(
+                            selected = !isNeed,
+                            onClick = { isNeed = false },
+                            label = {
+                                Text(
+                                    text = "Want",
+                                    fontWeight = if (!isNeed) FontWeight.Bold else FontWeight.Normal
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
                 SpacerMd()
 
                 // Description
@@ -251,7 +299,7 @@ fun EditTransactionDialog(
                                 errorMessage = "Please select a category"
                                 return@PrimaryButton
                             }
-                            onSave(amountPaise, isExpense, description, selectedCategoryId, selectedAccountId, transaction.notes)
+                            onSave(amountPaise, isExpense, description, selectedCategoryId, selectedAccountId, transaction.notes, isNeed)
                         },
                         enabled = amountPaise > 0L && selectedAccountId.isNotBlank() && selectedCategoryId.isNotBlank(),
                         modifier = Modifier.weight(1f)

@@ -48,6 +48,7 @@ import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.rushi.mitavyay.data.model.AccountDisplayItem
+import com.rushi.mitavyay.data.model.NeedWantData
 import com.rushi.mitavyay.data.repository.AnalysisPeriod
 import com.rushi.mitavyay.data.repository.AnalysisSummary
 import com.rushi.mitavyay.data.repository.CategorySpending
@@ -234,7 +235,16 @@ fun AnalysisContent(
                         }
                     }
 
-                    // 8. Category Breakdown (Donut Pie Chart, Stacked Composition Bar & Legend)
+                    // 8. Need vs. Want Breakdown (Donut Pie Chart)
+                    if (uiState.needWantData.totalExpensePaise > 0L) {
+                        item {
+                            NeedWantBreakdownSection(
+                                needWantData = uiState.needWantData
+                            )
+                        }
+                    }
+
+                    // 9. Category Breakdown (Donut Pie Chart, Stacked Composition Bar & Legend)
                     if (uiState.categorySpendings.isNotEmpty()) {
                         item {
                             CategoryBreakdownSection(
@@ -682,6 +692,72 @@ fun CategoryBreakdownSection(
 
             // 3. Ranked Detailed Legend
             CategorySpendingLegendList(categorySpendings = categorySpendings)
+        }
+    }
+}
+
+@Composable
+fun NeedWantBreakdownSection(
+    needWantData: NeedWantData,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.appShapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = MaterialTheme.spacing.xs)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.spacing.md)
+        ) {
+            Text(
+                text = "Spending: Need vs. Want",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Essential needs vs. discretionary wants",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.md))
+
+            val needCategory = CategorySpending(
+                category = "Need",
+                totalExpensePaise = needWantData.needTotalPaise,
+                transactionCount = needWantData.needCount,
+                colorHex = "#26A69A",
+                percentage = needWantData.needPercentage
+            )
+            val wantCategory = CategorySpending(
+                category = "Want",
+                totalExpensePaise = needWantData.wantTotalPaise,
+                transactionCount = needWantData.wantCount,
+                colorHex = "#FFA726",
+                percentage = needWantData.wantPercentage
+            )
+            val segments = if (needWantData.totalExpensePaise > 0L) {
+                listOf(needCategory, wantCategory)
+            } else {
+                emptyList()
+            }
+
+            // Reuse existing CategoryDonutChart from PieChart.kt
+            CategoryDonutChart(
+                categorySpendings = segments,
+                totalExpensePaise = needWantData.totalExpensePaise
+            )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.md))
+
+            // Show amounts and percentages below chart
+            if (segments.isNotEmpty()) {
+                CategorySpendingLegendList(categorySpendings = segments)
+            }
         }
     }
 }

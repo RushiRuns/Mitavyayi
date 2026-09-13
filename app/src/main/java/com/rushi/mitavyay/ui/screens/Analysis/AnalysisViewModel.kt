@@ -3,6 +3,7 @@ package com.rushi.mitavyay.ui.screens.Analysis
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rushi.mitavyay.data.model.AccountDisplayItem
+import com.rushi.mitavyay.data.model.NeedWantData
 import com.rushi.mitavyay.data.model.toDisplayItem
 import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.AccountSpending
@@ -54,10 +55,18 @@ data class AnalysisUiState(
     val categorySpendings: List<CategorySpending> = emptyList(),
     val accountSpendings: List<AccountSpending> = emptyList(),
     val timeTrendPoints: List<TimeSpendingPoint> = emptyList(),
+    val needWantData: NeedWantData = NeedWantData(),
     val trendInsight: SpendingTrendInsight = SpendingTrendInsight(),
     val periodComparison: PeriodComparisonData? = null,
     val availableAccounts: List<AccountDisplayItem> = emptyList(),
     val isEmpty: Boolean = true
+)
+
+private data class BaseMetrics(
+    val categories: List<CategorySpending>,
+    val trend: List<TimeSpendingPoint>,
+    val summary: AnalysisSummary,
+    val needWant: NeedWantData
 )
 
 private data class FilterConfig(
@@ -101,9 +110,10 @@ class AnalysisViewModel @Inject constructor(
         val baseMetricsFlow = combine(
             transactionRepository.getCategorySpending(currentRange.startTimestamp, currentRange.endTimestamp, accountId),
             transactionRepository.getTimeSpendingTrend(currentRange.startTimestamp, currentRange.endTimestamp, period, accountId),
-            transactionRepository.getAnalysisSummary(currentRange.startTimestamp, currentRange.endTimestamp, accountId)
-        ) { categories, trend, summary ->
-            Triple(categories, trend, summary)
+            transactionRepository.getAnalysisSummary(currentRange.startTimestamp, currentRange.endTimestamp, accountId),
+            transactionRepository.getNeedWantSpending(currentRange.startTimestamp, currentRange.endTimestamp, accountId)
+        ) { categories, trend, summary, needWant ->
+            BaseMetrics(categories, trend, summary, needWant)
         }
 
         val extendedMetricsFlow = combine(
@@ -121,9 +131,10 @@ class AnalysisViewModel @Inject constructor(
         }
 
         combine(baseMetricsFlow, extendedMetricsFlow) { base, ext ->
-            val categories = base.first
-            val trend = base.second
-            val summary = base.third
+            val categories = base.categories
+            val trend = base.trend
+            val summary = base.summary
+            val needWant = base.needWant
 
             val accountSpendings = ext.first
             val comparison = ext.second
@@ -186,6 +197,7 @@ class AnalysisViewModel @Inject constructor(
                 categorySpendings = categories,
                 accountSpendings = accountSpendings,
                 timeTrendPoints = trend,
+                needWantData = needWant,
                 trendInsight = trendInsight,
                 periodComparison = comparison,
                 availableAccounts = accounts.map { it.toDisplayItem() },

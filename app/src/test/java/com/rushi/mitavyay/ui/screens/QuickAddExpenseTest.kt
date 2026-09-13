@@ -652,4 +652,46 @@ class QuickAddExpenseTest {
         assertEquals("acc_cash", afterSwap.selectedAccountId)
         assertEquals("acc_bank", afterSwap.selectedToAccountId)
     }
+
+    @Test
+    fun needWantToggle_defaultsToNeed_persistsNeed() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        assertTrue(viewModel.uiState.value.isNeed)
+
+        viewModel.onAmountChange(15000L)
+        viewModel.onDescriptionChange("Groceries")
+        viewModel.onCategorySelect("Groceries")
+        viewModel.onAccountSelect("acc_bank")
+
+        var callbackTriggered = false
+        viewModel.saveTransaction { callbackTriggered = true }
+
+        assertTrue(callbackTriggered)
+        assertEquals(1, fakeTransactionRepository.transactions.size)
+        val tx = fakeTransactionRepository.transactions.first()
+        assertTrue(tx.isNeed)
+    }
+
+    @Test
+    fun needWantToggle_toggleToWant_persistsWant() = runBlocking {
+        viewModel.uiState.first { !it.isLoading }
+        assertTrue(viewModel.uiState.value.isNeed)
+
+        // Toggle to Want
+        viewModel.onNeedWantToggle(false)
+        assertFalse(viewModel.uiState.value.isNeed)
+
+        viewModel.onAmountChange(45000L)
+        viewModel.onDescriptionChange("Concert Tickets")
+        viewModel.onCategorySelect("Entertainment")
+        viewModel.onAccountSelect("acc_bank")
+
+        var callbackTriggered = false
+        viewModel.saveTransaction { callbackTriggered = true }
+
+        assertTrue(callbackTriggered)
+        assertEquals(1, fakeTransactionRepository.transactions.size)
+        val tx = fakeTransactionRepository.transactions.first()
+        assertFalse(tx.isNeed)
+    }
 }

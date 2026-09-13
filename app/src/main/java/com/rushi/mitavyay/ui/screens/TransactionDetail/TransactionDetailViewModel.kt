@@ -126,6 +126,7 @@ class TransactionDetailViewModel @Inject constructor(
         category: String,
         accountId: String,
         notes: String? = null,
+        isNeed: Boolean = true,
         onSuccess: () -> Unit = {}
     ) {
         viewModelScope.launch {
@@ -137,7 +138,8 @@ class TransactionDetailViewModel @Inject constructor(
                     description = description.trim().ifBlank { category },
                     category = category,
                     accountId = accountId,
-                    notes = notes?.trim()?.ifBlank { null }
+                    notes = notes?.trim()?.ifBlank { null },
+                    isNeed = if (isExpense) isNeed else true
                 )
                 transactionRepository.updateTransaction(updated)
                 onSuccess()

@@ -3,6 +3,18 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 17: Need/Want toggle in Quick Add + Need vs. Want chart in Analysis (with DB migration).
+  - Implemented Room database schema migration from version 2 to 3 (`MIGRATION_2_3`), adding `isNeed INTEGER NOT NULL DEFAULT 1` to `transactions` table.
+  - Documented architectural decision in `docs/decisions/ADR-012-NeedWant-Field.md` and updated `SCHEMA.md`.
+  - Added `NeedWantData` data model in `data/model/NeedWantData.kt` and documented in `UTILITIES.md`.
+  - Updated `Transaction` entity and `TransactionDisplayItem` with `isNeed: Boolean = true`.
+  - Added `getNeedWantSpending` in `TransactionRepository` and `TransactionRepositoryImpl` to calculate essential vs. discretionary spending totals, counts, and percentages.
+  - Added "Need / Want" toggle row in `QuickAddExpenseSheet.kt` between Category and Description, auto-hidden in Income and Transfer modes via `AnimatedVisibility`.
+  - Added Need/Want SuggestionChip in `TransactionDetailScreen.kt` and editable toggle in `EditTransactionDialog.kt`.
+  - Added Need/Want toggle support in `BatchAddTransactionsDialog.kt` and `BatchAddViewModel.kt`.
+  - Added "Spending: Need vs. Want" donut chart card in `AnalysisScreen.kt` placed directly above "Spending by Category", reusing `CategoryDonutChart` from `PieChart.kt` with two segments and legend.
+  - Added comprehensive unit tests in `QuickAddExpenseTest.kt`, `EnhancedAnalysisTest.kt`, and `Migration2To3Test.kt`.
+  - Updated `UI_UX_Enhancement_Phases.md`.
 - Change 16: Transfer button added to Quick Add Expense.
   - Added third "Transfer" mode button alongside "Expense" and "Income" in `QuickAddExpenseSheet.kt` styled with neutral `secondaryContainer` and `onSecondaryContainer`.
   - Built Transfer UI with "From Account" and "To Account" dropdowns, account swap action, and category selector hidden via `AnimatedVisibility`.

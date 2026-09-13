@@ -322,6 +322,35 @@ private fun BatchRowCard(
                 )
             }
 
+            if (row.isExpense) {
+                SpacerSm()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)
+                ) {
+                    FilterChip(
+                        selected = row.isNeed,
+                        onClick = { onUpdate(row.copy(isNeed = true)) },
+                        label = { Text("Need", fontWeight = if (row.isNeed) FontWeight.Bold else FontWeight.Normal) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilterChip(
+                        selected = !row.isNeed,
+                        onClick = { onUpdate(row.copy(isNeed = false)) },
+                        label = { Text("Want", fontWeight = if (!row.isNeed) FontWeight.Bold else FontWeight.Normal) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
             SpacerSm()
 
             // Amount Input
