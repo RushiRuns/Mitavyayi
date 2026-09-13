@@ -99,7 +99,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 
 ### Inputs & Date Selection (`ui/components/Inputs.kt`, `CurrencyInput.kt`, `DatePicker.kt`)
 - `AppTextField`: Outlined text field wrapper with theme token colors, shapes, and error state validation feedback.
-- `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, and direct `Long` paise conversion.
+- `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, direct `Long` paise conversion, and `focusRequester` support.
 - `DatePickerField`, `AppDatePickerDialog`, & `AppDateRangePickerDialog`: Date and date-range selection components launching Material 3 DatePickerDialog / DateRangePickerDialog and emitting Unix timestamp ms (`Long`).
 - `DateFilter` (`com.rushi.mitavyay.data.model.DateFilter`):
   - Sealed class representing chronological transaction filtering: `AllTime`, `Today`, `ThisWeek` (Mon–Sun), `ThisMonth`, and `CustomRange(startDateMs, endDateMs)`.

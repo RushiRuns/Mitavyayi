@@ -420,24 +420,24 @@
 
 ### Tasks
 
-- [ ] Add `FocusRequester` for the amount `TextField`
-- [ ] Attach it to the amount input field via `.focusRequester(focusRequester)` modifier
-- [ ] Request focus when sheet opens:
+- [x] Add `FocusRequester` for the amount `TextField`
+- [x] Attach it to the amount input field via `.focusRequester(focusRequester)` modifier
+- [x] Request focus when sheet opens:
   ```kotlin
   LaunchedEffect(Unit) {
     delay(200) // Wait for sheet animation to complete
     focusRequester.requestFocus()
   }
   ```
-- [ ] Ensure `keyboardType = KeyboardType.Decimal` on the amount field
+- [x] Ensure `keyboardType = KeyboardType.Decimal` on the amount field
 
 **Testing**
-- [ ] Test: Open Quick Add sheet → keyboard opens automatically on amount field
-- [ ] Test: Works on both Expense and Income modes
+- [x] Test: Open Quick Add sheet → keyboard opens automatically on amount field
+- [x] Test: Works on both Expense and Income modes
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 10: Auto-focus amount input on Quick Add Expense open"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 10: Auto-focus amount input on Quick Add Expense open"`
 
 ---
 

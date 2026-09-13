@@ -3,6 +3,13 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 10: Auto-focus amount input on Quick Add Expense open.
+  - Added `FocusRequester` parameter support to `CurrencyInput` (`ui/components/CurrencyInput.kt`), directly attaching it to the internal `OutlinedTextField`.
+  - Integrated `LaunchedEffect(Unit)` with a 200ms delay in `QuickAddExpenseContent` (`ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`) to wait for sheet expansion animations before requesting input focus.
+  - Soft keyboard automatically opens focused on the amount field upon opening the Quick Add Expense bottom sheet, eliminating extra user taps.
+  - Functions identically and seamlessly across both Expense and Income entry modes.
+  - Confirmed `keyboardType = KeyboardType.Decimal` remains strictly enforced on the monetary field.
+  - Updated `UTILITIES.md` and `UI_UX_Enhancement_Phases.md`.
 - Change 9: Fixed pull-to-refresh positioning in Transactions tab.
   - Resolved pull-to-refresh indicator positioning so it triggers and animates cleanly below the search bar and date filter chips rather than stuck at the top of the screen.
   - Implemented `PullToRefreshBox` (`ui/components/PullToRefresh.kt`) adhering to Material 3 semantics with accent green spinner (`MaterialTheme.colorScheme.primary`) on neutral container surface.

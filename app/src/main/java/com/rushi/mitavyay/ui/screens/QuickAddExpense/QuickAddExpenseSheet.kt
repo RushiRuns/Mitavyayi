@@ -44,12 +44,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.delay
 import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.model.CategoryDisplayItem
 import com.rushi.mitavyay.ui.components.AddCategoryDialog
@@ -175,9 +177,19 @@ fun QuickAddExpenseContent(
     onSubmit: () -> Unit,
     onBatchAddClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    hapticFeedbackEnabled: Boolean = true
+    hapticFeedbackEnabled: Boolean = true,
+    focusRequester: FocusRequester = remember { FocusRequester() }
 ) {
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        delay(200) // Wait for sheet animation to complete
+        try {
+            focusRequester.requestFocus()
+        } catch (_: Exception) {
+            // Focus requester may fail if sheet is detached or not yet composed
+        }
+    }
 
     Column(
         modifier = modifier
@@ -279,7 +291,8 @@ fun QuickAddExpenseContent(
             label = if (uiState.isExpense) "Expense Amount" else "Income Amount",
             isError = uiState.errorMessage != null && uiState.amountPaise <= 0L,
             errorMessage = if (uiState.amountPaise <= 0L) uiState.errorMessage else null,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            focusRequester = focusRequester
         )
 
         SpacerMd()

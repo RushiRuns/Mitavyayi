@@ -15,6 +15,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,7 +43,8 @@ fun CurrencyInput(
     isError: Boolean = false,
     errorMessage: String? = null,
     enabled: Boolean = true,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    focusRequester: FocusRequester? = null
 ) {
     // Maintain internal string representation while user is typing
     var textValue by remember(amountPaise) {
@@ -62,7 +65,9 @@ fun CurrencyInput(
                 val parsedPaise = CurrencyFormatter.parseToPaise(filtered)
                 onAmountChange(parsedPaise)
             },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier),
             enabled = enabled,
             singleLine = true,
             label = { Text(text = label, style = MaterialTheme.typography.bodySmall) },
