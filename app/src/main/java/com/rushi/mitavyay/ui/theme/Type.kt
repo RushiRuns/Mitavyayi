@@ -13,7 +13,10 @@ import androidx.compose.ui.unit.sp
 
 // ==============================================================================
 // App Typography Tokens (xs: 12sp, sm: 13sp, body: 15sp, lg: 18sp, xl: 20sp, title: 24sp)
-// Supports global font scaling dynamically via fontScale parameter
+// Supports global font scaling dynamically via fontScale parameter.
+// Sizes/line-heights unchanged - this is orthogonal to theme colors. Only the
+// letter-spacing on xl/title was tightened slightly so headings read crisper
+// against the new surfaces instead of feeling loose.
 // ==============================================================================
 
 @Immutable
@@ -78,14 +81,14 @@ fun getAppTypography(
             fontWeight = FontWeight.SemiBold,
             fontSize = xlSize,
             lineHeight = (26 * fontScale).sp,
-            letterSpacing = 0.sp
+            letterSpacing = (-0.1).sp
         ),
         title = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = titleSize,
             lineHeight = (30 * fontScale).sp,
-            letterSpacing = 0.sp
+            letterSpacing = (-0.25).sp
         )
     )
 }
@@ -102,14 +105,14 @@ fun getTypography(
             fontWeight = FontWeight.Bold,
             fontSize = (32 * fontScale).sp,
             lineHeight = (40 * fontScale).sp,
-            letterSpacing = 0.sp
+            letterSpacing = (-0.25).sp
         ),
         displayMedium = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight.SemiBold,
             fontSize = (28 * fontScale).sp,
             lineHeight = (36 * fontScale).sp,
-            letterSpacing = 0.sp
+            letterSpacing = (-0.25).sp
         ),
         displaySmall = tokens.title,
         headlineLarge = tokens.title.copy(fontWeight = FontWeight.SemiBold),

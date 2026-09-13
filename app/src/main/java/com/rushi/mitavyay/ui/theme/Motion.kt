@@ -23,7 +23,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 
 /**
  * Standardized motion and animation tokens for Mitavyay.
- * Provides consistent durations, easings, and transition specifications.
+ * Unchanged from before - durations/easing don't need to differ by theme.
  */
 @Immutable
 data class AppMotion(

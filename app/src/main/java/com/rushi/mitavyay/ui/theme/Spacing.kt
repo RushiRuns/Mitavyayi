@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 
 // ==============================================================================
 // Spacing scale: xs (4dp), sm (8dp), md (16dp), lg (24dp), xl (32dp)
-// Custom Spacing class with computed values for consistency
+// Unchanged from before - layout spacing doesn't need to differ by theme.
 // ==============================================================================
 
 @Immutable

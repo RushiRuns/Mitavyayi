@@ -11,47 +11,68 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 // =========================================================================
-// Mitavyay Color Palette - Neutral Grey Foundation with Green Accent
+// Mitavyay Color Palette v2
+// Dark theme  -> cool graphite scale (slight blue undertone), more elevation
+//                steps so surfaces actually separate from the background.
+// Light theme -> warm greige scale (not stark white-on-white).
+// Green stays the accent in both, tuned per-theme for real AA contrast.
 // =========================================================================
 
 // -------------------------------------------------------------------------
-// Accent Tokens (Green - Used selectively for CTAs, FABs, Income, Highlights)
+// Green tonal ramp (single source of truth for every green used below)
 // -------------------------------------------------------------------------
-val AccentGreen = Color(0xFF4CAF50)              // Primary brand green / Income accent
-val AccentGreenDark = Color(0xFF388E3C)          // High contrast green for light surfaces (WCAG AA)
-val AccentGreenLight = Color(0xFF81C784)         // High contrast pastel green for dark surfaces (WCAG AA)
-val AccentGreenContainer = Color(0xFFE8F5E9)     // Subtle green container for light theme highlights
-val AccentGreenContainerDark = Color(0xFF1B382B) // Subtle dark green container for dark theme highlights
+val Green50 = Color(0xFFE8F5E9)
+val Green100 = Color(0xFFC8E6C9)
+val Green200 = Color(0xFFA5D6A7)
+val Green300 = Color(0xFF81C784)
+val Green400 = Color(0xFF66BB6A)
+val Green500 = Color(0xFF4CAF50)
+val Green600 = Color(0xFF43A047)
+val Green700 = Color(0xFF388E3C)
+val Green800 = Color(0xFF2E7D32)
+val Green900 = Color(0xFF1B5E20)
 
 // -------------------------------------------------------------------------
-// Light Theme Neutrals (Off-White & Pure Grey Hierarchy)
+// Accent Tokens (Used for CTAs, FABs, Income, Highlights)
 // -------------------------------------------------------------------------
-val LightBackground = Color(0xFFF5F5F5)
+val AccentGreen = Green500                        // Base brand green (icons, decorative)
+val AccentGreenDark = Green800                    // 0xFF2E7D32 - text/icon on light surfaces, ~5:1 on white
+val AccentGreenLight = Green300                   // 0xFF81C784 - text/icon on dark surfaces, ~10:1 on graphite bg
+val AccentGreenContainer = Color(0xFFE3F2E4)      // Warm-tinted green container for light theme
+val AccentGreenContainerDark = Color(0xFF1D3324)  // Green blended into the graphite scale for dark theme
+
+// -------------------------------------------------------------------------
+// Light Theme Neutrals (warm greige, not flat white/grey)
+// -------------------------------------------------------------------------
+val LightBackground = Color(0xFFF7F7F4)
 val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFEEEEEE)
-val LightOnSurface = Color(0xFF121212)
-val LightOnSurfaceSecondary = Color(0xFF757575)
-val LightDivider = Color(0xFFE0E0E0)
-val LightOutline = Color(0xFFBDBDBD)
+val LightSurfaceVariant = Color(0xFFEFEFEA)
+val LightSurfaceElevated = Color(0xFFFBFBF9)      // for a card sitting on top of another card
+val LightOnSurface = Color(0xFF1B1D1B)
+val LightOnSurfaceSecondary = Color(0xFF6C6F6A)
+val LightDivider = Color(0xFFE5E5DF)
+val LightOutline = Color(0xFFC9CAC3)
 
 // -------------------------------------------------------------------------
-// Dark Theme Neutrals (Deep Charcoal & Pure Grey Hierarchy)
+// Dark Theme Neutrals (cool graphite, slight blue undertone, 4 elevation tiers)
 // -------------------------------------------------------------------------
-val DarkBackground = Color(0xFF121212)
-val DarkSurface = Color(0xFF1E1E1E)
-val DarkSurfaceVariant = Color(0xFF2A2A2A)
-val DarkSurfaceElevated = Color(0xFF333333)
-val DarkOnSurface = Color(0xFFE0E0E0)
-val DarkOnSurfaceSecondary = Color(0xFF9E9E9E)
-val DarkDivider = Color(0xFF3A3A3A)
-val DarkOutline = Color(0xFF555555)
+val DarkBackground = Color(0xFF0F1113)
+val DarkSurface = Color(0xFF161A1D)
+val DarkSurfaceVariant = Color(0xFF1E2226)
+val DarkSurfaceElevated = Color(0xFF262B30)       // cards
+val DarkSurfaceElevated2 = Color(0xFF31373D)      // dialogs, bottom sheets, card-on-card
+val DarkOnSurface = Color(0xFFECEDEE)
+val DarkOnSurfaceSecondary = Color(0xFFA6ADB4)
+val DarkDivider = Color(0xFF2E3338)
+val DarkOutline = Color(0xFF4A5158)
 
 // -------------------------------------------------------------------------
-// Semantic Financial Colors
+// Semantic Financial Colors (flat swatches, same in both themes - used for
+// category chips/icons rather than text-on-background, so vividness > contrast)
 // -------------------------------------------------------------------------
-val ExpenseRed = Color(0xFFE53935)
-val IncomeGreen = AccentGreen                    // 0xFF4CAF50
-val WarningAmber = Color(0xFFFFA000)
+val ExpenseRed = Color(0xFFE0483D)
+val IncomeGreen = AccentGreen
+val WarningAmber = Color(0xFFF2A93C)
 
 // ==========================================
 // Primary Brand Colors (Accent Green)
@@ -59,41 +80,41 @@ val WarningAmber = Color(0xFFFFA000)
 val PrimaryLight = AccentGreenDark
 val OnPrimaryLight = Color(0xFFFFFFFF)
 val PrimaryContainerLight = AccentGreenContainer
-val OnPrimaryContainerLight = Color(0xFF1B5E20)
+val OnPrimaryContainerLight = Color(0xFF163519)
 
 val PrimaryDark = AccentGreenLight
-val OnPrimaryDark = Color(0xFF003816)
+val OnPrimaryDark = Color(0xFF0B2B12)
 val PrimaryContainerDark = AccentGreenContainerDark
-val OnPrimaryContainerDark = Color(0xFFA5D6A7)
+val OnPrimaryContainerDark = Color(0xFFA8D9AC)
 
 // ==========================================
-// Secondary Colors (Neutral Slate / Grey)
+// Secondary Colors (Neutral, matched to each theme's undertone)
 // ==========================================
-val SecondaryLight = Color(0xFF5F6368)
+val SecondaryLight = Color(0xFF5F6359)            // warm slate, matches greige bg
 val OnSecondaryLight = Color(0xFFFFFFFF)
 val SecondaryContainerLight = LightSurfaceVariant
-val OnSecondaryContainerLight = Color(0xFF212121)
+val OnSecondaryContainerLight = Color(0xFF1F211D)
 
-val SecondaryDark = Color(0xFFB0B0B0)
-val OnSecondaryDark = Color(0xFF1E1E1E)
+val SecondaryDark = Color(0xFFA9B0B6)             // cool slate, matches graphite bg
+val OnSecondaryDark = Color(0xFF1E2226)
 val SecondaryContainerDark = DarkSurfaceVariant
-val OnSecondaryContainerDark = Color(0xFFE0E0E0)
+val OnSecondaryContainerDark = Color(0xFFDDE2E6)
 
 // ==========================================
-// Tertiary Colors (Cool Slate for Badges/Charts)
+// Tertiary Colors (blue-slate, for badges/charts - keeps a 2nd hue in the system)
 // ==========================================
-val TertiaryLight = Color(0xFF455A64)
+val TertiaryLight = Color(0xFF45607A)
 val OnTertiaryLight = Color(0xFFFFFFFF)
-val TertiaryContainerLight = Color(0xFFECEFF1)
-val OnTertiaryContainerLight = Color(0xFF1C2B32)
+val TertiaryContainerLight = Color(0xFFE1E9F0)
+val OnTertiaryContainerLight = Color(0xFF16283A)
 
-val TertiaryDark = Color(0xFF90A4AE)
-val OnTertiaryDark = Color(0xFF101B20)
-val TertiaryContainerDark = Color(0xFF263238)
-val OnTertiaryContainerDark = Color(0xFFCFD8DC)
+val TertiaryDark = Color(0xFF9FC1DE)
+val OnTertiaryDark = Color(0xFF0C2436)
+val TertiaryContainerDark = Color(0xFF223B4E)
+val OnTertiaryContainerDark = Color(0xFFC6E1F2)
 
 // ==========================================
-// Background & Surface Colors (Neutral Grey)
+// Background & Surface Colors
 // ==========================================
 val BackgroundLight = LightBackground
 val OnBackgroundLight = LightOnSurface
@@ -116,38 +137,38 @@ val OutlineVariantDark = DarkDivider
 // ==========================================
 // Status & Semantic Colors (Error, Success, Warning)
 // ==========================================
-// Error (e.g. Expenses, over-budget)
-val ErrorLight = Color(0xFFD32F2F)
+// Error (e.g. Expenses, over-budget) - warm terracotta-red, not the stock Material red
+val ErrorLight = Color(0xFFC4453A)
 val OnErrorLight = Color(0xFFFFFFFF)
-val ErrorContainerLight = Color(0xFFFFEBEE)
-val OnErrorContainerLight = Color(0xFFC62828)
+val ErrorContainerLight = Color(0xFFFBE6E3)
+val OnErrorContainerLight = Color(0xFF5C160E)
 
-val ErrorDark = Color(0xFFFF8A80)
-val OnErrorDark = Color(0xFF490005)
-val ErrorContainerDark = Color(0xFF8C1D18)
-val OnErrorContainerDark = Color(0xFFFFCDD2)
+val ErrorDark = Color(0xFFE68A80)
+val OnErrorDark = Color(0xFF3A0D08)
+val ErrorContainerDark = Color(0xFF5C2620)
+val OnErrorContainerDark = Color(0xFFF7CFC9)
 
-// Success (e.g. Income, savings, debt settled)
+// Success (e.g. Income, savings, debt settled) - reuses the primary green
 val SuccessLight = AccentGreenDark
 val OnSuccessLight = Color(0xFFFFFFFF)
 val SuccessContainerLight = AccentGreenContainer
-val OnSuccessContainerLight = Color(0xFF1B5E20)
+val OnSuccessContainerLight = Color(0xFF163519)
 
 val SuccessDark = AccentGreenLight
-val OnSuccessDark = Color(0xFF003816)
+val OnSuccessDark = Color(0xFF0B2B12)
 val SuccessContainerDark = AccentGreenContainerDark
-val OnSuccessContainerDark = Color(0xFFA5D6A7)
+val OnSuccessContainerDark = Color(0xFFA8D9AC)
 
-// Warning (e.g. Budget warnings 80%, upcoming dues)
-val WarningLight = Color(0xFFE65100)
+// Warning (e.g. Budget warnings 80%, upcoming dues) - warm amber, not orange-red
+val WarningLight = Color(0xFFA3650C)
 val OnWarningLight = Color(0xFFFFFFFF)
-val WarningContainerLight = Color(0xFFFFF3E0)
-val OnWarningContainerLight = Color(0xFFBF360C)
+val WarningContainerLight = Color(0xFFFBEBD2)
+val OnWarningContainerLight = Color(0xFF452C00)
 
-val WarningDark = Color(0xFFFFB74D)
-val OnWarningDark = Color(0xFF3E2723)
-val WarningContainerDark = Color(0xFF5D2A00)
-val OnWarningContainerDark = Color(0xFFFFE0B2)
+val WarningDark = Color(0xFFF0B860)
+val OnWarningDark = Color(0xFF3D2600)
+val WarningContainerDark = Color(0xFF5B3E10)
+val OnWarningContainerDark = Color(0xFFFBDCA8)
 
 // ==========================================
 // Extended Semantic Color Scheme
