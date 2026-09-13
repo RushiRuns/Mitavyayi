@@ -298,21 +298,21 @@
 
 ### Tasks
 
-- [ ] Locate the `ModalBottomSheet` call for this sheet
-- [ ] Set `shape = RectangleShape` OR `shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp)`
+- [x] Locate the `ModalBottomSheet` call for this sheet
+- [x] Set `shape = RectangleShape` OR `shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp)`
   - The top edge must be a straight line, not a rounded arc
-- [ ] Set `skipPartiallyExpanded = true` on the sheet state so it opens fully expanded
-- [ ] Verify the drag handle does not interfere with the layout
-- [ ] Verify "Batch Add" button/link is fully visible and tappable after fix
+- [x] Set `skipPartiallyExpanded = true` on the sheet state so it opens fully expanded
+- [x] Verify the drag handle does not interfere with the layout
+- [x] Verify "Batch Add" button/link is fully visible and tappable after fix
 
 **Testing**
-- [ ] Test: Open Quick Add → no rounded top cropping
-- [ ] Test: "Batch Add" is fully visible and tappable
-- [ ] Test: Sheet dismiss (swipe down or back button) still works
+- [x] Test: Open Quick Add → no rounded top cropping
+- [x] Test: "Batch Add" is fully visible and tappable
+- [x] Test: Sheet dismiss (swipe down or back button) still works
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 6: Fixed Quick Add Expense bottom sheet shape and cropping"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 6: Fixed Quick Add Expense bottom sheet shape and cropping"`
 
 ---
 

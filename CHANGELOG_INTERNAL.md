@@ -3,6 +3,12 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 6: Fixed Quick Add Expense bottom sheet shape and cropping.
+  - Resolved severe dome-like corner clipping on `ModalBottomSheet` in `QuickAddExpenseSheet.kt` by explicitly setting `shape = RectangleShape`.
+  - Configured `dragHandle = { BottomSheetDefaults.DragHandle() }` and confirmed `skipPartiallyExpanded = true` on `rememberModalBottomSheetState` so sheet expands cleanly without truncating content.
+  - Header elements ("Quick Add Expense" title, "Batch Add" action button, and close icon) are now fully revealed, unclipped, and completely tappable across all screen densities.
+  - Fixed root cause in `Shape.kt` where `MitavyayShapes.extraLarge` had an extreme radius of `9999.dp`, normalizing it to standard `16.dp`.
+  - Updated `UI_UX_Enhancement_Phases.md` and verified all unit tests pass cleanly.
 - Change 5: Date picker added to Quick Add Expense.
   - Added interactive Date row in `QuickAddExpenseSheet` positioned cleanly between Account and Category selectors.
   - Displays calendar icon (`Icons.Outlined.DateRange`) with human-friendly relative formatting: `"Today, dd MMM yyyy"`, `"Yesterday, dd MMM yyyy"`, or `"dd MMM yyyy"` via `DateTimeFormatter.formatRelativeDate`.
