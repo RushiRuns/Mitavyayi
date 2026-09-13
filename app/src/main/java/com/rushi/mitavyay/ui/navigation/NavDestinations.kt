@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -31,6 +32,12 @@ sealed class NavDestination(
         route = "analysis",
         title = "Analysis",
         icon = Icons.Default.DateRange
+    )
+
+    data object More : NavDestination(
+        route = "more",
+        title = "More",
+        icon = Icons.Default.Menu
     )
 
     data object Accounts : NavDestination(
@@ -94,7 +101,7 @@ sealed class NavDestination(
         val topLevelDestinations = listOf(
             TransactionList,
             Analysis,
-            Accounts
+            More
         )
 
         fun isTopLevel(route: String?): Boolean =
@@ -104,6 +111,7 @@ sealed class NavDestination(
             return when (route?.substringBefore("/")) {
                 TransactionList.route -> TransactionList
                 Analysis.route -> Analysis
+                More.route -> More
                 Accounts.route -> Accounts
                 Categories.route -> Categories
                 ImportExport.route -> ImportExport

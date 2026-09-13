@@ -136,12 +136,13 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `AccountBreakdownCard`: Multi-dimensional breakdown of spending across accounts and payment methods with percentage progress bars.
 - `parseCategoryColor`: Pure Kotlin color hex parser with fallback palette for safe JVM unit testing and Android device rendering.
 
-### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`)
-- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `accounts`, `categories`, `import_export`, `debts`, `repeat_expenses`, `goals`, and `transaction_detail/{transactionId}`), tab labels, and icons.
-- `MitavyayNavHost` (`ui/navigation/NavHost.kt`): Top-level NavHost mapping routes to Compose screens without Fragments.
+### Navigation & Scaffold (`ui/navigation/`, `ui/components/`, `ui/`, `ui/screens/Hub/`)
+- `NavDestination` (`ui/navigation/NavDestinations.kt`): Sealed hierarchy defining routes (`transactions`, `analysis`, `more`, `accounts`, `categories`, `import_export`, `debts`, `repeat_expenses`, `goals`, `budgets`, `insights`, and `transaction_detail/{transactionId}`), top-level destinations (Transactions, Analysis, More), tab labels, and icons.
+- `MitavyayNavHost` (`ui/navigation/NavHost.kt`): Top-level NavHost mapping routes to Compose screens without Fragments, including the 'More' HubScreen.
 - `MitavyayAppState` & `rememberMitavyayAppState` (`ui/AppState.kt`): State holder for navigation controller, backstack resolution, and tab switching.
-- `MitavyayBottomBar` (`ui/components/BottomNavBar.kt`): Material 3 navigation bar utilizing theme tokens.
-- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating TopAppBar (with Debts & Loans, Recurring Expenses, Savings Goals, Categories, Backup & CSV Data, and theme dialog), BottomNavBar, FAB, and NavHost.
+- `MitavyayBottomBar` (`ui/components/BottomNavBar.kt`): Material 3 navigation bar utilizing theme tokens with Transactions, Analysis, and More tabs.
+- `HubScreen` & `HubMenuItem` (`ui/screens/Hub/HubScreen.kt`): Centralized hub menu screen presenting accessible card items for Accounts, Debt & Loans, Insights, Recurring Expenses, Saving Goals, Budget Planning, Categories, and Settings.
+- `MitavyayApp` (`ui/MitavyayApp.kt`): Root application scaffold orchestrating uncluttered TopAppBar, BottomNavBar with More tab, FAB, and NavHost.
 - `DebtListScreen` (`ui/screens/Debt/DebtListScreen.kt`): Screen managing active and settled debts with summary metrics (Total Lent, Total Borrowed), tab switching, settlement flow, and zero delete capability per ADR-007.
 - `RepeatExpenseListScreen` (`ui/screens/RepeatExpense/RepeatExpenseListScreen.kt`): Screen managing recurring expenses with monthly commitment readout, All/Active/Paused tabs, on-demand due evaluation, and active toggle switch.
 - `GoalsListScreen` (`ui/screens/Goals/GoalsListScreen.kt`): Screen managing savings targets with summary metrics (Total Target, Total Saved, Overall Progress, active/achieved counts), tab switching (All, In Progress, Achieved, Overdue), and savings deposits.

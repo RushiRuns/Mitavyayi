@@ -3,6 +3,21 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 1: Replace 'Accounts' Tab with 'More' Hub Screen; Top bar icons removed.
+  - Replaced bottom navigation 'Accounts' tab with 'More' (`NavDestination.More`, route = `"more"`, icon = `Icons.Default.Menu`).
+  - Created `HubScreen` (`ui/screens/Hub/HubScreen.kt`) presenting clean, card-based navigation to:
+    - 🏦 Accounts (`NavDestination.Accounts.route`)
+    - 💳 Debt & Loans (`NavDestination.Debt.route`)
+    - 💡 Insights (`NavDestination.Insights.route`)
+    - 🔁 Recurring Expenses (`NavDestination.RepeatExpenses.route`)
+    - 🎯 Saving Goals (`NavDestination.Goals.route`)
+    - 📊 Budget Planning (`NavDestination.Budget.route`)
+    - 🏷️ Categories (`NavDestination.Categories.route`)
+    - ⚙️ Settings (`onOpenSettings` -> `showThemeDialog`)
+  - Cleaned up `TopAppBar` in `MitavyayApp.kt`: removed all 8 cluttered feature shortcut action icons.
+  - Sub-screens (Accounts, Debt, Goals, Budget, Insights, Categories, Repeat Expenses) now display standard back navigation in TopAppBar returning cleanly to 'More'.
+  - Updated `NavigationTest.kt` and `AnimationsTest.kt` to verify top-level and sub-destination behavior.
+  - All 178 unit tests pass cleanly.
 - Feature 4.9: Insights (Basic Statistics) complete.
   - Implemented simple, high-value financial dashboard providing key statistics for any selected month:
     - Repository Calculations (`TransactionRepository.kt` & `BasicInsightsCalculator`):

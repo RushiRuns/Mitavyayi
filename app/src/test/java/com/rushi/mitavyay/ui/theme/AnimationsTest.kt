@@ -56,8 +56,9 @@ class AnimationsTest {
     fun testTopLevelNavigationCheck() {
         assertTrue(NavDestination.isTopLevel(NavDestination.TransactionList.route))
         assertTrue(NavDestination.isTopLevel(NavDestination.Analysis.route))
-        assertTrue(NavDestination.isTopLevel(NavDestination.Accounts.route))
+        assertTrue(NavDestination.isTopLevel(NavDestination.More.route))
 
+        assertFalse(NavDestination.isTopLevel(NavDestination.Accounts.route))
         assertFalse(NavDestination.isTopLevel(NavDestination.Budget.route))
         assertFalse(NavDestination.isTopLevel(NavDestination.Goals.route))
         assertFalse(NavDestination.isTopLevel(NavDestination.Debt.route))

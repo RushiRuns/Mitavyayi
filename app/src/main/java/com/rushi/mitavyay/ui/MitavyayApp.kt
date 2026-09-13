@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -76,56 +73,7 @@ fun MitavyayApp(
                     }
                 },
                 actions = {
-                    if (appState.isTopLevelDestination) {
-                        IconButton(onClick = { appState.navController.navigate(NavDestination.Debt.route) }) {
-                            Icon(
-                                imageVector = NavDestination.Debt.icon,
-                                contentDescription = "Debts & Loans"
-                            )
-                        }
-                        IconButton(onClick = { appState.navController.navigate(NavDestination.RepeatExpenses.route) }) {
-                            Icon(
-                                imageVector = NavDestination.RepeatExpenses.icon,
-                                contentDescription = "Recurring Expenses"
-                            )
-                        }
-                        IconButton(onClick = { appState.navController.navigate(NavDestination.Goals.route) }) {
-                            Icon(
-                                imageVector = NavDestination.Goals.icon,
-                                contentDescription = "Savings Goals"
-                            )
-                        }
-                        IconButton(onClick = { appState.navController.navigate(NavDestination.Budget.route) }) {
-                            Icon(
-                                imageVector = NavDestination.Budget.icon,
-                                contentDescription = "Budget Planning"
-                            )
-                        }
-                        IconButton(onClick = { appState.navController.navigate(NavDestination.Insights.route) }) {
-                            Icon(
-                                imageVector = NavDestination.Insights.icon,
-                                contentDescription = "Insights & Statistics"
-                            )
-                        }
-                        IconButton(onClick = { appState.navController.navigate(NavDestination.Categories.route) }) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Manage Categories"
-                            )
-                        }
-                        IconButton(onClick = { appState.navController.navigate(NavDestination.ImportExport.route) }) {
-                            Icon(
-                                imageVector = Icons.Default.Share,
-                                contentDescription = "Backup & Import CSV"
-                            )
-                        }
-                        IconButton(onClick = { showThemeDialog = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Theme Settings"
-                            )
-                        }
-                    }
+                    // Feature shortcuts moved into 'More' Hub screen
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -167,6 +115,7 @@ fun MitavyayApp(
     ) { paddingValues ->
         MitavyayNavHost(
             navController = appState.navController,
+            onOpenSettings = { showThemeDialog = true },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)

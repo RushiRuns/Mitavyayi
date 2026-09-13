@@ -10,6 +10,7 @@ class NavigationTest {
     fun testDestinationRoutes() {
         assertEquals("transactions", NavDestination.TransactionList.route)
         assertEquals("analysis", NavDestination.Analysis.route)
+        assertEquals("more", NavDestination.More.route)
         assertEquals("accounts", NavDestination.Accounts.route)
         assertEquals("categories", NavDestination.Categories.route)
         assertEquals("import_export", NavDestination.ImportExport.route)
@@ -27,13 +28,14 @@ class NavigationTest {
         assertEquals(3, topLevel.size)
         assertTrue(topLevel.contains(NavDestination.TransactionList))
         assertTrue(topLevel.contains(NavDestination.Analysis))
-        assertTrue(topLevel.contains(NavDestination.Accounts))
+        assertTrue(topLevel.contains(NavDestination.More))
     }
 
     @Test
     fun testFromRoute() {
         assertEquals(NavDestination.TransactionList, NavDestination.fromRoute("transactions"))
         assertEquals(NavDestination.Analysis, NavDestination.fromRoute("analysis"))
+        assertEquals(NavDestination.More, NavDestination.fromRoute("more"))
         assertEquals(NavDestination.Accounts, NavDestination.fromRoute("accounts"))
         assertEquals(NavDestination.Categories, NavDestination.fromRoute("categories"))
         assertEquals(NavDestination.ImportExport, NavDestination.fromRoute("import_export"))
