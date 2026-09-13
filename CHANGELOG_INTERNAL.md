@@ -3,6 +3,16 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 18: Default categories can now be deleted and edited.
+  - Enabled edit and delete actions for all categories (both default and custom) across `CategoriesScreen.kt` and `CategoryItemRow`.
+  - Added delete confirmation alert dialog before deleting any category with the exact message: `"Transactions with this category will keep the category name but may appear uncategorized."` and `"Delete"` / `"Cancel"` actions.
+  - Updated `CategoriesViewModel.kt` to allow editing and deleting non-custom categories, and introduced explicit `updateCategory` and `addCategory` methods.
+  - Added edit mode support to `AddCategoryDialog.kt` accepting optional `categoryToEdit`: pre-filling fields, displaying title `"Edit Category"` and `"Save Changes"` button, or `"Add Category"` for new categories.
+  - Added `HAS_SEEDED_DEFAULT_CATEGORIES` boolean preference to DataStore (`mitavyay_preferences`) and exposed `hasSeededDefaultCategories` / `setHasSeededDefaultCategories` on `PreferencesRepository`.
+  - Injected `PreferencesRepository` into `CategoryRepositoryImpl`: only auto-seeds default categories on the very first launch, ensuring deleted default categories never reappear upon app restart or background process kill.
+  - Removed redundant category auto-seeding `init` block from `QuickAddExpenseViewModel.kt`.
+  - Authored architectural decision record `docs/decisions/ADR-013-Default-Categories-Edit-Delete.md` and updated `SCHEMA.md`.
+  - Updated unit tests in `CategoryRepositoryTest.kt` and `CategoriesViewModelTest.kt`, verifying edit/delete on default categories and preventing auto-seeding when already seeded.
 - Change 17: Need/Want toggle in Quick Add + Need vs. Want chart in Analysis (with DB migration).
   - Implemented Room database schema migration from version 2 to 3 (`MIGRATION_2_3`), adding `isNeed INTEGER NOT NULL DEFAULT 1` to `transactions` table.
   - Documented architectural decision in `docs/decisions/ADR-012-NeedWant-Field.md` and updated `SCHEMA.md`.

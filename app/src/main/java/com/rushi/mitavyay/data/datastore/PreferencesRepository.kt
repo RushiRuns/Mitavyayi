@@ -15,6 +15,7 @@ interface PreferencesRepository {
     val language: Flow<String>
     val appOpenCount: Flow<Int>
     val hapticFeedbackEnabled: Flow<Boolean>
+    val hasSeededDefaultCategories: Flow<Boolean>
 
     suspend fun setThemeMode(mode: String)
     suspend fun setFontScaleMultiplier(scale: Float)
@@ -22,6 +23,7 @@ interface PreferencesRepository {
     suspend fun setLanguage(lang: String)
     suspend fun incrementAppOpenCount()
     suspend fun setHapticFeedbackEnabled(enabled: Boolean)
+    suspend fun setHasSeededDefaultCategories(seeded: Boolean)
 }
 
 @Singleton
@@ -51,6 +53,10 @@ class PreferencesRepositoryImpl @Inject constructor(
 
     override val hapticFeedbackEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[PreferenceKeys.HAPTIC_FEEDBACK_ENABLED] ?: true
+    }
+
+    override val hasSeededDefaultCategories: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferenceKeys.HAS_SEEDED_DEFAULT_CATEGORIES] ?: false
     }
 
     override suspend fun setThemeMode(mode: String) {
@@ -87,6 +93,12 @@ class PreferencesRepositoryImpl @Inject constructor(
     override suspend fun setHapticFeedbackEnabled(enabled: Boolean) {
         dataStore.edit { prefs ->
             prefs[PreferenceKeys.HAPTIC_FEEDBACK_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun setHasSeededDefaultCategories(seeded: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[PreferenceKeys.HAS_SEEDED_DEFAULT_CATEGORIES] = seeded
         }
     }
 }

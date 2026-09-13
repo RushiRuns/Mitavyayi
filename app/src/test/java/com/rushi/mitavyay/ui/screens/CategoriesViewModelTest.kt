@@ -59,7 +59,7 @@ class CategoriesViewModelTest {
         }
 
         override suspend fun deleteCategory(id: String) {
-            categories.removeAll { it.id == id && it.isCustom }
+            categories.removeAll { it.id == id }
             notifyChange()
         }
 
@@ -108,7 +108,6 @@ class CategoriesViewModelTest {
             val index = categories.indexOfFirst { it.id == id }
             if (index == -1) return Result.failure(IllegalArgumentException("Not found"))
             val existing = categories[index]
-            if (!existing.isCustom) return Result.failure(IllegalStateException("Cannot edit default"))
 
             val trimmed = name.trim()
             if (categories.any { it.name.equals(trimmed, ignoreCase = true) && it.id != id }) {
@@ -121,7 +120,7 @@ class CategoriesViewModelTest {
         }
 
         override suspend fun canDeleteCategory(id: String): Boolean {
-            return categories.find { it.id == id }?.isCustom == true
+            return categories.any { it.id == id }
         }
     }
 
@@ -210,11 +209,13 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun onEditCategoryClick_ignoresDefaultCategory() = runBlocking {
+    fun onEditCategoryClick_worksForDefaultCategory() = runBlocking {
         val defaultCat = fakeRepository.categories.first { !it.isCustom }.toDisplayItem()
         viewModel.onEditCategoryClick(defaultCat)
 
-        assertNull(viewModel.uiState.value.editingCategory)
+        val editingState = viewModel.uiState.first { it.editingCategory != null }
+        assertEquals(defaultCat.id, editingState.editingCategory?.id)
+        assertEquals(defaultCat.name, editingState.editingCategory?.name)
     }
 
     @Test
@@ -232,5 +233,20 @@ class CategoriesViewModelTest {
         val state = viewModel.uiState.first { it.deletingCategory == null && it.customCategories.none { cat -> cat.name == "Temporary" } }
         assertNull(state.deletingCategory)
         assertEquals(0, state.customCategories.size)
+    }
+
+    @Test
+    fun onDeleteCategoryClick_andConfirmDelete_removesDefaultCategory() = runBlocking {
+        val defaultCat = fakeRepository.categories.first { !it.isCustom }.toDisplayItem()
+        viewModel.onDeleteCategoryClick(defaultCat)
+
+        val deletingState = viewModel.uiState.first { it.deletingCategory != null }
+        assertEquals(defaultCat.name, deletingState.deletingCategory?.name)
+
+        viewModel.confirmDeleteCategory()
+
+        val state = viewModel.uiState.first { it.deletingCategory == null && it.defaultCategories.none { cat -> cat.id == defaultCat.id } }
+        assertNull(state.deletingCategory)
+        assertEquals(1, state.defaultCategories.size)
     }
 }

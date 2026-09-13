@@ -88,7 +88,7 @@ Predefined and custom user-created transaction categories.
 - `name`: `String`
 - `icon`: `String` (Icon identifier token)
 - `color`: `String` (Hex color token)
-- `isCustom`: `Boolean` (False for default seeded categories, true for user-defined)
+- `isCustom`: `Boolean` (False for default seeded categories, true for user-defined. Note: as of Change 18, both default and custom categories can be freely edited and deleted by the user)
 
 ### 8. `budgets` (`Budget.kt`)
 Monthly category budget allocations.

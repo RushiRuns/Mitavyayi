@@ -1,5 +1,6 @@
 package com.rushi.mitavyay.data
 
+import com.rushi.mitavyay.data.datastore.PreferencesRepository
 import com.rushi.mitavyay.data.db.Category
 import com.rushi.mitavyay.data.db.CategoryDao
 import com.rushi.mitavyay.data.repository.CategoryRepositoryImpl
@@ -17,6 +18,32 @@ import org.junit.Before
 import org.junit.Test
 
 class CategoryRepositoryTest {
+
+    private class FakePreferencesRepository : PreferencesRepository {
+        private val _themeMode = MutableStateFlow("SYSTEM")
+        private val _fontScale = MutableStateFlow(1.0f)
+        private val _currency = MutableStateFlow("₹")
+        private val _language = MutableStateFlow("en")
+        private val _openCount = MutableStateFlow(0)
+        private val _hapticEnabled = MutableStateFlow(true)
+        val hasSeededFlow = MutableStateFlow(false)
+
+        override val themeMode: Flow<String> = _themeMode
+        override val fontScaleMultiplier: Flow<Float> = _fontScale
+        override val currencySymbol: Flow<String> = _currency
+        override val language: Flow<String> = _language
+        override val appOpenCount: Flow<Int> = _openCount
+        override val hapticFeedbackEnabled: Flow<Boolean> = _hapticEnabled
+        override val hasSeededDefaultCategories: Flow<Boolean> = hasSeededFlow
+
+        override suspend fun setThemeMode(mode: String) { _themeMode.value = mode }
+        override suspend fun setFontScaleMultiplier(scale: Float) { _fontScale.value = scale }
+        override suspend fun setCurrencySymbol(symbol: String) { _currency.value = symbol }
+        override suspend fun setLanguage(lang: String) { _language.value = lang }
+        override suspend fun incrementAppOpenCount() { _openCount.value += 1 }
+        override suspend fun setHapticFeedbackEnabled(enabled: Boolean) { _hapticEnabled.value = enabled }
+        override suspend fun setHasSeededDefaultCategories(seeded: Boolean) { hasSeededFlow.value = seeded }
+    }
 
     private class FakeCategoryDao : CategoryDao {
         val list = mutableListOf<Category>()
@@ -72,12 +99,14 @@ class CategoryRepositoryTest {
     }
 
     private lateinit var fakeDao: FakeCategoryDao
+    private lateinit var fakePreferencesRepository: FakePreferencesRepository
     private lateinit var repository: CategoryRepositoryImpl
 
     @Before
     fun setUp() {
         fakeDao = FakeCategoryDao()
-        repository = CategoryRepositoryImpl(fakeDao)
+        fakePreferencesRepository = FakePreferencesRepository()
+        repository = CategoryRepositoryImpl(fakeDao, fakePreferencesRepository)
     }
 
     @Test
@@ -89,6 +118,7 @@ class CategoryRepositoryTest {
         assertTrue(all.none { it.isCustom })
         assertTrue(all.any { it.name == "Food & Dining" })
         assertTrue(all.any { it.name == "Groceries" })
+        assertTrue(fakePreferencesRepository.hasSeededFlow.value)
     }
 
     @Test
@@ -98,6 +128,17 @@ class CategoryRepositoryTest {
         val categories = repository.getAllCategories().first { it.isNotEmpty() }
         assertEquals(11, categories.size)
         assertEquals(11, fakeDao.list.size)
+        assertTrue(fakePreferencesRepository.hasSeededFlow.value)
+    }
+
+    @Test
+    fun getAllCategories_doesNotAutoSeedWhenAlreadySeededEvenIfEmpty() = runBlocking {
+        fakePreferencesRepository.setHasSeededDefaultCategories(true)
+        assertTrue(fakeDao.list.isEmpty())
+
+        val categories = repository.getAllCategories().first()
+        assertTrue(categories.isEmpty())
+        assertTrue(fakeDao.list.isEmpty())
     }
 
     @Test
@@ -175,7 +216,7 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    fun updateCustomCategory_failsForDefaultCategory() = runBlocking {
+    fun updateCustomCategory_succeedsForDefaultCategory() = runBlocking {
         repository.seedDefaultCategories()
         val defaultCat = fakeDao.list.first { !it.isCustom }
 
@@ -186,8 +227,11 @@ class CategoryRepositoryTest {
             icon = "star"
         )
 
-        assertTrue(result.isFailure)
-        assertEquals("Default categories cannot be edited", result.exceptionOrNull()?.message)
+        assertTrue(result.isSuccess)
+        val updated = repository.getCategoryById(defaultCat.id)
+        assertNotNull(updated)
+        assertEquals("Changed Name", updated?.name)
+        assertEquals("#000000", updated?.color)
     }
 
     @Test
@@ -207,14 +251,14 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    fun deleteCategory_onlyDeletesCustomCategory() = runBlocking {
+    fun deleteCategory_deletesBothDefaultAndCustomCategories() = runBlocking {
         repository.seedDefaultCategories()
         val defaultCat = fakeDao.list.first { !it.isCustom }
 
         // Attempt to delete default category
+        assertTrue(repository.canDeleteCategory(defaultCat.id))
         repository.deleteCategory(defaultCat.id)
-        assertNotNull(repository.getCategoryById(defaultCat.id))
-        assertFalse(repository.canDeleteCategory(defaultCat.id))
+        assertNull(repository.getCategoryById(defaultCat.id))
 
         // Create and delete custom category
         val customCat = repository.createCustomCategory("Custom To Delete", "#555555", "star").getOrThrow()

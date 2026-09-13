@@ -66,15 +66,6 @@ class QuickAddExpenseViewModel @Inject constructor(
         val isSaving: Boolean = false
     )
 
-    init {
-        viewModelScope.launch {
-            categoryRepository.getAllCategories().collect { categories ->
-                if (categories.isEmpty()) {
-                    categoryRepository.seedDefaultCategories()
-                }
-            }
-        }
-    }
 
     val uiState: StateFlow<QuickAddExpenseUiState> = combine(
         accountRepository.getActiveAccounts(),

@@ -30,6 +30,7 @@ class DualThemeTest {
         private val _language = MutableStateFlow("en")
         private val _openCount = MutableStateFlow(0)
         private val _hapticEnabled = MutableStateFlow(true)
+        private val _hasSeededDefaultCategories = MutableStateFlow(false)
 
         override val themeMode: Flow<String> = _themeMode
         override val fontScaleMultiplier: Flow<Float> = _fontScale
@@ -37,6 +38,7 @@ class DualThemeTest {
         override val language: Flow<String> = _language
         override val appOpenCount: Flow<Int> = _openCount
         override val hapticFeedbackEnabled: Flow<Boolean> = _hapticEnabled
+        override val hasSeededDefaultCategories: Flow<Boolean> = _hasSeededDefaultCategories
 
         override suspend fun setThemeMode(mode: String) {
             _themeMode.value = mode
@@ -60,6 +62,10 @@ class DualThemeTest {
 
         override suspend fun setHapticFeedbackEnabled(enabled: Boolean) {
             _hapticEnabled.value = enabled
+        }
+
+        override suspend fun setHasSeededDefaultCategories(seeded: Boolean) {
+            _hasSeededDefaultCategories.value = seeded
         }
     }
 

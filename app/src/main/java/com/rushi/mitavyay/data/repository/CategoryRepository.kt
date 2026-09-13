@@ -1,8 +1,10 @@
 package com.rushi.mitavyay.data.repository
 
+import com.rushi.mitavyay.data.datastore.PreferencesRepository
 import com.rushi.mitavyay.data.db.Category
 import com.rushi.mitavyay.data.db.CategoryDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import java.util.UUID
 import javax.inject.Inject
@@ -25,13 +27,22 @@ interface CategoryRepository {
 
 @Singleton
 class CategoryRepositoryImpl @Inject constructor(
-    private val categoryDao: CategoryDao
+    private val categoryDao: CategoryDao,
+    private val preferencesRepository: PreferencesRepository
 ) : CategoryRepository {
 
     override fun getAllCategories(): Flow<List<Category>> =
         categoryDao.getAll().onEach { list ->
-            if (list.isEmpty()) {
-                seedDefaultCategories()
+            if (list.isNotEmpty()) {
+                val hasSeeded = preferencesRepository.hasSeededDefaultCategories.first()
+                if (!hasSeeded) {
+                    preferencesRepository.setHasSeededDefaultCategories(true)
+                }
+            } else {
+                val hasSeeded = preferencesRepository.hasSeededDefaultCategories.first()
+                if (!hasSeeded) {
+                    seedDefaultCategories()
+                }
             }
         }
 
@@ -47,14 +58,14 @@ class CategoryRepositoryImpl @Inject constructor(
 
     override suspend fun deleteCategory(id: String) {
         val cat = categoryDao.getById(id)
-        if (cat != null && cat.isCustom) {
+        if (cat != null) {
             categoryDao.deleteById(id)
         }
     }
 
     override suspend fun canDeleteCategory(id: String): Boolean {
         val cat = categoryDao.getById(id)
-        return cat != null && cat.isCustom
+        return cat != null
     }
 
     override suspend fun createCustomCategory(
@@ -91,10 +102,6 @@ class CategoryRepositoryImpl @Inject constructor(
         val cat = categoryDao.getById(id)
             ?: return Result.failure(IllegalArgumentException("Category not found"))
 
-        if (!cat.isCustom) {
-            return Result.failure(IllegalStateException("Default categories cannot be edited"))
-        }
-
         val trimmed = name.trim()
         if (trimmed.isBlank()) {
             return Result.failure(IllegalArgumentException("Category name cannot be blank"))
@@ -129,5 +136,6 @@ class CategoryRepositoryImpl @Inject constructor(
             Category(id = "cat_other", name = "Other", icon = "more_horiz", color = "#8D6E63", isCustom = false)
         )
         categoryDao.insertAll(defaults)
+        preferencesRepository.setHasSeededDefaultCategories(true)
     }
 }

@@ -187,6 +187,7 @@ class ViewModelsTest {
             override val language: Flow<String> = flowOf("en")
             override val appOpenCount: Flow<Int> = flowOf(1)
             override val hapticFeedbackEnabled: Flow<Boolean> = flowOf(true)
+            override val hasSeededDefaultCategories: Flow<Boolean> = flowOf(false)
 
             override suspend fun setThemeMode(mode: String) {}
             override suspend fun setFontScaleMultiplier(scale: Float) {}
@@ -196,6 +197,7 @@ class ViewModelsTest {
                 openCountIncremented = true
             }
             override suspend fun setHapticFeedbackEnabled(enabled: Boolean) {}
+            override suspend fun setHasSeededDefaultCategories(seeded: Boolean) {}
         }
 
         val viewModel = MainViewModel(fakePrefs)

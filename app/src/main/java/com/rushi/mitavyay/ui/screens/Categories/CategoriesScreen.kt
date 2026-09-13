@@ -167,8 +167,8 @@ fun CategoriesContent(
                         @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
                         CategoryItemRow(
                             category = category,
-                            onEditClick = null,
-                            onDeleteClick = null,
+                            onEditClick = { onEditClick(category) },
+                            onDeleteClick = { onDeleteClick(category) },
                             modifier = Modifier.animateItemPlacement()
                         )
                     }
@@ -180,7 +180,7 @@ fun CategoriesContent(
     // Add or Edit Dialog
     if (uiState.showAddDialog || uiState.editingCategory != null) {
         AddCategoryDialog(
-            initialCategory = uiState.editingCategory,
+            categoryToEdit = uiState.editingCategory,
             onDismiss = onDismissDialog,
             onSave = onSaveCategory,
             errorMessage = uiState.errorMessage
@@ -192,7 +192,7 @@ fun CategoriesContent(
         AppAlertDialog(
             onDismissRequest = onDismissDialog,
             title = "Delete Category?",
-            text = "Are you sure you want to delete '${uiState.deletingCategory!!.name}'? Past transactions in this category will keep their label.",
+            text = "Transactions with this category will keep the category name but may appear uncategorized.",
             confirmText = "Delete",
             dismissText = "Cancel",
             onConfirm = onConfirmDelete,
@@ -248,28 +248,7 @@ fun CategoryItemRow(
                 )
             }
 
-            if (category.isCustom) {
-                if (onEditClick != null) {
-                    IconButton(onClick = onEditClick) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit Category",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-                if (onDeleteClick != null) {
-                    IconButton(onClick = onDeleteClick) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Category",
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            } else {
+            if (!category.isCustom) {
                 Surface(
                     shape = MaterialTheme.appShapes.small,
                     color = MaterialTheme.colorScheme.surfaceVariant
@@ -279,6 +258,28 @@ fun CategoryItemRow(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(MaterialTheme.spacing.xs))
+            }
+
+            if (onEditClick != null) {
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Category",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            if (onDeleteClick != null) {
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Category",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }

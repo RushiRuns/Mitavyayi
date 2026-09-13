@@ -43,23 +43,25 @@ import com.rushi.mitavyay.ui.theme.spacing
 
 @Composable
 fun AddCategoryDialog(
-    initialCategory: CategoryDisplayItem? = null,
+    categoryToEdit: CategoryDisplayItem? = null,
     onDismiss: () -> Unit,
     onSave: (name: String, colorHex: String, icon: String) -> Unit,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    initialCategory: CategoryDisplayItem? = categoryToEdit
 ) {
-    var name by remember(initialCategory) {
-        mutableStateOf(initialCategory?.name ?: "")
+    val activeCategory = categoryToEdit ?: initialCategory
+    var name by remember(activeCategory) {
+        mutableStateOf(activeCategory?.name ?: "")
     }
-    var selectedColor by remember(initialCategory) {
-        mutableStateOf(initialCategory?.colorHex ?: CategoryColorOptions.first())
+    var selectedColor by remember(activeCategory) {
+        mutableStateOf(activeCategory?.colorHex ?: CategoryColorOptions.first())
     }
-    var selectedIcon by remember(initialCategory) {
-        mutableStateOf(initialCategory?.icon ?: CategoryIconOptions.first().id)
+    var selectedIcon by remember(activeCategory) {
+        mutableStateOf(activeCategory?.icon ?: CategoryIconOptions.first().id)
     }
     var localError by remember { mutableStateOf<String?>(null) }
 
-    val isEditing = initialCategory != null
+    val isEditing = activeCategory != null
     val parsedColor = parseCategoryColor(selectedColor, 0)
     val displayError = errorMessage ?: localError
 
@@ -79,7 +81,7 @@ fun AddCategoryDialog(
                     .padding(MaterialTheme.spacing.lg)
             ) {
                 Text(
-                    text = if (isEditing) "Edit Category" else "New Category",
+                    text = if (isEditing) "Edit Category" else "Add Category",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -235,7 +237,7 @@ fun AddCategoryDialog(
                         modifier = Modifier.weight(1f)
                     )
                     PrimaryButton(
-                        text = if (isEditing) "Save Changes" else "Create Category",
+                        text = if (isEditing) "Save Changes" else "Add Category",
                         onClick = {
                             val trimmed = name.trim()
                             if (trimmed.isBlank()) {

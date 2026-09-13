@@ -12,4 +12,5 @@ object PreferenceKeys {
     val LANGUAGE = stringPreferencesKey("language")
     val APP_OPEN_COUNT = intPreferencesKey("app_open_count")
     val HAPTIC_FEEDBACK_ENABLED = booleanPreferencesKey("haptic_feedback_enabled")
+    val HAS_SEEDED_DEFAULT_CATEGORIES = booleanPreferencesKey("has_seeded_default_categories")
 }

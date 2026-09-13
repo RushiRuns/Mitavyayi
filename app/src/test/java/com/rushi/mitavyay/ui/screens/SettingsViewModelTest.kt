@@ -45,6 +45,7 @@ class SettingsViewModelTest {
         val languageFlow = MutableStateFlow("en")
         val appOpenCountFlow = MutableStateFlow(1)
         val hapticFlow = MutableStateFlow(true)
+        val hasSeededFlow = MutableStateFlow(false)
 
         override val themeMode: Flow<String> = themeFlow
         override val fontScaleMultiplier: Flow<Float> = fontScaleFlow
@@ -52,6 +53,7 @@ class SettingsViewModelTest {
         override val language: Flow<String> = languageFlow
         override val appOpenCount: Flow<Int> = appOpenCountFlow
         override val hapticFeedbackEnabled: Flow<Boolean> = hapticFlow
+        override val hasSeededDefaultCategories: Flow<Boolean> = hasSeededFlow
 
         override suspend fun setThemeMode(mode: String) {
             themeFlow.value = mode
@@ -75,6 +77,10 @@ class SettingsViewModelTest {
 
         override suspend fun setHapticFeedbackEnabled(enabled: Boolean) {
             hapticFlow.value = enabled
+        }
+
+        override suspend fun setHasSeededDefaultCategories(seeded: Boolean) {
+            hasSeededFlow.value = seeded
         }
     }
 

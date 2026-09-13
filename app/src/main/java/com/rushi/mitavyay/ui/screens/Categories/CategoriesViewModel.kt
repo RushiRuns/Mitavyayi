@@ -63,41 +63,47 @@ class CategoriesViewModel @Inject constructor(
     }
 
     fun onEditCategoryClick(category: CategoryDisplayItem) {
-        if (category.isCustom) {
-            _dialogState.value = DialogState(editingCategory = category)
-        }
+        _dialogState.value = DialogState(editingCategory = category)
     }
 
     fun onDeleteCategoryClick(category: CategoryDisplayItem) {
-        if (category.isCustom) {
-            _dialogState.value = DialogState(deletingCategory = category)
-        }
+        _dialogState.value = DialogState(deletingCategory = category)
     }
 
     fun onDismissDialog() {
         _dialogState.value = DialogState()
     }
 
-    fun saveCategory(name: String, colorHex: String, icon: String) {
+    fun updateCategory(id: String, name: String, colorHex: String, icon: String) {
         viewModelScope.launch {
-            val editing = _dialogState.value.editingCategory
-            if (editing != null) {
-                val result = categoryRepository.updateCustomCategory(editing.id, name, colorHex, icon)
-                result.fold(
-                    onSuccess = { _dialogState.value = DialogState() },
-                    onFailure = { error ->
-                        _dialogState.value = _dialogState.value.copy(errorMessage = error.localizedMessage)
-                    }
-                )
-            } else {
-                val result = categoryRepository.createCustomCategory(name, colorHex, icon)
-                result.fold(
-                    onSuccess = { _dialogState.value = DialogState() },
-                    onFailure = { error ->
-                        _dialogState.value = _dialogState.value.copy(errorMessage = error.localizedMessage)
-                    }
-                )
-            }
+            val result = categoryRepository.updateCustomCategory(id, name, colorHex, icon)
+            result.fold(
+                onSuccess = { _dialogState.value = DialogState() },
+                onFailure = { error ->
+                    _dialogState.value = _dialogState.value.copy(errorMessage = error.localizedMessage)
+                }
+            )
+        }
+    }
+
+    fun addCategory(name: String, colorHex: String, icon: String) {
+        viewModelScope.launch {
+            val result = categoryRepository.createCustomCategory(name, colorHex, icon)
+            result.fold(
+                onSuccess = { _dialogState.value = DialogState() },
+                onFailure = { error ->
+                    _dialogState.value = _dialogState.value.copy(errorMessage = error.localizedMessage)
+                }
+            )
+        }
+    }
+
+    fun saveCategory(name: String, colorHex: String, icon: String) {
+        val editing = _dialogState.value.editingCategory
+        if (editing != null) {
+            updateCategory(editing.id, name, colorHex, icon)
+        } else {
+            addCategory(name, colorHex, icon)
         }
     }
 
