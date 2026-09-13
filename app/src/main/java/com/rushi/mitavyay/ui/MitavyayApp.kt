@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rushi.mitavyay.ui.components.MitavyayBottomBar
-import com.rushi.mitavyay.ui.components.ThemeSelectionDialog
 import androidx.compose.ui.platform.LocalContext
 import com.rushi.mitavyay.ui.components.pressScale
 import com.rushi.mitavyay.ui.navigation.MitavyayNavHost
@@ -46,7 +45,6 @@ fun MitavyayApp(
     val context = LocalContext.current
     var showQuickAddSheet by remember { mutableStateOf(false) }
     var showBatchAddDialog by remember { mutableStateOf(false) }
-    var showThemeDialog by remember { mutableStateOf(false) }
     val currentDestination = appState.currentDestination
     val currentRoute = appState.currentRoute
     val currentThemeMode by mainViewModel.themeMode.collectAsState()
@@ -115,7 +113,6 @@ fun MitavyayApp(
     ) { paddingValues ->
         MitavyayNavHost(
             navController = appState.navController,
-            onOpenSettings = { showThemeDialog = true },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -136,20 +133,6 @@ fun MitavyayApp(
     if (showBatchAddDialog) {
         BatchAddTransactionsDialog(
             onDismiss = { showBatchAddDialog = false }
-        )
-    }
-
-    if (showThemeDialog) {
-        ThemeSelectionDialog(
-            currentThemeMode = currentThemeMode,
-            onThemeSelected = { mode ->
-                mainViewModel.setThemeMode(mode)
-            },
-            hapticFeedbackEnabled = hapticFeedbackEnabled,
-            onHapticFeedbackToggled = { enabled ->
-                mainViewModel.setHapticFeedbackEnabled(enabled)
-            },
-            onDismiss = { showThemeDialog = false }
         )
     }
 }

@@ -106,7 +106,7 @@
 
 ### Tasks
 
-- [ ] Create `ui/screens/Settings/SettingsScreen.kt`
+- [x] Create `ui/screens/Settings/SettingsScreen.kt`
   - Full-page composable, not a dialog
   - TopAppBar with back arrow
   - Sections:
@@ -116,23 +116,23 @@
     - **About:** App version info
   - Use `Scaffold` with `LazyColumn` for the settings list
   - Each setting item: label + current value/toggle
-- [ ] Create `ui/screens/Settings/SettingsViewModel.kt` (if needed for reading preferences)
-- [ ] Add `SettingsScreen` route to `NavDestinations.kt` and `NavHost.kt`
-- [ ] In `HubScreen.kt`, tapping "Settings" navigates to `SettingsScreen`
-- [ ] Remove Backup & Data shortcut from top bar (part of Change 1 top bar cleanup)
-- [ ] Verify `ImportExportScreen.kt` still works when navigated to from `SettingsScreen`
+- [x] Create `ui/screens/Settings/SettingsViewModel.kt` (if needed for reading preferences)
+- [x] Add `SettingsScreen` route to `NavDestinations.kt` and `NavHost.kt`
+- [x] In `HubScreen.kt`, tapping "Settings" navigates to `SettingsScreen`
+- [x] Remove Backup & Data shortcut from top bar (part of Change 1 top bar cleanup)
+- [x] Verify `ImportExportScreen.kt` still works when navigated to from `SettingsScreen`
 
 **Testing**
-- [ ] Test: Open Settings from Hub → full-page screen
-- [ ] Test: Tap "Backup & Data" inside Settings → ImportExportScreen opens
-- [ ] Test: Back from ImportExportScreen → returns to SettingsScreen
-- [ ] Test: All existing settings (theme toggle, haptic toggle) still work
-- [ ] Test: Settings preferences persist after app restart
+- [x] Test: Open Settings from Hub → full-page screen
+- [x] Test: Tap "Backup & Data" inside Settings → ImportExportScreen opens
+- [x] Test: Back from ImportExportScreen → returns to SettingsScreen
+- [x] Test: All existing settings (theme toggle, haptic toggle) still work
+- [x] Test: Settings preferences persist after app restart
 
 **Closure**
-- [ ] Update `UTILITIES.md`
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 2: Settings full-page screen with Backup & Data moved inside"`
+- [x] Update `UTILITIES.md`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 2: Settings full-page screen with Backup & Data moved inside"`
 
 ---
 

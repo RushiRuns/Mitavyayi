@@ -15,6 +15,7 @@ import com.rushi.mitavyay.ui.screens.Hub.HubScreen
 import com.rushi.mitavyay.ui.screens.Insights.InsightsScreen
 import com.rushi.mitavyay.ui.screens.RepeatExpense.RepeatExpenseListScreen
 import com.rushi.mitavyay.ui.screens.Settings.ImportExportScreen
+import com.rushi.mitavyay.ui.screens.Settings.SettingsScreen
 import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailScreen
 import com.rushi.mitavyay.ui.screens.TransactionList.TransactionListScreen
 
@@ -29,8 +30,7 @@ import com.rushi.mitavyay.ui.theme.appMotion
 fun MitavyayNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = NavDestination.TransactionList.route,
-    onOpenSettings: () -> Unit = {}
+    startDestination: String = NavDestination.TransactionList.route
 ) {
     val motion = MaterialTheme.appMotion
 
@@ -86,7 +86,14 @@ fun MitavyayNavHost(
                 onNavigateToGoals = { navController.navigate(NavDestination.Goals.route) },
                 onNavigateToBudget = { navController.navigate(NavDestination.Budget.route) },
                 onNavigateToCategories = { navController.navigate(NavDestination.Categories.route) },
-                onNavigateToSettings = onOpenSettings
+                onNavigateToSettings = { navController.navigate(NavDestination.Settings.route) }
+            )
+        }
+        composable(NavDestination.Settings.route) {
+            SettingsScreen(
+                onNavigateToBackupData = {
+                    navController.navigate(NavDestination.ImportExport.route)
+                }
             )
         }
         composable(NavDestination.Accounts.route) {

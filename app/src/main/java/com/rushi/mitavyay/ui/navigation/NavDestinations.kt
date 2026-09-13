@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -44,6 +45,12 @@ sealed class NavDestination(
         route = "accounts",
         title = "Accounts",
         icon = Icons.Default.AccountBox
+    )
+
+    data object Settings : NavDestination(
+        route = "settings",
+        title = "Settings",
+        icon = Icons.Default.Settings
     )
 
     data object Categories : NavDestination(
@@ -113,6 +120,7 @@ sealed class NavDestination(
                 Analysis.route -> Analysis
                 More.route -> More
                 Accounts.route -> Accounts
+                Settings.route -> Settings
                 Categories.route -> Categories
                 ImportExport.route -> ImportExport
                 Debt.route -> Debt

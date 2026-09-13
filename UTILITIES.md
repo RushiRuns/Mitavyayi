@@ -149,6 +149,7 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 - `BudgetListScreen` (`ui/screens/Budget/BudgetListScreen.kt`): Screen managing monthly category budgets with month navigation (<, >, Today), threshold warning banner (80% / 100%), overall health summary card, budget vs actual comparative bar chart, copy from previous month action, and category budget item cards.
 - `InsightsScreen` (`ui/screens/Insights/InsightsScreen.kt`): Simple, high-value financial statistics dashboard providing key metrics for any month (total spent with previous month comparison badge, daily burn rate across elapsed days, largest transaction of the month with detail navigation, most used category by frequency and volume, and monthly cash flow summary). Powered by repository-level reactive aggregations.
 - `BasicInsightsData` & `BasicInsightsCalculator` (`data/repository/TransactionRepository.kt`): Data model and pure calculation engine for monthly basic insights, maintaining offline-first execution and `Long` paise financial precision.
+- `SettingsScreen` & `SettingsViewModel` (`ui/screens/Settings/SettingsScreen.kt`, `SettingsViewModel.kt`): Full-page settings screen organizing Appearance (System/Light/Dark theme selector), Data Management (navigation link to Backup & Data CSV Import/Export), Preferences (tactile haptic feedback toggle), and About information.
 - `ImportExportScreen` (`ui/screens/Settings/ImportExportScreen.kt`): Screen managing transaction export, SAF document creation, system sharing, and all-or-nothing CSV import.
 
 

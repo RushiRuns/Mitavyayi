@@ -3,6 +3,14 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 2: Settings as Full-Page Screen + Move 'Backup & Data'.
+  - Created full-page `SettingsScreen` (`ui/screens/Settings/SettingsScreen.kt`) and `SettingsViewModel` (`ui/screens/Settings/SettingsViewModel.kt`).
+  - Added `NavDestination.Settings` (`route = "settings"`, `title = "Settings"`, `icon = Icons.Default.Settings`) with TopAppBar back navigation returning to `More` hub.
+  - Included Appearance section (System default, Light theme, Dark theme radio selectors), Preferences section (Haptic feedback toggle), and About section.
+  - Moved "Backup & Data" into Settings with direct navigation card opening `ImportExportScreen` (`route = "import_export"`), supporting backward navigation returning to Settings.
+  - Connected `HubScreen` "Settings" menu item to `NavDestination.Settings.route`.
+  - Created `SettingsViewModelTest.kt` covering initial state, theme switching, and haptic feedback toggling.
+  - All 181 unit tests pass cleanly.
 - Change 1: Replace 'Accounts' Tab with 'More' Hub Screen; Top bar icons removed.
   - Replaced bottom navigation 'Accounts' tab with 'More' (`NavDestination.More`, route = `"more"`, icon = `Icons.Default.Menu`).
   - Created `HubScreen` (`ui/screens/Hub/HubScreen.kt`) presenting clean, card-based navigation to:
