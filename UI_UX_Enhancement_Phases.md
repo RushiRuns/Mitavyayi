@@ -232,26 +232,26 @@
 
 ### Tasks
 
-- [ ] In `QuickAddExpenseSheet.kt`: remove the `NotesField` composable and its state variable
+- [x] In `QuickAddExpenseSheet.kt`: remove the `NotesField` composable and its state variable
   - When saving, pass `notes = null` (or empty string, per existing schema)
-- [ ] In `EditTransactionDialog.kt`: remove Notes text field
-- [ ] In `TransactionDetailScreen.kt`: remove the Notes display section
-- [ ] In `BatchAddTransactionsDialog.kt`: remove Notes column/field
-- [ ] Delete `ui/components/NotesField.kt` (after verifying no other file imports it)
+- [x] In `EditTransactionDialog.kt`: remove Notes text field
+- [x] In `TransactionDetailScreen.kt`: remove the Notes display section
+- [x] In `BatchAddTransactionsDialog.kt`: remove Notes column/field
+- [x] Delete `ui/components/NotesField.kt` (after verifying no other file imports it)
   - Grep for `NotesField` across all `.kt` files to confirm zero remaining usages
-- [ ] Remove the "Bullet", "Today", "#tax", "#reimbursable" quick-insert chips if they are Notes-specific helpers (visible in Image 2)
+- [x] Remove the "Bullet", "Today", "#tax", "#reimbursable" quick-insert chips if they are Notes-specific helpers (visible in Image 2)
 
 **Testing**
-- [ ] Test: Quick add expense has no Notes field
-- [ ] Test: Transaction detail has no Notes section
-- [ ] Test: Edit transaction has no Notes field
-- [ ] Test: All existing transactions with notes still load (notes data not lost)
-- [ ] Test: App compiles with zero references to NotesField
+- [x] Test: Quick add expense has no Notes field
+- [x] Test: Transaction detail has no Notes section
+- [x] Test: Edit transaction has no Notes field
+- [x] Test: All existing transactions with notes still load (notes data not lost)
+- [x] Test: App compiles with zero references to NotesField
 
 **Closure**
-- [ ] Update `UTILITIES.md` — remove NotesField entry
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 4: Notes feature removed from UI (data column preserved)"`
+- [x] Update `UTILITIES.md` — remove NotesField entry
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 4: Notes feature removed from UI (data column preserved)"`
 
 ---
 

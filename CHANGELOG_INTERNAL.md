@@ -3,6 +3,14 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 4: Notes feature removed from UI (data column preserved).
+  - Completely removed the "Notes" field and quick-insert helper chips from `QuickAddExpenseSheet` and `EditTransactionDialog`.
+  - Removed Notes detail row, dedicated Notes card, and `EditNoteDialog` from `TransactionDetailScreen`.
+  - Removed Notes field from `BatchAddTransactionsDialog` rows.
+  - Removed notes preview from `TransactionCard` item views in `Cards.kt`.
+  - Safely deleted `NotesField.kt` component (`ui/components/NotesField.kt`) after verifying zero remaining usages.
+  - Data safety preserved: Room database schema and `Transaction.notes` entity column remain completely intact for zero data loss.
+  - Updated `UTILITIES.md` and `UI_UX_Enhancement_Phases.md`.
 - Change 3: Green demoted to accent; grey-based neutral theme for light/dark.
   - Refactored `Color.kt` to demote green from ubiquitous surface/container usage to a selective, intentional accent color (`#4CAF50` / `#388E3C` / `#81C784`).
   - Restructured Light theme palette to clean neutral off-white/greys: background `#F5F5F5`, cards/surfaces `#FFFFFF`, secondary containers/dividers `#EEEEEE` / `#E0E0E0`, text `#121212` / `#757575`.

@@ -215,16 +215,6 @@ fun TransactionCard(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
-                if (!item.notes.isNullOrBlank()) {
-                    SpacerXs()
-                    Text(
-                        text = "📝 ${item.notes.lines().firstOrNull() ?: ""}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
             }
 
             Text(

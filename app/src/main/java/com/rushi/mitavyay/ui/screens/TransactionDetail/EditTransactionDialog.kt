@@ -38,7 +38,6 @@ import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.model.CategoryDisplayItem
 import com.rushi.mitavyay.ui.components.AppTextField
 import com.rushi.mitavyay.ui.components.CurrencyInput
-import com.rushi.mitavyay.ui.components.NotesField
 import com.rushi.mitavyay.ui.components.PrimaryButton
 import com.rushi.mitavyay.ui.components.SecondaryButton
 import com.rushi.mitavyay.ui.components.SpacerLg
@@ -71,9 +70,6 @@ fun EditTransactionDialog(
     }
     var selectedAccountId by remember(transaction) {
         mutableStateOf(transaction.accountId)
-    }
-    var notes by remember(transaction) {
-        mutableStateOf(transaction.notes ?: "")
     }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -218,15 +214,6 @@ fun EditTransactionDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                SpacerMd()
-
-                // Notes
-                NotesField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
                 if (errorMessage != null && amountPaise > 0L) {
                     SpacerSm()
                     Text(
@@ -264,7 +251,7 @@ fun EditTransactionDialog(
                                 errorMessage = "Please select a category"
                                 return@PrimaryButton
                             }
-                            onSave(amountPaise, isExpense, description, selectedCategoryId, selectedAccountId, notes.trim().ifBlank { null })
+                            onSave(amountPaise, isExpense, description, selectedCategoryId, selectedAccountId, transaction.notes)
                         },
                         enabled = amountPaise > 0L && selectedAccountId.isNotBlank() && selectedCategoryId.isNotBlank(),
                         modifier = Modifier.weight(1f)

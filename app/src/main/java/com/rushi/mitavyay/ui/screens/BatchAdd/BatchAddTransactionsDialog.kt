@@ -47,7 +47,6 @@ import com.rushi.mitavyay.data.model.AccountDisplayItem
 import com.rushi.mitavyay.data.model.CategoryDisplayItem
 import com.rushi.mitavyay.ui.components.AppTextField
 import com.rushi.mitavyay.ui.components.CurrencyInput
-import com.rushi.mitavyay.ui.components.NotesField
 import com.rushi.mitavyay.ui.components.PrimaryButton
 import com.rushi.mitavyay.ui.components.SecondaryButton
 import com.rushi.mitavyay.ui.components.SpacerLg
@@ -398,19 +397,6 @@ private fun BatchRowCard(
                 }
             }
 
-            SpacerSm()
-
-            // Notes Field
-            NotesField(
-                value = row.notes,
-                onValueChange = { onUpdate(row.copy(notes = it)) },
-                label = "Notes / Tags",
-                placeholder = "Add tags or receipt notes...",
-                minLines = 2,
-                maxLines = 3,
-                showQuickHelpers = false,
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }

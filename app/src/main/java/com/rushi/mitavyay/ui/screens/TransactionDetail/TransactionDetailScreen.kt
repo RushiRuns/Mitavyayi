@@ -43,7 +43,6 @@ import com.rushi.mitavyay.ui.components.AppAlertDialog
 import com.rushi.mitavyay.ui.components.DangerButton
 import com.rushi.mitavyay.ui.components.EmptyState
 import com.rushi.mitavyay.ui.components.LoadingState
-import com.rushi.mitavyay.ui.components.NotesField
 import com.rushi.mitavyay.ui.components.PrimaryButton
 import com.rushi.mitavyay.ui.components.SecondaryButton
 import com.rushi.mitavyay.ui.components.SpacerLg
@@ -65,7 +64,6 @@ fun TransactionDetailScreen(
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
-    var showEditNoteDialog by remember { mutableStateOf(false) }
 
     when {
         uiState.isLoading -> {
@@ -207,73 +205,6 @@ fun TransactionDetailScreen(
                             label = "Category",
                             value = tx.category
                         )
-                        if (!tx.notes.isNullOrBlank()) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = MaterialTheme.spacing.sm),
-                                color = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                            DetailRow(
-                                label = "Notes",
-                                value = tx.notes
-                            )
-                        }
-                    }
-                }
-
-                SpacerLg()
-
-                // Dedicated Notes Card
-                Card(
-                    shape = MaterialTheme.appShapes.medium,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = MaterialTheme.spacing.xs
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(MaterialTheme.spacing.cardContent)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Transaction Notes",
-                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            if (!isTransfer) {
-                                IconButton(onClick = { showEditNoteDialog = true }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Edit,
-                                        contentDescription = if (tx.notes.isNullOrBlank()) "Add Note" else "Edit Note",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            }
-                        }
-
-                        if (!tx.notes.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
-                            Text(
-                                text = tx.notes,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        } else {
-                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.xs))
-                            Text(
-                                text = "No notes attached. Tap edit to add receipt details, tags, or reminders.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
-                        }
                     }
                 }
 
@@ -368,61 +299,7 @@ fun TransactionDetailScreen(
                 )
             }
 
-            // Edit Note Dialog
-            if (showEditNoteDialog) {
-                var noteText by remember { mutableStateOf(tx.notes ?: "") }
-                Dialog(onDismissRequest = { showEditNoteDialog = false }) {
-                    Surface(
-                        shape = MaterialTheme.appShapes.large,
-                        color = MaterialTheme.colorScheme.surface,
-                        tonalElevation = MaterialTheme.spacing.sm,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(MaterialTheme.spacing.lg)
-                        ) {
-                            Text(
-                                text = if (tx.notes.isNullOrBlank()) "Add Note" else "Edit Note",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            SpacerMd()
-                            NotesField(
-                                value = noteText,
-                                onValueChange = { noteText = it },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            SpacerLg()
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                SecondaryButton(
-                                    text = "Cancel",
-                                    onClick = { showEditNoteDialog = false },
-                                    modifier = Modifier.weight(1f)
-                                )
-                                PrimaryButton(
-                                    text = "Save",
-                                    onClick = {
-                                        viewModel.updateNotes(noteText.trim().ifBlank { null }) {
-                                            showEditNoteDialog = false
-                                            Toast.makeText(context, "Note updated", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+
         }
     }
 }
