@@ -3,6 +3,15 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 7: Transaction date filter added; Batch Add button replaced with folder icon.
+  - Replaced the `+` button beside the search bar in `TransactionListScreen` with a date filter folder icon button (`R.drawable.ic_folder_open`).
+  - Implemented `DateFilterMenu` dropdown offering: "All Time" (clears filter), "Today", "This Week (Mon–Sun)", "This Month", and "Custom Date...".
+  - Created `DateFilter` sealed class (`data/model/DateFilter.kt`) with date matching logic (`matches(timestamp)`).
+  - Wired `dateFilter` state into `TransactionListViewModel` and reactive UI flow.
+  - Added active filter visual indicator: folder icon highlights in accent green (`primary`) when active, and an `InputChip` shows the current filter label with a single-tap clear button.
+  - Integrated `AppDateRangePickerDialog` (Material 3 `DateRangePicker`) in `ui/components/DatePicker.kt` for picking custom date ranges.
+  - Confirmed Batch Add remains fully accessible via the Quick Add sheet header.
+  - Added comprehensive unit tests in `TransactionListAndDetailTest.kt` verifying filtering for Today, ThisMonth, CustomRange, and AllTime. All 188 unit tests pass cleanly.
 - Change 6: Fixed Quick Add Expense bottom sheet shape and cropping.
   - Resolved severe dome-like corner clipping on `ModalBottomSheet` in `QuickAddExpenseSheet.kt` by explicitly setting `shape = RectangleShape`.
   - Configured `dragHandle = { BottomSheetDefaults.DragHandle() }` and confirmed `skipPartiallyExpanded = true` on `rememberModalBottomSheetState` so sheet expands cleanly without truncating content.

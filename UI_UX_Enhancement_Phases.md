@@ -328,35 +328,35 @@
 ### Tasks
 
 **UI Change**
-- [ ] Replace the `+` `IconButton` next to the search bar with `Icons.Default.FolderOpen` (or similar folder icon)
-- [ ] Change click handler to open a date filter dropdown/menu
+- [x] Replace the `+` `IconButton` next to the search bar with `Icons.Default.FolderOpen` (or similar folder icon)
+- [x] Change click handler to open a date filter dropdown/menu
 
 **Batch Add Access**
-- [ ] Batch Add remains accessible in the Quick Add sheet header (already visible in Image 2 as "Batch Add" link) — no further action needed
+- [x] Batch Add remains accessible in the Quick Add sheet header (already visible in Image 2 as "Batch Add" link) — no further action needed
 
 **Date Filter**
-- [ ] Create a `DateFilterMenu` composable (dropdown or bottom sheet):
+- [x] Create a `DateFilterMenu` composable (dropdown or bottom sheet):
   - **All Time** — clear filter (default)
   - **Today**
   - **This Week** (Mon–Sun)
   - **This Month**
   - **Custom Date** — opens date range picker
-- [ ] In `TransactionListViewModel.kt`:
+- [x] In `TransactionListViewModel.kt`:
   - Add `dateFilter: DateFilter` sealed class state
   - Filter the `transactions` Flow based on `dateFilter`
-- [ ] Show active filter indicator: when a filter is active, the folder icon changes to accent green
+- [x] Show active filter indicator: when a filter is active, the folder icon changes to accent green
 
 **Testing**
-- [ ] Test: Tap folder icon → filter dropdown appears
-- [ ] Test: Each filter option shows correct transactions
-- [ ] Test: Custom date range works
-- [ ] Test: "All Time" clears filter
-- [ ] Test: Batch Add still accessible via Quick Add sheet
+- [x] Test: Tap folder icon → filter dropdown appears
+- [x] Test: Each filter option shows correct transactions
+- [x] Test: Custom date range works
+- [x] Test: "All Time" clears filter
+- [x] Test: Batch Add still accessible via Quick Add sheet
 
 **Closure**
-- [ ] Update `UTILITIES.md` with `DateFilter` sealed class
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 7: Transaction date filter added; Batch Add button replaced with folder icon"`
+- [x] Update `UTILITIES.md` with `DateFilter` sealed class
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 7: Transaction date filter added; Batch Add button replaced with folder icon"`
 
 ---
 

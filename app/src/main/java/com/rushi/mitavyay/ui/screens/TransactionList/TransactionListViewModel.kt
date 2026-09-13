@@ -2,7 +2,9 @@ package com.rushi.mitavyay.ui.screens.TransactionList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rushi.mitavyay.data.model.DateFilter
 import com.rushi.mitavyay.data.model.TransactionDisplayItem
+import com.rushi.mitavyay.data.model.matches
 import com.rushi.mitavyay.data.model.toDisplayItem
 import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
@@ -22,6 +24,7 @@ data class TransactionListUiState(
     val isRefreshing: Boolean = false,
     val transactions: List<TransactionDisplayItem> = emptyList(),
     val searchQuery: String = "",
+    val dateFilter: DateFilter = DateFilter.AllTime,
     val errorMessage: String? = null
 )
 
@@ -34,15 +37,18 @@ class TransactionListViewModel @Inject constructor(
     private val accountsFlow = accountRepository?.getAllAccounts() ?: flowOf(emptyList())
     private val _searchQuery = MutableStateFlow("")
     private val _isRefreshing = MutableStateFlow(false)
+    private val _dateFilter = MutableStateFlow<DateFilter>(DateFilter.AllTime)
 
     val uiState: StateFlow<TransactionListUiState> = combine(
         transactionRepository.getAllTransactions(),
         accountsFlow,
         _searchQuery,
-        _isRefreshing
-    ) { transactions, accounts, query, isRefreshing ->
+        _isRefreshing,
+        _dateFilter
+    ) { transactions, accounts, query, isRefreshing, dateFilter ->
         val accountMap = accounts.associateBy { it.id }
         val allDisplayItems = transactions
+            .filter { dateFilter.matches(it.timestamp) }
             .sortedByDescending { it.timestamp }
             .map { tx ->
                 tx.toDisplayItem(accountName = accountMap[tx.accountId]?.name)
@@ -64,7 +70,8 @@ class TransactionListViewModel @Inject constructor(
             isLoading = false,
             isRefreshing = isRefreshing,
             transactions = filtered,
-            searchQuery = query
+            searchQuery = query,
+            dateFilter = dateFilter
         )
     }.stateIn(
         scope = viewModelScope,
@@ -74,6 +81,10 @@ class TransactionListViewModel @Inject constructor(
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query
+    }
+
+    fun onDateFilterChange(filter: DateFilter) {
+        _dateFilter.value = filter
     }
 
     fun refresh() {

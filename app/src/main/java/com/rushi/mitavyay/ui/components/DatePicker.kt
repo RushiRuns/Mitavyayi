@@ -9,10 +9,12 @@ import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -120,6 +122,72 @@ fun AppDatePickerDialog(
     ) {
         DatePicker(
             state = datePickerState,
+            colors = DatePickerDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                weekdayContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                subheadContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                yearContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                currentYearContentColor = MaterialTheme.colorScheme.primary,
+                selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                selectedYearContainerColor = MaterialTheme.colorScheme.primary,
+                dayContentColor = MaterialTheme.colorScheme.onSurface,
+                selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
+                selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+                todayContentColor = MaterialTheme.colorScheme.primary,
+                todayDateBorderColor = MaterialTheme.colorScheme.primary
+            )
+        )
+    }
+}
+
+/**
+ * Material 3 DateRangePickerDialog wrapper using application theme tokens.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppDateRangePickerDialog(
+    initialSelectedStartDateMs: Long? = null,
+    initialSelectedEndDateMs: Long? = null,
+    onDateRangeSelected: (startDateMs: Long, endDateMs: Long) -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val dateRangePickerState = rememberDateRangePickerState(
+        initialSelectedStartDateMillis = initialSelectedStartDateMs,
+        initialSelectedEndDateMillis = initialSelectedEndDateMs
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            PrimaryButton(
+                text = stringResource(R.string.action_confirm),
+                onClick = {
+                    val start = dateRangePickerState.selectedStartDateMillis
+                    val end = dateRangePickerState.selectedEndDateMillis ?: start
+                    if (start != null && end != null) {
+                        onDateRangeSelected(start, end)
+                    }
+                },
+                enabled = dateRangePickerState.selectedStartDateMillis != null
+            )
+        },
+        dismissButton = {
+            TertiaryButton(
+                text = stringResource(R.string.action_cancel),
+                onClick = onDismissRequest
+            )
+        },
+        modifier = modifier,
+        shape = MaterialTheme.appShapes.large,
+        colors = DatePickerDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        DateRangePicker(
+            state = dateRangePickerState,
             colors = DatePickerDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 titleContentColor = MaterialTheme.colorScheme.onSurface,

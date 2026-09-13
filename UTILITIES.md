@@ -97,7 +97,11 @@ This file serves as the index for all shared utilities, formatters, extensions, 
 ### Inputs & Date Selection (`ui/components/Inputs.kt`, `CurrencyInput.kt`, `DatePicker.kt`)
 - `AppTextField`: Outlined text field wrapper with theme token colors, shapes, and error state validation feedback.
 - `CurrencyInput`: Dedicated monetary input with currency prefix, sanitized numeric entry, and direct `Long` paise conversion.
-- `DatePickerField` & `AppDatePickerDialog`: Date selection field launching a Material 3 DatePickerDialog and emitting Unix timestamp ms (`Long`).
+- `DatePickerField`, `AppDatePickerDialog`, & `AppDateRangePickerDialog`: Date and date-range selection components launching Material 3 DatePickerDialog / DateRangePickerDialog and emitting Unix timestamp ms (`Long`).
+- `DateFilter` (`com.rushi.mitavyay.data.model.DateFilter`):
+  - Sealed class representing chronological transaction filtering: `AllTime`, `Today`, `ThisWeek` (Mon–Sun), `ThisMonth`, and `CustomRange(startDateMs, endDateMs)`.
+  - Includes `fun DateFilter.matches(timestamp: Long): Boolean` evaluation engine.
+  - *Location*: `data/model/DateFilter.kt`
 
 ### Dialogs & Bottom Sheets (`ui/components/Dialogs.kt`, `ui/screens/Accounts/AddAccountDialog.kt`, `ui/screens/Transfer/TransferDialog.kt`, `ui/screens/QuickAddExpense/QuickAddExpenseSheet.kt`, `ui/screens/BatchAdd/BatchAddTransactionsDialog.kt`, `ui/screens/TransactionDetail/EditTransactionDialog.kt`, `ui/components/ThemeSelectionDialog.kt`, `ui/components/AddCategoryDialog.kt`, `ui/screens/Debt/AddDebtDialog.kt`, `ui/screens/RepeatExpense/AddRepeatDialog.kt`, `ui/screens/Goals/AddGoalDialog.kt`, `ui/screens/Goals/AddGoalSavingsDialog.kt`)
 - `AppAlertDialog`: Standardized confirmation and alert dialog with theme typography, colors, and confirm/dismiss actions.

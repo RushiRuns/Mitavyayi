@@ -8,6 +8,7 @@ import com.rushi.mitavyay.data.repository.AccountRepository
 import com.rushi.mitavyay.data.repository.CategoryRepository
 import com.rushi.mitavyay.data.repository.TransactionRepository
 import com.rushi.mitavyay.data.repository.TransferRepository
+import com.rushi.mitavyay.data.model.DateFilter
 import com.rushi.mitavyay.ui.navigation.NavDestination
 import com.rushi.mitavyay.ui.screens.TransactionDetail.TransactionDetailViewModel
 import com.rushi.mitavyay.ui.screens.TransactionList.TransactionListViewModel
@@ -292,6 +293,85 @@ class TransactionListAndDetailTest {
 
         assertEquals("-₹1,500.00", expenseItem.amountFormatted)
         assertFalse(expenseItem.isCredit)
+    }
+
+    @Test
+    fun transactionList_filterByToday() = runBlocking {
+        val now = System.currentTimeMillis()
+        val tenDaysAgo = now - (10L * 24 * 60 * 60 * 1000L)
+
+        fakeTxRepo.addTransaction(
+            Transaction("tx_today", "acc_bank", -5000L, "Coffee today", now, "Food & Dining")
+        )
+        fakeTxRepo.addTransaction(
+            Transaction("tx_old", "acc_bank", -10000L, "Coffee old", tenDaysAgo, "Food & Dining")
+        )
+
+        val viewModel = TransactionListViewModel(fakeTxRepo, fakeAccountRepo)
+        viewModel.onDateFilterChange(DateFilter.Today)
+
+        val state = viewModel.uiState.first { it.transactions.size == 1 && it.transactions[0].id == "tx_today" }
+        assertEquals(1, state.transactions.size)
+        assertEquals("tx_today", state.transactions[0].id)
+    }
+
+    @Test
+    fun transactionList_filterByThisMonth() = runBlocking {
+        val now = System.currentTimeMillis()
+        val oneYearAgo = now - (365L * 24 * 60 * 60 * 1000L)
+
+        fakeTxRepo.addTransaction(
+            Transaction("tx_month", "acc_bank", -5000L, "Snack this month", now, "Food & Dining")
+        )
+        fakeTxRepo.addTransaction(
+            Transaction("tx_year_ago", "acc_bank", -10000L, "Snack last year", oneYearAgo, "Food & Dining")
+        )
+
+        val viewModel = TransactionListViewModel(fakeTxRepo, fakeAccountRepo)
+        viewModel.onDateFilterChange(DateFilter.ThisMonth)
+
+        val state = viewModel.uiState.first { it.transactions.size == 1 && it.transactions[0].id == "tx_month" }
+        assertEquals(1, state.transactions.size)
+        assertEquals("tx_month", state.transactions[0].id)
+    }
+
+    @Test
+    fun transactionList_filterByCustomRange() = runBlocking {
+        val t1 = 1700000000000L // within range
+        val t2 = 1700100000000L // within range
+        val tOutside = 1710000000000L // outside range
+
+        fakeTxRepo.addTransaction(Transaction("tx_1", "acc_bank", -1000L, "T1", t1, "Food"))
+        fakeTxRepo.addTransaction(Transaction("tx_2", "acc_bank", -2000L, "T2", t2, "Food"))
+        fakeTxRepo.addTransaction(Transaction("tx_3", "acc_bank", -3000L, "T3", tOutside, "Food"))
+
+        val viewModel = TransactionListViewModel(fakeTxRepo, fakeAccountRepo)
+        viewModel.onDateFilterChange(DateFilter.CustomRange(1699900000000L, 1700200000000L))
+
+        val state = viewModel.uiState.first { it.transactions.size == 2 }
+        assertEquals(2, state.transactions.size)
+        assertTrue(state.transactions.any { it.id == "tx_1" })
+        assertTrue(state.transactions.any { it.id == "tx_2" })
+        assertFalse(state.transactions.any { it.id == "tx_3" })
+    }
+
+    @Test
+    fun transactionList_allTimeClearsFilter() = runBlocking {
+        val now = System.currentTimeMillis()
+        val old = now - (60L * 24 * 60 * 60 * 1000L)
+
+        fakeTxRepo.addTransaction(Transaction("tx_now", "acc_bank", -1000L, "Now", now, "Food"))
+        fakeTxRepo.addTransaction(Transaction("tx_old", "acc_bank", -2000L, "Old", old, "Food"))
+
+        val viewModel = TransactionListViewModel(fakeTxRepo, fakeAccountRepo)
+        viewModel.onDateFilterChange(DateFilter.Today)
+
+        val stateFiltered = viewModel.uiState.first { it.transactions.size == 1 }
+        assertEquals(1, stateFiltered.transactions.size)
+
+        viewModel.onDateFilterChange(DateFilter.AllTime)
+        val stateAll = viewModel.uiState.first { it.transactions.size == 2 }
+        assertEquals(2, stateAll.transactions.size)
     }
 
     @Test

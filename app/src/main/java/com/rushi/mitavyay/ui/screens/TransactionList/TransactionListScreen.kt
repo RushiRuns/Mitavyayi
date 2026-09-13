@@ -29,32 +29,43 @@ import com.rushi.mitavyay.ui.components.TransactionCard
 import com.rushi.mitavyay.ui.theme.appShapes
 import com.rushi.mitavyay.ui.theme.spacing
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
-import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
-import androidx.compose.foundation.background
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.rushi.mitavyay.R
+import com.rushi.mitavyay.data.model.DateFilter
 import com.rushi.mitavyay.data.model.TransactionDisplayItem
 import com.rushi.mitavyay.ui.components.AppAlertDialog
+import com.rushi.mitavyay.ui.components.AppDateRangePickerDialog
 import com.rushi.mitavyay.ui.components.EmptySearchIllustration
 import com.rushi.mitavyay.ui.components.EmptyTransactionsIllustration
 import com.rushi.mitavyay.ui.components.SkeletonTransactionList
+import com.rushi.mitavyay.ui.screens.BatchAdd.BatchAddTransactionsDialog
+import com.rushi.mitavyay.util.DateTimeFormatter
 import com.rushi.mitavyay.util.hapticError
 import com.rushi.mitavyay.util.hapticLight
 import com.rushi.mitavyay.util.hapticSuccess
@@ -67,23 +78,16 @@ fun TransactionListScreen(
     viewModel: TransactionListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var showBatchAddDialog by remember { mutableStateOf(false) }
 
     TransactionListContent(
         uiState = uiState,
         onSearchQueryChange = viewModel::onSearchQueryChange,
+        onDateFilterChange = viewModel::onDateFilterChange,
         onTransactionClick = onTransactionClick,
-        onBatchAddClick = { showBatchAddDialog = true },
         onRefresh = viewModel::refresh,
         onDeleteTransaction = viewModel::deleteTransaction,
         modifier = modifier
     )
-
-    if (showBatchAddDialog) {
-        BatchAddTransactionsDialog(
-            onDismiss = { showBatchAddDialog = false }
-        )
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,14 +95,18 @@ fun TransactionListScreen(
 fun TransactionListContent(
     uiState: TransactionListUiState,
     onSearchQueryChange: (String) -> Unit = {},
+    onDateFilterChange: (DateFilter) -> Unit = {},
     onTransactionClick: (String) -> Unit = {},
-    onBatchAddClick: () -> Unit = {},
+    onBatchAddClick: (() -> Unit)? = null,
     onRefresh: () -> Unit = {},
     onDeleteTransaction: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     var transactionPendingDelete by remember { mutableStateOf<TransactionDisplayItem?>(null) }
+    var showFilterMenu by remember { mutableStateOf(false) }
+    var showCustomDateRangePicker by remember { mutableStateOf(false) }
+    val isFilterActive = uiState.dateFilter !is DateFilter.AllTime
 
     val pullToRefreshState = rememberPullToRefreshState()
     if (pullToRefreshState.isRefreshing) {
@@ -135,7 +143,7 @@ fun TransactionListContent(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        // Search Bar and Batch Add Action
+        // Search Bar and Date Filter Action
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -182,16 +190,104 @@ fun TransactionListContent(
                 modifier = Modifier.weight(1f)
             )
 
-            FilledTonalIconButton(
-                onClick = onBatchAddClick,
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Batch Add Transactions",
-                    tint = MaterialTheme.colorScheme.primary
+            // Filter Folder Icon Button
+            Box {
+                FilledTonalIconButton(
+                    onClick = {
+                        context.hapticLight()
+                        showFilterMenu = true
+                    },
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = if (isFilterActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (isFilterActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_folder_open),
+                        contentDescription = "Filter by date",
+                        tint = if (isFilterActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                DateFilterMenu(
+                    expanded = showFilterMenu,
+                    selectedFilter = uiState.dateFilter,
+                    onFilterSelect = { filter ->
+                        context.hapticLight()
+                        showFilterMenu = false
+                        onDateFilterChange(filter)
+                    },
+                    onCustomDateClick = {
+                        context.hapticLight()
+                        showFilterMenu = false
+                        showCustomDateRangePicker = true
+                    },
+                    onDismissRequest = { showFilterMenu = false }
                 )
             }
+        }
+
+        // Active Date Filter Indicator Chip
+        if (isFilterActive) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MaterialTheme.spacing.md, vertical = MaterialTheme.spacing.xs),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                InputChip(
+                    selected = true,
+                    onClick = {
+                        context.hapticLight()
+                        showFilterMenu = true
+                    },
+                    label = {
+                        val labelText = when (val filter = uiState.dateFilter) {
+                            is DateFilter.AllTime -> "All Time"
+                            is DateFilter.Today -> "Today"
+                            is DateFilter.ThisWeek -> "This Week"
+                            is DateFilter.ThisMonth -> "This Month"
+                            is DateFilter.CustomRange -> "${DateTimeFormatter.formatShortDate(filter.startDateMs)} - ${DateTimeFormatter.formatShortDate(filter.endDateMs)}"
+                        }
+                        Text("Date: $labelText")
+                    },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                context.hapticLight()
+                                onDateFilterChange(DateFilter.AllTime)
+                            },
+                            modifier = Modifier.size(18.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear Date Filter",
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
+                    },
+                    colors = InputChipDefaults.inputChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        selectedLabelColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+        }
+
+        if (showCustomDateRangePicker) {
+            val initialStart = (uiState.dateFilter as? DateFilter.CustomRange)?.startDateMs ?: System.currentTimeMillis()
+            val initialEnd = (uiState.dateFilter as? DateFilter.CustomRange)?.endDateMs ?: System.currentTimeMillis()
+            AppDateRangePickerDialog(
+                initialSelectedStartDateMs = initialStart,
+                initialSelectedEndDateMs = initialEnd,
+                onDateRangeSelected = { start, end ->
+                    context.hapticSuccess()
+                    onDateFilterChange(DateFilter.CustomRange(start, end))
+                    showCustomDateRangePicker = false
+                },
+                onDismissRequest = { showCustomDateRangePicker = false }
+            )
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -200,12 +296,30 @@ fun TransactionListContent(
                     SkeletonTransactionList(count = 6)
                 }
                 uiState.transactions.isEmpty() -> {
-                    if (uiState.searchQuery.isNotBlank()) {
+                    if (uiState.searchQuery.isNotBlank() || isFilterActive) {
+                        val filterLabel = when (val filter = uiState.dateFilter) {
+                            is DateFilter.AllTime -> ""
+                            is DateFilter.Today -> "Today"
+                            is DateFilter.ThisWeek -> "This Week"
+                            is DateFilter.ThisMonth -> "This Month"
+                            is DateFilter.CustomRange -> "${DateTimeFormatter.formatShortDate(filter.startDateMs)} - ${DateTimeFormatter.formatShortDate(filter.endDateMs)}"
+                        }
+                        val desc = when {
+                            uiState.searchQuery.isNotBlank() && isFilterActive ->
+                                "No transactions found matching \"${uiState.searchQuery}\" for date filter: $filterLabel."
+                            isFilterActive ->
+                                "No transactions found for date filter: $filterLabel."
+                            else ->
+                                "No transactions found matching \"${uiState.searchQuery}\". Try a different keyword."
+                        }
                         EmptyState(
                             title = "No matching transactions",
-                            description = "No transactions found matching \"${uiState.searchQuery}\". Try a different keyword or check notes.",
-                            actionText = "Clear Search",
-                            onAction = { onSearchQueryChange("") },
+                            description = desc,
+                            actionText = "Clear Filters",
+                            onAction = {
+                                if (uiState.searchQuery.isNotBlank()) onSearchQueryChange("")
+                                if (isFilterActive) onDateFilterChange(DateFilter.AllTime)
+                            },
                             illustration = { EmptySearchIllustration() }
                         )
                     } else {
@@ -310,3 +424,97 @@ private fun SwipeableTransactionCard(
         )
     }
 }
+
+@Composable
+fun DateFilterMenu(
+    expanded: Boolean,
+    selectedFilter: DateFilter,
+    onFilterSelect: (DateFilter) -> Unit,
+    onCustomDateClick: () -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
+    ) {
+        DropdownMenuItem(
+            text = { Text("All Time") },
+            trailingIcon = {
+                if (selectedFilter is DateFilter.AllTime) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Selected",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            },
+            onClick = { onFilterSelect(DateFilter.AllTime) }
+        )
+        DropdownMenuItem(
+            text = { Text("Today") },
+            trailingIcon = {
+                if (selectedFilter is DateFilter.Today) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Selected",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            },
+            onClick = { onFilterSelect(DateFilter.Today) }
+        )
+        DropdownMenuItem(
+            text = { Text("This Week (Mon–Sun)") },
+            trailingIcon = {
+                if (selectedFilter is DateFilter.ThisWeek) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Selected",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            },
+            onClick = { onFilterSelect(DateFilter.ThisWeek) }
+        )
+        DropdownMenuItem(
+            text = { Text("This Month") },
+            trailingIcon = {
+                if (selectedFilter is DateFilter.ThisMonth) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Selected",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            },
+            onClick = { onFilterSelect(DateFilter.ThisMonth) }
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    if (selectedFilter is DateFilter.CustomRange)
+                        "Custom (${DateTimeFormatter.formatShortDate(selectedFilter.startDateMs)} - ${DateTimeFormatter.formatShortDate(selectedFilter.endDateMs)})"
+                    else "Custom Date..."
+                )
+            },
+            trailingIcon = {
+                if (selectedFilter is DateFilter.CustomRange) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Selected",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            },
+            onClick = onCustomDateClick
+        )
+    }
+}
+
