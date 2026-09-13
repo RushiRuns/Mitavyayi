@@ -158,7 +158,7 @@
 ### Tasks
 
 **Color.kt**
-- [ ] Redefine the full color palette:
+- [x] Redefine the full color palette:
   ```kotlin
   // Accent
   val AccentGreen = Color(0xFF4CAF50)
@@ -187,32 +187,32 @@
   val IncomeGreen = Color(0xFF4CAF50)  // = AccentGreen
   val WarningAmber = Color(0xFFFFA000)
   ```
-- [ ] Document the palette decision in `docs/decisions/ADR-011-Color-Palette-Refactor.md`
+- [x] Document the palette decision in `docs/decisions/ADR-011-Color-Palette-Refactor.md`
 
 **Theme.kt**
-- [ ] Update `LightColorScheme` to use the new neutral palette
-- [ ] Update `DarkColorScheme` to use the new neutral palette
-- [ ] `primary` = `AccentGreen`, `onPrimary` = white
-- [ ] `background`, `surface`, `surfaceVariant` = appropriate grey tokens
-- [ ] All secondary surfaces use grey, not green tints
+- [x] Update `LightColorScheme` to use the new neutral palette
+- [x] Update `DarkColorScheme` to use the new neutral palette
+- [x] `primary` = `AccentGreen`, `onPrimary` = white
+- [x] `background`, `surface`, `surfaceVariant` = appropriate grey tokens
+- [x] All secondary surfaces use grey, not green tints
 
 **Audit & Fix Hardcoded Colors**
-- [ ] Search codebase for `Color(0xFF` — fix every instance to use a theme token
-- [ ] Search for `MaterialTheme.colorScheme.primary` being used as a background where grey is more appropriate
-- [ ] `BottomNavBar.kt`: selected tab uses green accent; unselected uses grey — correct
-- [ ] `QuickAddExpenseSheet.kt`: "Expense" toggle red, "Income" toggle green — keep; background grey
-- [ ] `Cards.kt` (TransactionCard): background should be `surfaceVariant` (grey card), not green-tinted
+- [x] Search codebase for `Color(0xFF` — fix every instance to use a theme token
+- [x] Search for `MaterialTheme.colorScheme.primary` being used as a background where grey is more appropriate
+- [x] `BottomNavBar.kt`: selected tab uses green accent; unselected uses grey — correct
+- [x] `QuickAddExpenseSheet.kt`: "Expense" toggle red, "Income" toggle green — keep; background grey
+- [x] `Cards.kt` (TransactionCard): background should be `surfaceVariant` (grey card), not green-tinted
 
 **Testing**
-- [ ] Test: All screens in light mode — no green except accents
-- [ ] Test: All screens in dark mode — no green except accents
-- [ ] Test: WCAG AA contrast ratios pass (text on background)
-- [ ] Test: Income amounts still green, expense amounts still red
-- [ ] Test: FAB and primary buttons still green
+- [x] Test: All screens in light mode — no green except accents
+- [x] Test: All screens in dark mode — no green except accents
+- [x] Test: WCAG AA contrast ratios pass (text on background)
+- [x] Test: Income amounts still green, expense amounts still red
+- [x] Test: FAB and primary buttons still green
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 3: Green demoted to accent; grey-based neutral theme for light/dark"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 3: Green demoted to accent; grey-based neutral theme for light/dark"`
 
 ---
 

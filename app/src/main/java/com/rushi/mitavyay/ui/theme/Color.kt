@@ -10,101 +10,144 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
+// =========================================================================
+// Mitavyay Color Palette - Neutral Grey Foundation with Green Accent
+// =========================================================================
+
+// -------------------------------------------------------------------------
+// Accent Tokens (Green - Used selectively for CTAs, FABs, Income, Highlights)
+// -------------------------------------------------------------------------
+val AccentGreen = Color(0xFF4CAF50)              // Primary brand green / Income accent
+val AccentGreenDark = Color(0xFF388E3C)          // High contrast green for light surfaces (WCAG AA)
+val AccentGreenLight = Color(0xFF81C784)         // High contrast pastel green for dark surfaces (WCAG AA)
+val AccentGreenContainer = Color(0xFFE8F5E9)     // Subtle green container for light theme highlights
+val AccentGreenContainerDark = Color(0xFF1B382B) // Subtle dark green container for dark theme highlights
+
+// -------------------------------------------------------------------------
+// Light Theme Neutrals (Off-White & Pure Grey Hierarchy)
+// -------------------------------------------------------------------------
+val LightBackground = Color(0xFFF5F5F5)
+val LightSurface = Color(0xFFFFFFFF)
+val LightSurfaceVariant = Color(0xFFEEEEEE)
+val LightOnSurface = Color(0xFF121212)
+val LightOnSurfaceSecondary = Color(0xFF757575)
+val LightDivider = Color(0xFFE0E0E0)
+val LightOutline = Color(0xFFBDBDBD)
+
+// -------------------------------------------------------------------------
+// Dark Theme Neutrals (Deep Charcoal & Pure Grey Hierarchy)
+// -------------------------------------------------------------------------
+val DarkBackground = Color(0xFF121212)
+val DarkSurface = Color(0xFF1E1E1E)
+val DarkSurfaceVariant = Color(0xFF2A2A2A)
+val DarkSurfaceElevated = Color(0xFF333333)
+val DarkOnSurface = Color(0xFFE0E0E0)
+val DarkOnSurfaceSecondary = Color(0xFF9E9E9E)
+val DarkDivider = Color(0xFF3A3A3A)
+val DarkOutline = Color(0xFF555555)
+
+// -------------------------------------------------------------------------
+// Semantic Financial Colors
+// -------------------------------------------------------------------------
+val ExpenseRed = Color(0xFFE53935)
+val IncomeGreen = AccentGreen                    // 0xFF4CAF50
+val WarningAmber = Color(0xFFFFA000)
+
 // ==========================================
-// Primary Brand Colors (Emerald / Forest)
+// Primary Brand Colors (Accent Green)
 // ==========================================
-val PrimaryLight = Color(0xFF006C4C)
+val PrimaryLight = AccentGreenDark
 val OnPrimaryLight = Color(0xFFFFFFFF)
-val PrimaryContainerLight = Color(0xFF89F8C7)
-val OnPrimaryContainerLight = Color(0xFF002114)
+val PrimaryContainerLight = AccentGreenContainer
+val OnPrimaryContainerLight = Color(0xFF1B5E20)
 
-val PrimaryDark = Color(0xFF6CDBAC)
-val OnPrimaryDark = Color(0xFF003825)
-val PrimaryContainerDark = Color(0xFF005138)
-val OnPrimaryContainerDark = Color(0xFF89F8C7)
+val PrimaryDark = AccentGreenLight
+val OnPrimaryDark = Color(0xFF003816)
+val PrimaryContainerDark = AccentGreenContainerDark
+val OnPrimaryContainerDark = Color(0xFFA5D6A7)
 
 // ==========================================
-// Secondary Colors (Slate / Sage)
+// Secondary Colors (Neutral Slate / Grey)
 // ==========================================
-val SecondaryLight = Color(0xFF4C6357)
+val SecondaryLight = Color(0xFF5F6368)
 val OnSecondaryLight = Color(0xFFFFFFFF)
-val SecondaryContainerLight = Color(0xFFCEE9D9)
-val OnSecondaryContainerLight = Color(0xFF092016)
+val SecondaryContainerLight = LightSurfaceVariant
+val OnSecondaryContainerLight = Color(0xFF212121)
 
-val SecondaryDark = Color(0xFFB3CCBE)
-val OnSecondaryDark = Color(0xFF1F352A)
-val SecondaryContainerDark = Color(0xFF354B40)
-val OnSecondaryContainerDark = Color(0xFFCEE9D9)
+val SecondaryDark = Color(0xFFB0B0B0)
+val OnSecondaryDark = Color(0xFF1E1E1E)
+val SecondaryContainerDark = DarkSurfaceVariant
+val OnSecondaryContainerDark = Color(0xFFE0E0E0)
 
 // ==========================================
-// Tertiary Colors (Ocean / Steel Teal)
+// Tertiary Colors (Cool Slate for Badges/Charts)
 // ==========================================
-val TertiaryLight = Color(0xFF3D6373)
+val TertiaryLight = Color(0xFF455A64)
 val OnTertiaryLight = Color(0xFFFFFFFF)
-val TertiaryContainerLight = Color(0xFFC1E8FB)
-val OnTertiaryContainerLight = Color(0xFF001F29)
+val TertiaryContainerLight = Color(0xFFECEFF1)
+val OnTertiaryContainerLight = Color(0xFF1C2B32)
 
-val TertiaryDark = Color(0xFFA5CDE0)
-val OnTertiaryDark = Color(0xFF073543)
-val TertiaryContainerDark = Color(0xFF244B5B)
-val OnTertiaryContainerDark = Color(0xFFC1E8FB)
+val TertiaryDark = Color(0xFF90A4AE)
+val OnTertiaryDark = Color(0xFF101B20)
+val TertiaryContainerDark = Color(0xFF263238)
+val OnTertiaryContainerDark = Color(0xFFCFD8DC)
 
 // ==========================================
-// Background & Surface Colors (Neutral)
+// Background & Surface Colors (Neutral Grey)
 // ==========================================
-val BackgroundLight = Color(0xFFFBFDFA)
-val OnBackgroundLight = Color(0xFF191C1A)
-val SurfaceLight = Color(0xFFFBFDFA)
-val OnSurfaceLight = Color(0xFF191C1A)
-val SurfaceVariantLight = Color(0xFFDBE5DE)
-val OnSurfaceVariantLight = Color(0xFF404944)
-val OutlineLight = Color(0xFF707974)
-val OutlineVariantLight = Color(0xFFBFC9C2)
+val BackgroundLight = LightBackground
+val OnBackgroundLight = LightOnSurface
+val SurfaceLight = LightSurface
+val OnSurfaceLight = LightOnSurface
+val SurfaceVariantLight = LightSurfaceVariant
+val OnSurfaceVariantLight = LightOnSurfaceSecondary
+val OutlineLight = LightOutline
+val OutlineVariantLight = LightDivider
 
-val BackgroundDark = Color(0xFF101412)
-val OnBackgroundDark = Color(0xFFE1E3DF)
-val SurfaceDark = Color(0xFF101412)
-val OnSurfaceDark = Color(0xFFE1E3DF)
-val SurfaceVariantDark = Color(0xFF404944)
-val OnSurfaceVariantDark = Color(0xFFBFC9C2)
-val OutlineDark = Color(0xFF8A938D)
-val OutlineVariantDark = Color(0xFF404944)
+val BackgroundDark = DarkBackground
+val OnBackgroundDark = DarkOnSurface
+val SurfaceDark = DarkSurface
+val OnSurfaceDark = DarkOnSurface
+val SurfaceVariantDark = DarkSurfaceVariant
+val OnSurfaceVariantDark = DarkOnSurfaceSecondary
+val OutlineDark = DarkOutline
+val OutlineVariantDark = DarkDivider
 
 // ==========================================
 // Status & Semantic Colors (Error, Success, Warning)
 // ==========================================
 // Error (e.g. Expenses, over-budget)
-val ErrorLight = Color(0xFFBA1A1A)
+val ErrorLight = Color(0xFFD32F2F)
 val OnErrorLight = Color(0xFFFFFFFF)
-val ErrorContainerLight = Color(0xFFFFDAD6)
-val OnErrorContainerLight = Color(0xFF410002)
+val ErrorContainerLight = Color(0xFFFFEBEE)
+val OnErrorContainerLight = Color(0xFFC62828)
 
-val ErrorDark = Color(0xFFFFB4AB)
-val OnErrorDark = Color(0xFF690005)
-val ErrorContainerDark = Color(0xFF93000A)
-val OnErrorContainerDark = Color(0xFFFFDAD6)
+val ErrorDark = Color(0xFFFF8A80)
+val OnErrorDark = Color(0xFF490005)
+val ErrorContainerDark = Color(0xFF8C1D18)
+val OnErrorContainerDark = Color(0xFFFFCDD2)
 
 // Success (e.g. Income, savings, debt settled)
-val SuccessLight = Color(0xFF1B6C31)
+val SuccessLight = AccentGreenDark
 val OnSuccessLight = Color(0xFFFFFFFF)
-val SuccessContainerLight = Color(0xFFA6F5AB)
-val OnSuccessContainerLight = Color(0xFF002107)
+val SuccessContainerLight = AccentGreenContainer
+val OnSuccessContainerLight = Color(0xFF1B5E20)
 
-val SuccessDark = Color(0xFF8BD891)
-val OnSuccessDark = Color(0xFF003913)
-val SuccessContainerDark = Color(0xFF00531E)
-val OnSuccessContainerDark = Color(0xFFA6F5AB)
+val SuccessDark = AccentGreenLight
+val OnSuccessDark = Color(0xFF003816)
+val SuccessContainerDark = AccentGreenContainerDark
+val OnSuccessContainerDark = Color(0xFFA5D6A7)
 
 // Warning (e.g. Budget warnings 80%, upcoming dues)
-val WarningLight = Color(0xFF7B5800)
+val WarningLight = Color(0xFFE65100)
 val OnWarningLight = Color(0xFFFFFFFF)
-val WarningContainerLight = Color(0xFFFFDEA3)
-val OnWarningContainerLight = Color(0xFF261900)
+val WarningContainerLight = Color(0xFFFFF3E0)
+val OnWarningContainerLight = Color(0xFFBF360C)
 
-val WarningDark = Color(0xFFF6BD39)
-val OnWarningDark = Color(0xFF412D00)
-val WarningContainerDark = Color(0xFF5D4200)
-val OnWarningContainerDark = Color(0xFFFFDEA3)
+val WarningDark = Color(0xFFFFB74D)
+val OnWarningDark = Color(0xFF3E2723)
+val WarningContainerDark = Color(0xFF5D2A00)
+val OnWarningContainerDark = Color(0xFFFFE0B2)
 
 // ==========================================
 // Extended Semantic Color Scheme

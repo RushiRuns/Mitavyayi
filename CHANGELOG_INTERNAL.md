@@ -3,6 +3,14 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 3: Green demoted to accent; grey-based neutral theme for light/dark.
+  - Refactored `Color.kt` to demote green from ubiquitous surface/container usage to a selective, intentional accent color (`#4CAF50` / `#388E3C` / `#81C784`).
+  - Restructured Light theme palette to clean neutral off-white/greys: background `#F5F5F5`, cards/surfaces `#FFFFFF`, secondary containers/dividers `#EEEEEE` / `#E0E0E0`, text `#121212` / `#757575`.
+  - Restructured Dark theme palette to refined neutral charcoals/greys: background `#121212`, cards/surfaces `#1E1E1E`, secondary containers/variants `#2A2A2A`, elevated surfaces `#333333`, text `#E0E0E0` / `#9E9E9E`.
+  - Accent green is strictly reserved for: Floating Action Buttons (FABs), primary call-to-action buttons, positive cash flow/income amounts and badges, progress indicators, and active bottom navigation tab indicator.
+  - Retained expense red (`#E53935` / `#D32F2F`) for expenses, negative cash flow, and debt liabilities.
+  - Full WCAG AA/AAA contrast compliance across all text/container combinations.
+  - Documented design decision in `docs/decisions/ADR-011-Color-Palette-Refactor.md`.
 - Change 2: Settings as Full-Page Screen + Move 'Backup & Data'.
   - Created full-page `SettingsScreen` (`ui/screens/Settings/SettingsScreen.kt`) and `SettingsViewModel` (`ui/screens/Settings/SettingsViewModel.kt`).
   - Added `NavDestination.Settings` (`route = "settings"`, `title = "Settings"`, `icon = Icons.Default.Settings`) with TopAppBar back navigation returning to `More` hub.
