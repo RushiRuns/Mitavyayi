@@ -3,6 +3,12 @@
 This document tracks progress after each development session. 
 
 ## [Unreleased]
+- Change 13: FAB for adding new accounts on AccountsScreen.
+  - Added `FloatingActionButton` to `Scaffold` in `AccountsScreen.kt` for creating new accounts.
+  - Wired FAB click handler to `viewModel.onAddClick()`, launching `AddAccountDialog.kt`.
+  - Styled FAB with accent green (`MaterialTheme.colorScheme.primary`), white/onPrimary icon color, large rounded shape (`MaterialTheme.appShapes.large`), and `pressScale()` tactile animation.
+  - Passed `Scaffold`'s `paddingValues` to `AccountsContent` and removed redundant manual FAB placement in `AccountsContent`'s `Box`.
+  - Updated `UI_UX_Enhancement_Phases.md` and verified all unit tests pass cleanly.
 - Change 12: Smooth animated transitions for bottom tab switching.
   - Added explicit `enterTransition` and `exitTransition` to the three bottom navigation tab composables in `NavHost.kt` (`NavDestination.TransactionList`, `NavDestination.Analysis`, `NavDestination.More`).
   - Configured 250ms fade transitions (`fadeIn` / `fadeOut` with `FastOutSlowInEasing`) for seamless crossfading between top-level screens without jarring visual jumps or content pop.

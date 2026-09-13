@@ -537,7 +537,7 @@
 
 ### Tasks
 
-- [ ] Add `FloatingActionButton` to the `Scaffold` in `AccountsScreen.kt`:
+- [x] Add `FloatingActionButton` to the `Scaffold` in `AccountsScreen.kt`:
   ```kotlin
   floatingActionButton = {
     FloatingActionButton(onClick = { showAddAccountDialog = true }) {
@@ -545,16 +545,16 @@
     }
   }
   ```
-- [ ] Wire to existing `AddAccountDialog.kt`
-- [ ] FAB uses accent green color
+- [x] Wire to existing `AddAccountDialog.kt`
+- [x] FAB uses accent green color
 
 **Testing**
-- [ ] Test: Hub → Accounts → FAB visible
-- [ ] Test: Tap FAB → dialog opens → account added → appears in list
+- [x] Test: Hub → Accounts → FAB visible
+- [x] Test: Tap FAB → dialog opens → account added → appears in list
 
 **Closure**
-- [ ] Update `CHANGELOG_INTERNAL.md`
-- [ ] Commit: `"Change 13: FAB for adding new accounts on AccountsScreen"`
+- [x] Update `CHANGELOG_INTERNAL.md`
+- [x] Commit: `"Change 13: FAB for adding new accounts on AccountsScreen"`
 
 ---
 

@@ -25,6 +25,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
@@ -60,15 +61,33 @@ fun AccountsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    AccountsContent(
-        uiState = uiState,
-        onAddClick = { viewModel.onAddClick() },
-        onEditClick = { viewModel.onEditClick(it) },
-        onDeleteClick = { viewModel.onDeleteClick(it) },
-        onToggleActive = { viewModel.toggleActiveStatus(it) },
-        onTransferClick = { viewModel.onTransferClick(it) },
-        modifier = modifier
-    )
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { viewModel.onAddClick() },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = MaterialTheme.appShapes.large,
+                modifier = Modifier.pressScale()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Account"
+                )
+            }
+        }
+    ) { paddingValues ->
+        AccountsContent(
+            uiState = uiState,
+            onAddClick = { viewModel.onAddClick() },
+            onEditClick = { viewModel.onEditClick(it) },
+            onDeleteClick = { viewModel.onDeleteClick(it) },
+            onToggleActive = { viewModel.toggleActiveStatus(it) },
+            onTransferClick = { viewModel.onTransferClick(it) },
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
 
     if (uiState.isTransferOpen) {
         TransferDialog(
@@ -195,23 +214,6 @@ fun AccountsContent(
                     }
                 }
             }
-        }
-
-        // Add Account Floating Action Button on Accounts tab
-        FloatingActionButton(
-            onClick = onAddClick,
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            shape = MaterialTheme.appShapes.large,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-                .pressScale()
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add Account"
-            )
         }
     }
 }
