@@ -2,6 +2,7 @@ package com.rushi.mitavyay.ui.navigation
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -28,9 +29,12 @@ class NavigationTest {
     fun testTopLevelDestinationsList() {
         val topLevel = NavDestination.topLevelDestinations
         assertEquals(3, topLevel.size)
+        topLevel.forEach { assertNotNull(it) }
         assertTrue(topLevel.contains(NavDestination.TransactionList))
         assertTrue(topLevel.contains(NavDestination.Analysis))
         assertTrue(topLevel.contains(NavDestination.More))
+        assertTrue(NavDestination.quickAddFabDestinations.contains(NavDestination.TransactionList.route))
+        assertTrue(NavDestination.quickAddFabDestinations.contains(NavDestination.Analysis.route))
     }
 
     @Test

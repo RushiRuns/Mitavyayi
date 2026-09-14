@@ -55,11 +55,7 @@ fun MitavyayApp(
     var showQuickAddSheet by remember { mutableStateOf(false) }
     var showBatchAddDialog by remember { mutableStateOf(false) }
     val currentDestination = appState.currentDestination
-    val currentRoute = appState.currentRoute
-    val showFab = currentRoute in listOf(
-        NavDestination.TransactionList.route,
-        NavDestination.Analysis.route
-    )
+    val showFab = appState.isAtRoot && NavDestination.shouldShowQuickAddFab(appState.selectedTab.route)
     val currentThemeMode by mainViewModel.themeMode.collectAsState()
     val hapticFeedbackEnabled by mainViewModel.hapticFeedbackEnabled.collectAsState()
 
@@ -72,7 +68,7 @@ fun MitavyayApp(
                         targetState = currentDestination.title,
                         transitionSpec = {
                             fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) togetherWith
-                                fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing))
+                                    fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing))
                         },
                         label = "TopAppBarTitleCrossfade"
                     ) { title ->
@@ -104,8 +100,8 @@ fun MitavyayApp(
         bottomBar = {
             if (appState.isTopLevelDestination) {
                 MitavyayBottomBar(
-                    currentRoute = currentRoute,
-                    onNavigateToDestination = { appState.navigateToTopLevelDestination(it) }
+                    currentRoute = appState.selectedTab.route,
+                    onNavigateToDestination = { appState.selectTab(it) }
                 )
             }
         },
@@ -113,9 +109,9 @@ fun MitavyayApp(
             AnimatedVisibility(
                 visible = showFab,
                 enter = scaleIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) +
-                    fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)),
+                        fadeIn(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)),
                 exit = scaleOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)) +
-                    fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing))
+                        fadeOut(animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing))
             ) {
                 FloatingActionButton(
                     onClick = {
@@ -141,6 +137,7 @@ fun MitavyayApp(
     ) { paddingValues ->
         MitavyayNavHost(
             navController = appState.navController,
+            appState = appState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)

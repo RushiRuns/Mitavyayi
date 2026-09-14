@@ -105,19 +105,23 @@ sealed class NavDestination(
     }
 
     companion object {
-        val topLevelDestinations = listOf(
-            TransactionList,
-            Analysis,
-            More
-        )
+        val topLevelDestinations: List<NavDestination> by lazy {
+            listOf(
+                TransactionList,
+                Analysis,
+                More
+            )
+        }
 
         fun isTopLevel(route: String?): Boolean =
             topLevelDestinations.any { it.route == route }
 
-        val quickAddFabDestinations = listOf(
-            TransactionList.route,
-            Analysis.route
-        )
+        val quickAddFabDestinations: List<String> by lazy {
+            listOf(
+                TransactionList.route,
+                Analysis.route
+            )
+        }
 
         fun shouldShowQuickAddFab(route: String?): Boolean =
             route in quickAddFabDestinations
