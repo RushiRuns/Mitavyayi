@@ -219,7 +219,8 @@ fun AnalysisContent(
                         SpendingTrendCard(
                             points = uiState.timeTrendPoints,
                             chartType = uiState.chartType,
-                            onChartTypeSelected = onChartTypeSelected
+                            onChartTypeSelected = onChartTypeSelected,
+                            chartModelProducer = uiState.chartModelProducer
                         )
                     }
 
@@ -531,6 +532,7 @@ fun SpendingTrendCard(
     points: List<TimeSpendingPoint>,
     chartType: TrendChartType,
     onChartTypeSelected: (TrendChartType) -> Unit,
+    chartModelProducer: ChartEntryModelProducer,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -597,16 +599,6 @@ fun SpendingTrendCard(
                     )
                 }
             } else {
-                val chartEntries = remember(points) {
-                    points.mapIndexed { index, point ->
-                        FloatEntry(index.toFloat(), (point.expensePaise.toFloat() / 100f))
-                    }
-                }
-                val chartModelProducer = remember { ChartEntryModelProducer() }
-
-                LaunchedEffect(chartEntries) {
-                    chartModelProducer.setEntries(chartEntries)
-                }
 
                 ProvideChartStyle(m3ChartStyle()) {
                     val chart = if (chartType == TrendChartType.BAR) {

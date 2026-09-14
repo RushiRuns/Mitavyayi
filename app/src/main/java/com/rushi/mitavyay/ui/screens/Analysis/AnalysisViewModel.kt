@@ -16,6 +16,8 @@ import com.rushi.mitavyay.data.repository.SpendingTrendInsight
 import com.rushi.mitavyay.data.repository.TimeSpendingPoint
 import com.rushi.mitavyay.data.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.FloatEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -59,7 +61,8 @@ data class AnalysisUiState(
     val trendInsight: SpendingTrendInsight = SpendingTrendInsight(),
     val periodComparison: PeriodComparisonData? = null,
     val availableAccounts: List<AccountDisplayItem> = emptyList(),
-    val isEmpty: Boolean = true
+    val isEmpty: Boolean = true,
+    val chartModelProducer: ChartEntryModelProducer = ChartEntryModelProducer()
 )
 
 private data class BaseMetrics(
@@ -183,6 +186,13 @@ class AnalysisViewModel @Inject constructor(
                 hasComparisonData = hasComparison
             )
 
+            val chartEntries = trend.mapIndexed { index, point ->
+                FloatEntry(index.toFloat(), (point.expensePaise.toFloat() / 100f))
+            }
+            // Passing entries via a new producer so the state emission is pure,
+            // or we could use a cached producer. Let's create a new one to keep it simple and pure.
+            val producer = ChartEntryModelProducer(chartEntries)
+
             AnalysisUiState(
                 isLoading = false,
                 selectedPeriod = period,
@@ -201,12 +211,13 @@ class AnalysisViewModel @Inject constructor(
                 trendInsight = trendInsight,
                 periodComparison = comparison,
                 availableAccounts = accounts.map { it.toDisplayItem() },
-                isEmpty = isEmpty
+                isEmpty = isEmpty,
+                chartModelProducer = producer
             )
         }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Eagerly,
+        started = SharingStarted.WhileSubscribed(5_000),
         initialValue = AnalysisUiState(isLoading = false)
     )
 

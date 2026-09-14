@@ -91,7 +91,7 @@ class TransactionListViewModel @Inject constructor(
         )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Eagerly,
+        started = SharingStarted.WhileSubscribed(5_000),
         initialValue = TransactionListUiState(isLoading = false)
     )
 
@@ -99,7 +99,7 @@ class TransactionListViewModel @Inject constructor(
         .map { it.groupedTransactions }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
 
